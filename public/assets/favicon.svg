@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Campanha">
+  <rect width="180" height="180" rx="40" fill="#0E2038"/>
+  <path d="M46 92l32 32 56-64" fill="none" stroke="#E7C48A" stroke-width="16"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="46" y="140" width="88" height="8" rx="4" fill="#C6892F"/>
+</svg>

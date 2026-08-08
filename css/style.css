@@ -1,0 +1,663 @@
+/* =========================================================
+   Dr. Elton — Campanha • Design System
+   Voz: firme, sincera, cívica-calorosa.
+   Cor: navio-tinta (navy) + porcelana fria + âmbar.
+   Tipo: Bricolage Grotesque (display/UI/número) · Spectral (leitura).
+   Mobile-first. Motion orquestrado, gated por .js.
+   ========================================================= */
+
+/* ---------- fontes da campanha (auto-hospedadas em public/fonts) ----------
+   Faixas de peso: Geometos é master único (100–900 = sem bold sintético);
+   Avenir Medium responde 500–800, então os pesos "bold" já existentes no
+   CSS caem na Medium sem faux-bold e sem precisar reescrever cada peso.    */
+@font-face { font-family:"Geometos"; src:url("../public/fonts/geometos.woff2") format("woff2"); font-weight:100 900; font-display:swap; }
+@font-face { font-family:"Geometos Neue"; src:url("../public/fonts/geometos-black.woff2") format("woff2"); font-weight:900; font-display:swap; }
+@font-face { font-family:"Avenir LT Std"; src:url("../public/fonts/avenir-300.woff2") format("woff2"); font-weight:300; font-display:swap; }
+@font-face { font-family:"Avenir LT Std"; src:url("../public/fonts/avenir-400.woff2") format("woff2"); font-weight:400; font-style:normal; font-display:swap; }
+@font-face { font-family:"Avenir LT Std"; src:url("../public/fonts/avenir-i.woff2") format("woff2"); font-weight:400; font-style:italic; font-display:swap; }
+@font-face { font-family:"Avenir LT Std"; src:url("../public/fonts/avenir-500.woff2") format("woff2"); font-weight:500 800; font-display:swap; }
+
+:root {
+  /* superfícies — navy oficial Pantone 289C */
+  --ink:      #171E31;   /* RGB 23 30 49 — seções escuras, títulos no claro */
+  --ink-2:    #232E49;
+  --ink-deep: #0E1424;   /* rodapé */
+  --bg:       #ECEFF3;   /* porcelana fria (NÃO creme) */
+  --bg-2:     #E0E6EC;   /* seção suave */
+  --surface:  #FFFFFF;
+
+  /* texto */
+  --ink-txt:  #16233A;   /* corpo no claro (≥12:1) */
+  --ink-mut:  #465468;   /* secundário no claro (≥6:1) */
+  --paper-txt: rgba(236,239,243,.90);
+  --paper-mut: rgba(236,239,243,.66);
+
+  /* acento — Pantone 381C lima (fundo ESCURO) · 2728C azul (fundo CLARO)
+     lima é ilegível como texto no claro, então o acento é por contexto.
+     tokens --gold* mantidos como ALIAS (menos edição) apontando p/ as cores novas. */
+  --lime:      #CCFF00;  /* RGB 204 255 0 — acento/CTA/dark */
+  --blue:      #0B3984;  /* RGB 11 57 132 — texto-acento/links no claro, secundário */
+  --gold:      var(--lime);   /* acento primário */
+  --gold-deep: var(--blue);   /* onde era texto ouro no CLARO → azul */
+  --gold-lt:   var(--lime);   /* acento no escuro */
+  --teal:      var(--blue);   /* links no claro */
+
+  /* linhas */
+  --line:    rgba(14,32,56,.14);
+  --line-lt: rgba(236,239,243,.16);
+
+  /* tipografia — Geometos (títulos) · Geometos Neue (destaque/números) · Avenir (conteúdo) */
+  --display:     "Geometos", "Arial Narrow", sans-serif;
+  --display-alt: "Geometos Neue", "Geometos", sans-serif;
+  --body:        "Avenir LT Std", "Avenir Next", system-ui, sans-serif;
+  --prose:       var(--body);
+
+  /* escala */
+  --step--1: clamp(.83rem, .8rem + .16vw, .92rem);
+  --step-0:  clamp(1rem, .96rem + .2vw, 1.12rem);
+  --step-1:  clamp(1.18rem, 1.05rem + .5vw, 1.45rem);
+  --step-2:  clamp(1.55rem, 1.3rem + 1.1vw, 2.2rem);
+  --step-3:  clamp(2rem, 1.5rem + 2.2vw, 3.4rem);
+  --step-4:  clamp(2.1rem, 1.75rem + 1.5vw, 3rem); /* título menor: pedido do cliente, foto ganha peso */
+
+  /* layout */
+  --wrap: 1160px;
+  --gutter: clamp(1.15rem, 5vw, 3rem);
+  --radius: 16px;
+  --section-y: clamp(3.75rem, 8vw, 7.5rem);
+
+  /* motion */
+  --ease: cubic-bezier(.16, 1, .3, 1);
+
+  /* z-scale semântica */
+  --z-sticky: 40; --z-header: 50; --z-cta: 60;
+}
+
+* { box-sizing: border-box; }
+html { scroll-padding-top: 80px; -webkit-text-size-adjust: 100%; } /* scroll suave = JS controlado (main.js), nativo é lento em distância grande */
+
+body {
+  margin: 0;
+  font-family: var(--body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  color: var(--ink-txt);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img, svg { max-width: 100%; display: block; }
+a { color: inherit; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.wrap { width: 100%; max-width: var(--wrap); margin-inline: auto; padding-inline: var(--gutter); }
+
+/* ---------- tipografia ---------- */
+h1, h2, h3, h4 { font-family: var(--display); font-weight: 700; line-height: 1.08; margin: 0; letter-spacing: -.02em; text-wrap: balance; }
+.prose { font-family: var(--prose); font-size: var(--step-0); line-height: 1.7; text-wrap: pretty; max-width: 66ch; }
+p { margin: 0 0 1rem; }
+
+.section-title { font-size: var(--step-3); }
+.section-title::before { content: ""; display: block; width: 42px; height: 3px; background: var(--blue); border-radius: 2px; margin-bottom: 1.1rem; } /* azul no claro */
+.section-title.light { color: var(--surface); }
+.section-title.light::before { background: var(--lime); } /* lima no escuro */
+
+/* ---------- botões ---------- */
+.btn {
+  --btn-bg: var(--ink); --btn-fg: var(--surface);
+  display: inline-flex; align-items: center; justify-content: center; gap: .5em;
+  font-family: var(--body); font-weight: 500; font-size: var(--step-0); line-height: 1;
+  text-decoration: none; padding: .9em 1.5em; border-radius: 999px; border: 2px solid transparent;
+  background: var(--btn-bg); color: var(--btn-fg); cursor: pointer;
+  transition: transform .18s var(--ease), box-shadow .25s var(--ease), background .2s, color .2s, border-color .2s;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+.btn-gold  { --btn-bg: var(--gold); --btn-fg: #241703; box-shadow: 0 10px 26px -12px rgba(204, 255, 0,.95); }
+.btn-gold:hover { --btn-bg: var(--gold-lt); box-shadow: 0 14px 30px -12px rgba(204, 255, 0,1); }
+.btn-ghost { --btn-bg: transparent; --btn-fg: var(--surface); border-color: var(--line-lt); }
+.btn-ghost:hover { border-color: var(--gold-lt); color: var(--gold-lt); }
+.btn-lg { padding: 1.05em 1.8em; font-size: var(--step-1); }
+.btn-block { width: 100%; }
+
+/* ---------- header ---------- */
+.site-header {
+  position: sticky; top: 0; z-index: var(--z-header);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.header-inner { display: flex; align-items: center; gap: 1rem; min-height: 68px; }
+.brand { display: inline-flex; align-items: center; gap: .6rem; text-decoration: none; margin-right: auto; }
+.brand-name { font-family: var(--display-alt); font-weight: 900; font-size: clamp(1.35rem, 1.15rem + .8vw, 1.6rem); letter-spacing: -.03em; color: var(--ink); }
+.brand-num  { font-size: .95rem; }
+
+/* ---------- PLACA DA URNA (motivo único do número) ----------
+   Visor da urna: chapa quase-preta, dígitos lima, tracking largo.
+   Mesmo objeto em header (claro), hero (escuro) e rodapé (invertido).
+   Lima sobre --ink-deep ≈ 17:1; lima nunca vira texto sobre fundo claro. */
+.brand-num, .ballot-plate {
+  font-family: var(--display-alt); font-weight: 900; line-height: 1;
+  display: inline-block; letter-spacing: .08em;
+  color: var(--lime); background: var(--ink-deep);
+  border: 1px solid rgba(204, 255, 0, .34); border-radius: 9px;
+  padding: .22em .34em .18em .42em; /* .42 à esquerda compensa o tracking do último dígito */
+}
+
+.nav { display: none; gap: 1.7rem; }
+.nav a { position: relative; text-decoration: none; font-weight: 600; font-size: var(--step--1); color: var(--ink-txt); padding: .3rem 0; }
+.nav a::after { content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 2px; background: var(--blue); transition: right .28s var(--ease); }
+.nav a:hover::after { right: 0; }
+.header-cta { display: none; }
+
+.menu-toggle { display: inline-flex; flex-direction: column; justify-content: center; gap: 5px; width: 46px; height: 46px; padding: 0 11px; background: none; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; }
+.menu-toggle span { height: 2px; background: var(--ink); border-radius: 2px; transition: transform .28s var(--ease), opacity .2s; }
+.menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.mobile-menu { display: flex; flex-direction: column; gap: .25rem; padding: .5rem var(--gutter) 1.25rem; border-bottom: 1px solid var(--line); }
+.mobile-menu[hidden] { display: none; }
+.mobile-menu a { text-decoration: none; font-weight: 600; color: var(--ink); padding: .8rem 0; border-bottom: 1px solid var(--line); }
+.mobile-menu a:last-child { border: none; margin-top: .7rem; color: #241703; }
+
+/* ---------- hero ---------- */
+.hero { position: relative; background: var(--ink); color: var(--surface); overflow: clip; padding-top: clamp(1.5rem, 5vw, 3rem); isolation: isolate; } /* clip, não hidden: hidden criaria scroll container e sequestraria scroll()/sticky */
+.hero::after { /* brilho âmbar */
+  content: ""; position: absolute; z-index: -1; inset: auto -10% -30% 25%; height: 460px;
+  background: radial-gradient(closest-side, rgba(204, 255, 0,.26), transparent 72%); pointer-events: none;
+}
+.hero-backnum {
+  position: absolute; z-index: -1; right: -3%; bottom: -12%; line-height: .78;
+  font-family: var(--display-alt); font-weight: 900; font-size: clamp(9rem, 42vw, 32rem);
+  color: transparent; -webkit-text-stroke: 1.5px rgba(204, 255, 0,.055); /* recuou: a placa acesa é o número agora, o fantasma vira só textura */
+  letter-spacing: -.04em; pointer-events: none; user-select: none;
+}
+.hero-grid { display: grid; gap: clamp(1rem, 4vw, 3rem); align-items: end; }
+.hero-copy { padding-bottom: clamp(2rem, 6vw, 4rem); padding-top: clamp(1.5rem, 4vw, 2.5rem); }
+.hero-kicker { display: inline-flex; align-items: center; gap: .6rem; font-weight: 600; font-size: var(--step--1); color: var(--gold-lt); margin: 0 0 1.1rem; }
+.hero-kicker .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+/* LOCKUP: nome + número são o h1. É o que o eleitor precisa gravar —
+   vem antes do discurso, não depois dos botões. */
+.hero-lockup { display: flex; flex-direction: column; align-items: flex-start; gap: .6rem; margin: 0 0 clamp(1.5rem, 4vw, 2.1rem); }
+.lockup-name {
+  font-family: var(--display-alt); font-weight: 900; color: var(--surface);
+  font-size: clamp(2.4rem, 1.55rem + 3.6vw, 3.6rem); line-height: .96; letter-spacing: -.032em;
+}
+.lockup-ballot { display: inline-flex; align-items: center; gap: .75rem; }
+.plate-label { font-family: var(--body); font-weight: 700; text-transform: uppercase; letter-spacing: .22em; font-size: .7rem; color: var(--gold-lt); }
+.hero-lockup .ballot-plate {
+  font-size: clamp(2rem, 1.35rem + 2.8vw, 2.9rem);
+  box-shadow: 0 0 44px -10px rgba(204, 255, 0, .5); /* o visor acende: só a placa tem glow na página */
+}
+
+.hero-title { font-family: var(--display); font-size: var(--step-4); font-weight: 800; color: var(--surface); margin: 0 0 1rem; letter-spacing: -.035em; line-height: 1.08; text-wrap: balance; }
+.hero-title span { display: block; }
+.hero-title em { font-style: normal; font-family: var(--display-alt); font-weight: 900; color: var(--gold-lt); } /* "bold geometos p/ destacar palavra" */
+/* slogan cede o posto de título ao lockup e vira a segunda voz */
+.hero-slogan { font-size: clamp(1.25rem, 1.05rem + .85vw, 1.72rem); font-weight: 700; color: var(--paper-txt); max-width: 26ch; letter-spacing: -.02em; }
+.hero-lead { color: var(--paper-txt); max-width: 40ch; margin-bottom: 2rem; line-height: 1.75; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: .8rem; margin-bottom: 2.2rem; }
+
+.hero-photo { position: relative; align-self: end; display: flex; justify-content: center; min-height: 340px; }
+@media (min-width: 940px) { .hero-photo { justify-content: flex-end; } } /* ancora na borda, sem flutuar */
+.hero-photo::before { /* halo frio: separa o blazer navy do fundo navy */
+  content: ""; position: absolute; z-index: -1; inset: 6% 4% 0 4%;
+  background: radial-gradient(58% 52% at 50% 42%, rgba(150,182,225,.20), transparent 72%);
+  pointer-events: none;
+}
+.hero-photo img { align-self: end; max-height: min(82vh, 760px); width: auto; object-fit: contain; object-position: bottom center; filter: drop-shadow(0 28px 40px rgba(0,0,0,.55)) drop-shadow(0 0 2px rgba(204, 255, 0,.35)); }
+.photo-fallback { display: none; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; width: min(300px, 78%); aspect-ratio: 3/4; margin-inline: auto; align-self: end; border: 1.5px dashed var(--line-lt); border-radius: var(--radius); color: var(--paper-mut); font-weight: 600; text-transform: uppercase; letter-spacing: .14em; font-size: .78rem; }
+.photo-fallback small { font-family: var(--prose); font-size: .72rem; letter-spacing: 0; text-transform: none; opacity: .8; }
+.hero-photo.no-photo { align-items: center; }
+.hero-photo.no-photo .photo-fallback { display: flex; }
+
+/* ---------- seções ---------- */
+.section { padding-block: var(--section-y); }
+.section-ink  { background: var(--ink); color: var(--surface); position: relative; }
+.section-soft { background: var(--bg-2); }
+.section-head { max-width: 42rem; margin-bottom: clamp(2rem, 5vw, 3.5rem); }
+.section-head-split { max-width: none; display: grid; gap: 1rem clamp(2rem,5vw,4rem); }
+.section-intro { color: var(--ink-mut); }
+.section-ink .prose { color: var(--paper-txt); }
+
+.two-col { display: grid; gap: clamp(1.5rem, 4vw, 3rem); }
+.col-label .section-title { font-size: var(--step-2); }
+.lead-para { font-size: var(--step-1); color: var(--ink-txt); }
+.lead-para strong { font-family: var(--body); font-weight: 500; font-size: .82em; color: var(--gold-deep); display: inline-block; }
+
+.creds { margin: 2rem 0 0; display: grid; gap: 0; }
+/* mobile: empilhado (número em cima, rótulo full-width) — nunca colide */
+.creds div { display: grid; grid-template-columns: 1fr; gap: .1rem; padding: 1rem 0; border-top: 1px solid var(--line); }
+.creds dt { font-family: var(--display-alt); font-weight: 900; color: var(--gold-deep); font-size: 1.4rem; line-height: 1; margin: 0; white-space: nowrap; }
+.creds dd { margin: 0; font-family: var(--prose); color: var(--ink-mut); line-height: 1.4; }
+/* desktop: número + rótulo ao lado, topo alinhado.
+   A coluna do número se dimensiona pelo MAIOR dt (max-content no pai) e as 3
+   linhas compartilham essa trilha via subgrid — alinhadas entre si sem largura
+   fixa. Largura fixa aqui vazava: "25 anos" mede 115px e "+46 mil" 100px em
+   Geometos Black 1.5rem, contra os 6rem (96px) que a coluna tinha.
+   Sem suporte a subgrid, o div cai na regra mobile (1 coluna, empilhado). */
+@media (min-width: 560px) {
+  .creds { grid-template-columns: max-content 1fr; column-gap: 1rem; }
+  .creds div { grid-template-columns: subgrid; grid-column: 1 / -1; align-items: start; gap: .2rem 1rem; }
+  /* Número alinhado à DIREITA: a coluna tem a largura do maior ("25 anos"),
+     então um número curto como "3º" ficaria boiando longe do seu rótulo.
+     Alinhado à direita, todo número encosta na mesma calha de 1rem e a
+     ligação número→texto fica óbvia em todas as linhas. */
+  .creds dt { font-size: 1.5rem; text-align: right; }
+}
+
+/* ---------- timeline ----------
+   REDESENHADA: scroll é o motor. Nada de loop piscando nem relógio pra
+   sincronizar — cada <li> tem sua view-timeline; o nó IGNITA e o segmento
+   de linha se PREENCHE conforme entram na zona de leitura. Estado = função
+   pura da posição de scroll (reversível, determinístico, zero JS).
+   Estilos-base = estado ACESO: browser sem animation-timeline (Firefox)
+   vê a versão estática acesa — nunca uma seção apagada.                  */
+.timeline {
+  --tl-node: 18px;                                    /* diâmetro do anel */
+  --tl-cx: calc(var(--tl-node) / 2);                  /* eixo X comum */
+  --tl-node-top: .3rem;
+  --tl-cy: calc(var(--tl-node-top) + var(--tl-node) / 2);
+  --tl-gap: clamp(1.6rem, 3vw, 2.4rem);               /* mesma do grid gap */
+  --tl-col: 2.9rem;
+  list-style: none; margin: 0; padding: 0;
+  position: relative;
+  display: grid;
+  gap: var(--tl-gap);
+}
+
+.timeline > li {
+  position: relative;
+  display: grid; gap: .35rem;
+  padding-left: var(--tl-col);
+  view-timeline-name: --tl-seg;   /* relógio próprio: a posição DESTE li no viewport */
+  view-timeline-axis: block;
+}
+
+/* NÓ (li::after): anel aberto + núcleo + glow, num pseudo só.
+   Anel = border · núcleo = radial no background (liga via background-size,
+   pintura) · glow = box-shadow. Base = aceso.                             */
+.timeline > li::after {
+  content: "";
+  position: absolute;
+  left: 0; top: var(--tl-node-top);
+  width: var(--tl-node); height: var(--tl-node);
+  border-radius: 50%;
+  border: 1.5px solid var(--gold-lt);
+  background: radial-gradient(circle, var(--gold-lt) 0 2.5px, rgba(255,246,228,.4) 3px, transparent 3.5px)
+              center / 100% 100% no-repeat;
+  box-shadow: 0 0 10px 1px rgba(204, 255, 0, .38), inset 0 0 4px rgba(204, 255, 0, .28);
+  pointer-events: none;
+}
+
+/* SEGMENTO (li::before): a linha do MEU nó até o nó do PRÓXIMO li.
+   height = 100% + gap => termina exatamente no centro do nó seguinte,
+   qualquer viewport, sem medir nada. Último li não tem segmento.
+   2 camadas: trilho fantasma + preenchimento ouro com ponta clara.       */
+.timeline > li::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--tl-cx) - 1px);
+  top: calc(var(--tl-cy) + var(--tl-node) / 2 + 2px); /* nasce na borda de baixo do anel */
+  width: 2px;
+  height: calc(100% + var(--tl-gap) - var(--tl-node) - 4px);
+  background:
+    linear-gradient(var(--line-lt), var(--line-lt)),                     /* trilho */
+    linear-gradient(to bottom, var(--gold) 0%, var(--gold-lt) calc(100% - 14px), #FFF6E4 100%); /* fill */
+  background-repeat: no-repeat;
+  background-size: 100% 100%, 100% 100%;              /* base = preenchido */
+  pointer-events: none;
+}
+.timeline > li:last-child::before { content: none; }
+.tl-year { font-family: var(--display); font-weight: 700; color: var(--gold-lt); font-size: 1.05rem; letter-spacing: -.01em; }
+.tl-body h3 { color: var(--surface); font-size: var(--step-1); margin-bottom: .35rem; }
+.tl-body .prose { color: var(--paper-mut); margin: 0; }
+.tl-body em { color: var(--gold-lt); opacity: .7; font-style: normal; font-size: .8em; }
+.tl-quote { font-family: var(--prose); font-style: italic; color: var(--paper-txt); font-size: var(--step-1); line-height: 1.45; }
+
+/* ---------- propostas (lista-manifesto) ---------- */
+.pledges { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+.pledge {
+  display: grid; grid-template-columns: auto 1fr; gap: 0 1.3rem; align-items: start;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: clamp(1.4rem, 3vw, 1.9rem) clamp(1.2rem, 3vw, 1.7rem);
+  box-shadow: 0 14px 34px -26px rgba(14, 32, 56, .5);
+  transition: transform .2s var(--ease), box-shadow .25s, border-color .2s;
+}
+.pledge:hover { transform: translateY(-3px); box-shadow: 0 22px 44px -28px rgba(14, 32, 56, .6); border-color: transparent; }
+.pledge-icon { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 12px; background: color-mix(in srgb, var(--blue) 8%, var(--surface)); border: 1px solid var(--line); color: var(--gold-deep); transition: background .25s, color .25s; }
+.pledge-icon svg { width: 24px; height: 24px; }
+.pledge:hover .pledge-icon { background: var(--ink); color: var(--gold-lt); }
+.pledge-body { display: grid; gap: .5rem; }
+.pledge-body h3 { font-size: var(--step-1); color: var(--ink); }
+.pledge-quote { font-family: var(--prose); font-style: italic; color: var(--blue); margin: 0; font-size: var(--step-0); line-height: 1.42; }
+.pledge-body .prose { color: var(--ink-mut); margin: 0; max-width: 62ch; }
+
+/* ---------- depoimentos ---------- */
+.quotes { display: grid; gap: 1.1rem; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+.quote { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.4rem, 3vw, 2rem); display: flex; flex-direction: column; gap: 1.1rem; }
+.quote blockquote { margin: 0; font-family: var(--prose); font-size: var(--step-1); line-height: 1.5; color: var(--ink-txt); position: relative; }
+.quote blockquote::before { content: "\201C"; font-family: var(--prose); font-size: 2.4em; line-height: 0; color: var(--blue); vertical-align: -.35em; margin-right: .08em; }
+.quote-lead blockquote { font-size: var(--step-2); font-weight: 500; }
+.quote figcaption { display: flex; flex-direction: column; margin-top: auto; }
+.quote figcaption strong { font-family: var(--body); font-weight: 500; color: var(--ink); }
+.quote figcaption span { font-family: var(--prose); color: var(--ink-mut); font-size: var(--step--1); }
+.quote figcaption em { font-style: normal; opacity: .6; }
+
+/* ---------- galeria ---------- */
+.gallery { display: grid; grid-template-columns: 1fr; gap: .8rem; }
+.gphoto { position: relative; margin: 0; border-radius: 14px; overflow: hidden; aspect-ratio: 3/2; background: var(--ink); }
+.gphoto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s var(--ease); }
+.gphoto:hover img { transform: scale(1.05); }
+.gphoto figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 1.6rem .95rem .85rem; color: #fff; font-family: var(--display); font-weight: 600; font-size: var(--step--1); letter-spacing: -.01em; background: linear-gradient(to top, rgba(14,20,36,.9), rgba(14,20,36,.45) 55%, transparent); }
+.js .gphoto img { cursor: zoom-in; }
+
+/* ---------- lightbox da galeria (clique na foto abre) ---------- */
+.lightbox { border: none; padding: 0; background: transparent; max-width: 94vw; max-height: 94vh; overflow: visible; }
+.lightbox::backdrop { background: rgba(8, 12, 20, .88); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.lightbox img { max-width: 94vw; max-height: 84vh; width: auto; height: auto; display: block; margin: 0 auto; border-radius: 12px; box-shadow: 0 30px 90px -20px rgba(0, 0, 0, .75); }
+.lightbox-cap { color: #fff; font-family: var(--display); font-weight: 600; text-align: center; margin: .9rem 0 0; font-size: var(--step-0); }
+.lightbox-close { position: fixed; top: 1rem; right: 1.1rem; width: 46px; height: 46px; border: none; border-radius: 50%; background: rgba(255, 255, 255, .14); color: #fff; font-size: 1.7rem; line-height: 1; cursor: pointer; transition: background .2s, color .2s; }
+.lightbox-close:hover { background: var(--lime); color: var(--ink); }
+.lightbox[open] { animation: lbIn .25s var(--ease); }
+@keyframes lbIn { from { opacity: 0; transform: scale(.97); } }
+@media (prefers-reduced-motion: reduce) { .lightbox[open] { animation: none; } }
+
+/* ---------- formulário ---------- */
+.form-grid { display: grid; gap: clamp(2rem, 5vw, 3.5rem); }
+.form-lead { color: var(--paper-txt); max-width: 36ch; }
+.form-ballot { display: inline-flex; align-items: center; gap: .7rem; margin-top: 1.4rem; }
+.form-ballot .ballot-plate { font-size: 1.7rem; }
+
+.lead-form { background: var(--surface); border-radius: 20px; padding: clamp(1.5rem, 4vw, 2.4rem); box-shadow: 0 40px 70px -35px rgba(0,0,0,.55); }
+.field { margin-bottom: 1.15rem; }
+.field label, .consent label { display: block; font-weight: 600; font-size: var(--step--1); margin-bottom: .45rem; color: var(--ink); }
+.field input { width: 100%; font-family: var(--body); font-size: var(--step-0); color: var(--ink-txt); padding: .9rem 1rem; border: 1.5px solid var(--line); border-radius: 11px; background: #fff; transition: border-color .2s, box-shadow .2s; }
+.field input::placeholder { color: #8b93a1; }
+.field input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(11, 57, 132,.18); }
+.field input[aria-invalid="true"] { border-color: #c0392b; }
+.field-error { display: block; color: #b5341f; font-weight: 600; font-size: var(--step--1); min-height: 1em; margin-top: .35rem; }
+
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.consent { display: grid; grid-template-columns: auto 1fr; gap: .7rem; align-items: start; margin: .5rem 0 .3rem; }
+.consent input { margin-top: .15rem; width: 20px; height: 20px; accent-color: var(--blue); flex: none; }
+.consent label { font-family: var(--prose); font-weight: 400; font-size: var(--step--1); color: var(--ink-mut); line-height: 1.5; margin: 0; }
+.consent a { color: var(--teal); font-weight: 600; text-underline-offset: 2px; }
+
+.form-status { min-height: 1.2em; font-weight: 700; margin: 1rem 0 0; }
+.form-status.ok  { color: var(--teal); }
+.form-status.err { color: #b5341f; }
+.form-fineprint { font-family: var(--prose); font-size: .82rem; color: var(--ink-mut); margin: .85rem 0 0; }
+
+/* ---------- rodapé ---------- */
+.site-footer { background: var(--ink-deep); color: var(--paper-mut); padding-top: clamp(3rem, 6vw, 4.5rem); }
+.footer-grid { display: grid; gap: 2.2rem; padding-bottom: 2.5rem; }
+.footer-brand .brand-name { color: var(--surface); font-size: clamp(1.6rem, 1.3rem + 1.1vw, 2rem); display: inline-flex; align-items: center; flex-wrap: wrap; gap: .55rem; }
+/* rodapé JÁ é --ink-deep: a placa escura sumiria. Inverte — lima sólida,
+   dígitos navy. Único lugar da página com lima como superfície de texto. */
+.site-footer .brand-num { color: var(--ink-deep); background: var(--lime); border-color: var(--lime); font-size: .8em; }
+.footer-tag { font-family: var(--prose); margin-top: .9rem; max-width: 32ch; }
+.footer-col h4 { color: var(--surface); font-size: .82rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: .14em; }
+.footer-col a { display: block; text-decoration: none; color: var(--paper-mut); padding: .28rem 0; transition: color .2s; }
+.footer-col a:hover { color: var(--gold-lt); }
+.footer-wpp { font-weight: 700; color: var(--gold-lt) !important; }
+.socials { display: flex; flex-direction: column; }
+.footer-lgpd p { font-family: var(--prose); font-size: var(--step--1); line-height: 1.6; }
+.footer-bottom { display: flex; flex-wrap: wrap; gap: .4rem 1.5rem; justify-content: space-between; padding-block: 1.5rem; border-top: 1px solid var(--line-lt); font-size: .8rem; }
+.footer-bottom p { margin: 0; }
+.footer-legal { opacity: .6; }
+
+/* ---------- CTA fixo (mobile) ---------- */
+.sticky-cta { position: fixed; left: max(1rem, env(safe-area-inset-left)); right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); z-index: var(--z-cta); display: flex; align-items: center; justify-content: center; padding: 1rem; border-radius: 14px; background: var(--gold); color: #241703; font-family: var(--body); font-weight: 500; text-decoration: none; box-shadow: 0 14px 34px -10px rgba(204, 255, 0,.75); transform: translateY(150%); transition: transform .4s var(--ease); }
+.sticky-cta.show { transform: translateY(0); }
+
+/* =========================================================
+   MOTION — gated por .js (sem JS/headless: tudo visível)
+   ========================================================= */
+.js .load { opacity: 0; transform: translateY(18px); }
+.js.ready .load { animation: rise .7s var(--ease) forwards; animation-delay: calc(var(--i, 0) * 85ms); }
+@keyframes rise { to { opacity: 1; transform: none; } }
+
+.js .hero-photo { opacity: 0; transform: translateY(28px) scale(.985); }
+.js.ready .hero-photo { animation: heroPhoto 1.05s var(--ease) .15s forwards; }
+@keyframes heroPhoto { to { opacity: 1; transform: none; } }
+
+.js .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .75s var(--ease); }
+.js .reveal.in { opacity: 1; transform: none; }
+/* variações por contexto (não é a mesma entrada em tudo) */
+.js .timeline li.reveal { transform: translateX(-22px); }
+.js .timeline li.reveal.in { transform: none; }
+.js .quotes .reveal:nth-child(2) { transition-delay: .08s; }
+.js .quotes .reveal:nth-child(3) { transition-delay: .16s; }
+.js .gallery .reveal:nth-child(2) { transition-delay: .07s; }
+.js .gallery .reveal:nth-child(3) { transition-delay: .14s; }
+.js .gallery .reveal:nth-child(4) { transition-delay: .21s; }
+
+/* =========================================================
+   RESPONSIVO
+   ========================================================= */
+@media (min-width: 680px) {
+  .gallery { grid-template-columns: repeat(3, 1fr); }
+  .quotes { grid-template-columns: repeat(2, 1fr); }
+  .quote-lead { grid-column: 1 / -1; }
+  .footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1.7fr; }
+  .two-col { grid-template-columns: .9fr 1.3fr; align-items: start; }
+  .col-label { position: sticky; top: 96px; }
+  .section-head-split { grid-template-columns: 1.1fr 1fr; align-items: end; }
+  .pledges { grid-template-columns: 1fr 1fr; } /* 2 colunas de cards no desktop */
+  /* São 7 propostas em 2 colunas: a última fica sozinha na linha, encostada
+     à esquerda, com cara de card faltando ao lado. Centralizada, lê como
+     fecho da lista em vez de buraco. A regra só arma quando a contagem é
+     ÍMPAR — se entrar uma 8ª proposta, ela se desliga sozinha. */
+  .pledges > li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc((100% - 1rem) / 2); /* mesma largura de uma coluna (gap: 1rem) */
+  }
+}
+
+@media (min-width: 720px) {
+  .quotes { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 940px) {
+  .nav { display: flex; }
+  .header-cta { display: inline-flex; }
+  .menu-toggle, .mobile-menu { display: none; }
+  .sticky-cta { display: none; }
+  .hero-grid { grid-template-columns: 1fr .95fr; align-items: end; }
+  .form-grid { grid-template-columns: 1fr 1fr; align-items: center; }
+}
+
+/* ---------- foco / motion reduzido ---------- */
+:where(a, button, input, [tabindex]):focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js .load, .js .hero-photo, .js .reveal { opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important; }
+  .btn:hover, .pledge:hover .pledge-icon { transform: none; }
+  .sticky-cta { transition: none; }
+}
+
+/* =========================================================
+   ANIMAÇÕES — CSS puro, zero biblioteca, zero build.
+   GATE POR PROPRIEDADE (não por bloco):
+     · opacidade / cor / brilho ....... SEM gate  (visível também em reduce)
+     · transform / scale / parallax ... COM gate  (exceto micro-escala <6%)
+   Cada efeito tem camada sem gate, para nunca virar "não acontece nada".
+   ========================================================= */
+
+/* Ângulo registrado: sem @property o conic-gradient pula em degraus. */
+@property --lux-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Propostas: cards limpos que revelam suave no scroll (stagger leve).
+   O stacking-cards (sticky+encolher) foi removido: escondia conteúdo, e
+   agora são 7 propostas reais que a pessoa precisa LER, não um truque.   */
+.js .pledge.reveal:nth-child(2) { transition-delay: .05s; }
+.js .pledge.reveal:nth-child(3) { transition-delay: .10s; }
+.js .pledge.reveal:nth-child(4) { transition-delay: .05s; }
+.js .pledge.reveal:nth-child(5) { transition-delay: .10s; }
+.js .pledge.reveal:nth-child(6) { transition-delay: .05s; }
+.js .pledge.reveal:nth-child(7) { transition-delay: .10s; }
+
+/* ---------- B) RÉGUA DE LEITURA no header ----------
+   Sem gate: progresso 1:1 com o scroll do usuário (não é movimento
+   autônomo/vestibular) e é a camada que prova vida em reduce.          */
+@supports (animation-timeline: scroll()) {
+  .site-header::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+    background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-lt));
+    transform-origin: 0 50%;
+    scale: 0 1; /* base = from */
+    animation: readRuler linear;
+    animation-timeline: scroll(root); /* explícito: evita ancestral virar o scroller */
+    pointer-events: none;
+    z-index: 1;
+  }
+  @keyframes readRuler { from { scale: 0 1; } to { scale: 1 1; } }
+}
+
+/* ---------- C) DESTAQUE VIVO no hero ----------
+   O <em> só tinha cor. Pintamos uma barra marca-texto atrás dela
+   (superfície real p/ o grifo e p/ o brilho varrer). Evitamos recortar
+   gradiente dentro da própria letra: isso é ban do design system.
+   Sem gate: clip-path e background-position são pintura, não transform. */
+.hero-title em { position: relative; isolation: isolate; }
+.hero-title em::before,
+.hero-title em::after {
+  content: "";
+  position: absolute;
+  left: -.08em; right: -.08em; bottom: .04em;
+  height: .3em; border-radius: 3px;
+  z-index: -1; pointer-events: none;
+}
+.hero-title em::before { /* grifo se desenhando, uma vez, junto da entrada */
+  background: linear-gradient(90deg, rgba(204, 255, 0,.58), rgba(204, 255, 0,.42));
+  clip-path: inset(0 100% 0 0); /* base = from */
+  animation: emDraw .9s var(--ease) 1.05s forwards;
+}
+@keyframes emDraw {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+.hero-title em::after { /* brilho varrendo, para sempre */
+  background-image: linear-gradient(100deg, transparent 35%, rgba(255,244,220,.85) 50%, transparent 65%);
+  background-repeat: no-repeat;
+  background-size: 55% 100%;
+  background-position: -150% 0; /* base = from */
+  animation: emGlare 5s linear 2s infinite;
+}
+/* size 55% => só sai do quadro fora de [-122%, 222%]; -150%/260% garante
+   saída inteira dos dois lados (endpoint curto deixa lasca parada). */
+@keyframes emGlare {
+  from { background-position: -150% 0; }
+  to   { background-position: 260% 0; }
+}
+
+/* ---------- D) TRAJETÓRIA: ignição por scroll ----------
+   O scroll é o motor: sem loop, sem relógio, sem JS. Cada li tem sua
+   view-timeline (--tl-seg). Ao entrar na zona de leitura o ANO acende,
+   o NÓ ignita (anel ouro + núcleo + glow) e o SEGMENTO se preenche até
+   o próximo nó. Subiu o scroll, apaga de volta — estado é função pura
+   da posição. Tudo pintura (cor/background-size/shadow) => SEM gate:
+   funciona igual em reduced-motion, porque segue 1:1 a mão do usuário.
+   Fora do @supports fica o estado-base ACESO (fallback estático).       */
+@supports (animation-timeline: view()) {
+  /* nó: apagado -> ignição */
+  .timeline > li::after {
+    border-color: rgba(236, 239, 243, .25);
+    background-size: 0% 0%;                 /* núcleo desligado */
+    box-shadow: 0 0 0 0 rgba(204, 255, 0, 0);
+    animation: tlIgnite linear both;
+    animation-timeline: --tl-seg;
+    animation-range: entry 55% entry 100%;
+  }
+  @keyframes tlIgnite {
+    0%   { border-color: rgba(236, 239, 243, .25);
+           background-size: 0% 0%;
+           box-shadow: 0 0 0 0 rgba(204, 255, 0, 0); }
+    55%  { border-color: var(--gold);
+           background-size: 40% 40%;
+           box-shadow: 0 0 6px 0 rgba(204, 255, 0, .25); }
+    78%  { border-color: #FFF6E4;           /* pico da ignição */
+           background-size: 100% 100%;
+           box-shadow: 0 0 16px 4px rgba(204, 255, 0, .70), inset 0 0 6px rgba(204, 255, 0,.5); }
+    100% { border-color: var(--gold-lt);    /* assentado */
+           background-size: 100% 100%;
+           box-shadow: 0 0 10px 1px rgba(204, 255, 0, .38), inset 0 0 4px rgba(204, 255, 0, .28); }
+  }
+
+  /* segmento: vazio -> preenchido logo após o nó igniter */
+  .timeline > li::before {
+    background-size: 100% 100%, 100% 0%;
+    animation: tlFill linear both;
+    animation-timeline: --tl-seg;
+    animation-range: entry 100% cover 38%;
+  }
+  @keyframes tlFill {
+    from { background-size: 100% 100%, 100% 0%; }
+    to   { background-size: 100% 100%, 100% 100%; }
+  }
+
+  /* ano: fantasma -> ouro, junto da ignição do nó */
+  .timeline > li .tl-year {
+    color: rgba(236, 239, 243, .38);
+    animation: tlYear linear both;
+    animation-timeline: --tl-seg;
+    animation-range: entry 55% entry 100%;
+  }
+  @keyframes tlYear {
+    from { color: rgba(236, 239, 243, .38); }
+    to   { color: var(--gold-lt); }
+  }
+}
+
+/* ---------- E) CTA DO HEADER RESPIRANDO ----------
+   `scale` (propriedade independente), NUNCA transform nem box-shadow:
+   .btn:hover usa transform e .btn-gold:hover usa box-shadow.
+   5,5% em elemento pequeno = micro-escala <6%, fica sem gate.          */
+.header-cta {
+  scale: 1; /* base = from */
+  animation: ctaBreath 2.6s var(--ease) infinite;
+}
+@keyframes ctaBreath {
+  0%   { scale: 1; }
+  14%  { scale: 1.055; }
+  30%  { scale: 1; }
+  100% { scale: 1; } /* descanso longo: respira, não pisca */
+}
+.header-cta:hover,
+.header-cta:focus-visible { animation-play-state: paused; }
+
+/* ---------- F) LUZ CONTORNANDO O BOTÃO DE ENVIO ----------
+   conic-gradient girando, mascarado só na moldura de 2px.
+   Giro contínuo. drop-shadow em elemento mascarado segue o cometa.     */
+.lead-form button[type="submit"] { position: relative; isolation: isolate; }
+.lead-form button[type="submit"]::after {
+  content: "";
+  position: absolute; inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(from var(--lux-angle),
+      transparent 0deg, transparent 255deg,
+      var(--gold-lt) 310deg, #FFF3DA 334deg, var(--gold-lt) 352deg,
+      transparent 360deg);
+  /* anel: content-box XOR box inteiro (prefixo p/ Safari) */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  filter: drop-shadow(0 0 6px rgba(204, 255, 0, .7));
+  animation: luxSpin 3s linear infinite;
+  pointer-events: none; /* pseudo não pode roubar o clique do submit */
+  z-index: -1;
+}
+@keyframes luxSpin { to { --lux-angle: 360deg; } }
