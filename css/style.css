@@ -357,11 +357,22 @@ p { margin: 0 0 1rem; }
 /* ---------- abas de vídeo ---------- */
 .video-tabs { margin-top: clamp(2.5rem, 5vw, 4rem); }
 .tabs-heading { font-size: var(--step-1); margin-bottom: 1rem; }
-.tab-list { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 1.4rem; }
-.tab { font-family: var(--body); font-weight: 500; font-size: var(--step--1); padding: .6em 1.25em; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-mut); cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
-.tab:hover { border-color: var(--blue); color: var(--blue); }
-.tab[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
-.tab[aria-selected="true"]:hover { color: var(--surface); }
+.tab-list { display: flex; flex-wrap: wrap; gap: .65rem; margin-bottom: 1.4rem; }
+.tab {
+  display: inline-flex; align-items: center; gap: .6em;
+  font-family: var(--body); font-weight: 500; font-size: var(--step--1);
+  padding: .65em 1.3em .65em 1.05em; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink-mut);
+  cursor: pointer;
+  transition: background .25s var(--ease), color .2s, border-color .2s, transform .2s var(--ease), box-shadow .25s var(--ease);
+}
+.tab-icon { width: 17px; height: 17px; flex: none; opacity: .65; transition: opacity .2s; }
+.tab:hover { border-color: var(--blue); color: var(--blue); transform: translateY(-1px); }
+.tab:hover .tab-icon { opacity: 1; }
+.tab:active { transform: translateY(0); }
+.tab[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); box-shadow: 0 12px 26px -16px rgba(23,30,49,.6); }
+.tab[aria-selected="true"] .tab-icon { opacity: 1; color: var(--lime); } /* lima só no fundo escuro (regra da paleta) */
+.tab[aria-selected="true"]:hover { color: var(--surface); transform: none; }
 .tab-empty { color: var(--ink-mut); font-family: var(--prose); }
 .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
 .video-card { margin: 0; border-radius: 14px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
