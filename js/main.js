@@ -87,46 +87,6 @@
 
   /* Trajetória: 100% CSS scroll-driven (view-timeline por li) — sem JS.  */
 
-  /* ---------- abas de vídeo (WAI-ARIA tabs pattern, ativação manual) ---------- */
-  var tabList = document.querySelector(".tab-list");
-  if (tabList) {
-    var tabs = Array.prototype.slice.call(tabList.querySelectorAll('[role="tab"]'));
-    var panels = tabs.map(function (t) { return document.getElementById(t.getAttribute("aria-controls")); });
-
-    var selectTab = function (tab) {
-      tabs.forEach(function (t, i) {
-        var selected = t === tab;
-        t.setAttribute("aria-selected", String(selected));
-        t.tabIndex = selected ? 0 : -1;
-        if (panels[i]) panels[i].hidden = !selected;
-      });
-    };
-
-    tabList.addEventListener("click", function (e) {
-      var tab = e.target.closest && e.target.closest('[role="tab"]');
-      if (tab) selectTab(tab);
-    });
-
-    tabList.addEventListener("keydown", function (e) {
-      var i = tabs.indexOf(document.activeElement);
-      if (i === -1) return;
-      var next = null;
-      if (e.key === "ArrowRight") next = tabs[(i + 1) % tabs.length];
-      else if (e.key === "ArrowLeft") next = tabs[(i - 1 + tabs.length) % tabs.length];
-      else if (e.key === "Home") next = tabs[0];
-      else if (e.key === "End") next = tabs[tabs.length - 1];
-      if (next) { e.preventDefault(); selectTab(next); next.focus(); }
-    });
-
-    // pausa vídeos das outras abas ao trocar (evita áudio tocando escondido)
-    tabList.addEventListener("click", function () {
-      panels.forEach(function (p) {
-        if (!p) return;
-        p.querySelectorAll("video").forEach(function (v) { if (p.hidden) v.pause(); });
-      });
-    });
-  }
-
   /* ---------- CTA fixo (mobile): aparece após o hero, some no form ---------- */
   var sticky = document.querySelector(".sticky-cta");
   var hero = document.getElementById("hero");

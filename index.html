@@ -28,7 +28,7 @@
   <link rel="preload" href="public/fonts/avenir-400.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="public/assets/deputado.webp" as="image" type="image/webp" fetchpriority="high" />
 
-  <link rel="stylesheet" href="css/style.css?v=34" />
+  <link rel="stylesheet" href="css/style.css?v=35" />
   <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
@@ -322,53 +322,38 @@
           <h2 class="section-title">Veja de perto,<br />em vídeo.</h2>
         </div>
 
-        <div class="video-tabs">
-          <div class="tab-list" role="tablist" aria-label="Vídeos da campanha">
-            <span class="tab-indicator" aria-hidden="true"></span>
-            <button type="button" role="tab" id="tab-depoimentos-video" aria-controls="panel-depoimentos-video" aria-selected="false" tabindex="-1">
-              <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a7 7 0 01-7 7H8l-4 3 .8-4.2A7 7 0 1120 12z"/></svg>
-              <span>Depoimentos</span>
-            </button>
-            <button type="button" role="tab" id="tab-minha-casa" aria-controls="panel-minha-casa" aria-selected="true" tabindex="0">
-              <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11.5L12 4l8 7.5"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>
-              <span>Dr. Elton na minha casa</span>
-            </button>
-            <button type="button" role="tab" id="tab-prints" aria-controls="panel-prints" aria-selected="false" tabindex="-1">
-              <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><circle cx="12" cy="12" r="3.2"/><path d="M8.2 5.5l.9-1.5h5.8l.9 1.5"/></svg>
-              <span>Prints das redes</span>
-            </button>
+        <div class="video-block">
+          <h3 class="video-block-title">Dr. Elton na minha casa</h3>
+          <div class="video-grid">
+            <figure class="video-card reveal">
+              <video controls preload="none" poster="public/assets/videos/casa-william-padaria.webp" playsinline>
+                <source src="public/assets/videos/casa-william-padaria.mp4" type="video/mp4" />
+              </video>
+              <figcaption><strong>William</strong><span>padaria <em>[confirmar legenda]</em></span></figcaption>
+            </figure>
+            <figure class="video-card reveal">
+              <video controls preload="none" poster="public/assets/videos/casa-mulher-acamada.webp" playsinline>
+                <source src="public/assets/videos/casa-mulher-acamada.mp4" type="video/mp4" />
+              </video>
+              <figcaption><strong>Visita</strong><span><em>[confirmar nome/legenda]</em></span></figcaption>
+            </figure>
+            <figure class="video-card reveal">
+              <video controls preload="none" poster="public/assets/videos/casa-teresa-ramos.webp" playsinline>
+                <source src="public/assets/videos/casa-teresa-ramos.mp4" type="video/mp4" />
+              </video>
+              <figcaption><strong>Teresa Ramos</strong><span><em>[confirmar legenda]</em></span></figcaption>
+            </figure>
           </div>
+        </div>
 
-          <div class="tab-panel" id="panel-depoimentos-video" role="tabpanel" aria-labelledby="tab-depoimentos-video" hidden>
-            <p class="tab-empty">Em breve.</p>
-          </div>
+        <div class="video-block">
+          <h3 class="video-block-title">Depoimentos</h3>
+          <p class="video-empty">Em breve.</p>
+        </div>
 
-          <div class="tab-panel" id="panel-minha-casa" role="tabpanel" aria-labelledby="tab-minha-casa">
-            <div class="video-grid">
-              <figure class="video-card reveal">
-                <video controls preload="none" poster="public/assets/videos/casa-william-padaria.webp" playsinline>
-                  <source src="public/assets/videos/casa-william-padaria.mp4" type="video/mp4" />
-                </video>
-                <figcaption><strong>William</strong><span>padaria <em>[confirmar legenda]</em></span></figcaption>
-              </figure>
-              <figure class="video-card reveal">
-                <video controls preload="none" poster="public/assets/videos/casa-mulher-acamada.webp" playsinline>
-                  <source src="public/assets/videos/casa-mulher-acamada.mp4" type="video/mp4" />
-                </video>
-                <figcaption><strong>Visita</strong><span><em>[confirmar nome/legenda]</em></span></figcaption>
-              </figure>
-              <figure class="video-card reveal">
-                <video controls preload="none" poster="public/assets/videos/casa-teresa-ramos.webp" playsinline>
-                  <source src="public/assets/videos/casa-teresa-ramos.mp4" type="video/mp4" />
-                </video>
-                <figcaption><strong>Teresa Ramos</strong><span><em>[confirmar legenda]</em></span></figcaption>
-              </figure>
-            </div>
-          </div>
-
-          <div class="tab-panel" id="panel-prints" role="tabpanel" aria-labelledby="tab-prints" hidden>
-            <p class="tab-empty">Em breve.</p>
-          </div>
+        <div class="video-block">
+          <h3 class="video-block-title">Prints das redes</h3>
+          <p class="video-empty">Em breve.</p>
         </div>
       </div>
     </section>
@@ -460,6 +445,6 @@
 
   <a href="#participar" class="sticky-cta" aria-label="Quero participar">Quero participar</a>
 
-  <script src="js/main.js?v=10" defer></script>
+  <script src="js/main.js?v=11" defer></script>
 </body>
 </html>
