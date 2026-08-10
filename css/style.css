@@ -396,15 +396,12 @@ p { margin: 0 0 1rem; }
 @media (min-width: 640px) {
   .tab { flex-direction: row; padding: .8em 1.1em; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .tab, .tab-icon { transition: color .1s, opacity .1s; }
-  .tab-indicator { transition: none; }
-}
 /* troca de aba: [hidden] some do layout, então voltar a mostrar já reinicia a animation sozinho (sem JS) */
 .tab-panel { animation: tabPanelIn .45s var(--ease); }
 @keyframes tabPanelIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .tab { transition: color .1s; }
+  .tab, .tab-icon { transition: color .1s, opacity .1s; }
+  .tab-indicator { transition: none; }
   .tab-panel { animation: none; }
 }
 .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
