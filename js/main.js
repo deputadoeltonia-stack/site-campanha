@@ -92,6 +92,17 @@
   if (tabList) {
     var tabs = Array.prototype.slice.call(tabList.querySelectorAll('[role="tab"]'));
     var panels = tabs.map(function (t) { return document.getElementById(t.getAttribute("aria-controls")); });
+    var indicator = tabList.querySelector(".tab-indicator");
+
+    // indicator: largura/altura variam por aba (label diferente), então não dá pra
+    // animar só com transform — é um span decorativo absoluto, sem irmãos afetados
+    // pelo reflow, então o custo do layout-thrash aqui é irrelevante na prática.
+    var moveIndicator = function (tab) {
+      if (!indicator) return;
+      indicator.style.width = tab.offsetWidth + "px";
+      indicator.style.height = tab.offsetHeight + "px";
+      indicator.style.transform = "translate(" + tab.offsetLeft + "px," + tab.offsetTop + "px)";
+    };
 
     var selectTab = function (tab) {
       tabs.forEach(function (t, i) {
@@ -100,7 +111,26 @@
         t.tabIndex = selected ? 0 : -1;
         if (panels[i]) panels[i].hidden = !selected;
       });
+      moveIndicator(tab);
     };
+
+    // posiciona sem animar no load (evita o indicator "deslizar" do canto na 1ª pintura)
+    var activeTab = tabs.filter(function (t) { return t.getAttribute("aria-selected") === "true"; })[0] || tabs[0];
+    tabList.classList.add("no-motion");
+    moveIndicator(activeTab);
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { tabList.classList.remove("no-motion"); });
+    });
+
+    // reflow (resize/orientação) pode mudar largura/wrap das abas — reposiciona
+    var resizeTimer;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        var current = tabs.filter(function (t) { return t.getAttribute("aria-selected") === "true"; })[0];
+        if (current) moveIndicator(current);
+      }, 120);
+    });
 
     tabList.addEventListener("click", function (e) {
       var tab = e.target.closest && e.target.closest('[role="tab"]');
