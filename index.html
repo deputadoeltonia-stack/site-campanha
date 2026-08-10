@@ -28,7 +28,7 @@
   <link rel="preload" href="public/fonts/avenir-400.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="public/assets/deputado.webp" as="image" type="image/webp" fetchpriority="high" />
 
-  <link rel="stylesheet" href="css/style.css?v=26" />
+  <link rel="stylesheet" href="css/style.css?v=27" />
   <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
@@ -310,6 +310,46 @@
             <figcaption>Ouvir vem antes de decidir</figcaption>
           </figure>
         </div>
+
+        <div class="video-tabs">
+          <h3 class="tabs-heading">Veja em vídeo</h3>
+          <div class="tab-list" role="tablist" aria-label="Vídeos da campanha">
+            <button type="button" role="tab" id="tab-depoimentos-video" aria-controls="panel-depoimentos-video" aria-selected="false" tabindex="-1">Depoimentos</button>
+            <button type="button" role="tab" id="tab-minha-casa" aria-controls="panel-minha-casa" aria-selected="true" tabindex="0">Dr. Elton na minha casa</button>
+            <button type="button" role="tab" id="tab-prints" aria-controls="panel-prints" aria-selected="false" tabindex="-1">Prints das redes</button>
+          </div>
+
+          <div class="tab-panel" id="panel-depoimentos-video" role="tabpanel" aria-labelledby="tab-depoimentos-video" hidden>
+            <p class="tab-empty">Em breve.</p>
+          </div>
+
+          <div class="tab-panel" id="panel-minha-casa" role="tabpanel" aria-labelledby="tab-minha-casa">
+            <div class="video-grid">
+              <figure class="video-card reveal">
+                <video controls preload="none" poster="public/assets/videos/casa-william-padaria.webp" playsinline>
+                  <source src="public/assets/videos/casa-william-padaria.mp4" type="video/mp4" />
+                </video>
+                <figcaption><strong>William</strong><span>padaria <em>[confirmar legenda]</em></span></figcaption>
+              </figure>
+              <figure class="video-card reveal">
+                <video controls preload="none" poster="public/assets/videos/casa-mulher-acamada.webp" playsinline>
+                  <source src="public/assets/videos/casa-mulher-acamada.mp4" type="video/mp4" />
+                </video>
+                <figcaption><strong>Visita</strong><span><em>[confirmar nome/legenda]</em></span></figcaption>
+              </figure>
+              <figure class="video-card reveal">
+                <video controls preload="none" poster="public/assets/videos/casa-teresa-ramos.webp" playsinline>
+                  <source src="public/assets/videos/casa-teresa-ramos.mp4" type="video/mp4" />
+                </video>
+                <figcaption><strong>Teresa Ramos</strong><span><em>[confirmar legenda]</em></span></figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="panel-prints" role="tabpanel" aria-labelledby="tab-prints" hidden>
+            <p class="tab-empty">Em breve.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -400,6 +440,6 @@
 
   <a href="#participar" class="sticky-cta" aria-label="Quero participar">Quero participar</a>
 
-  <script src="js/main.js?v=7" defer></script>
+  <script src="js/main.js?v=8" defer></script>
 </body>
 </html>

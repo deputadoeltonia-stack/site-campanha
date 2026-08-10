@@ -354,6 +354,23 @@ p { margin: 0 0 1rem; }
 .gphoto figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 1.6rem .95rem .85rem; color: #fff; font-family: var(--display); font-weight: 600; font-size: var(--step--1); letter-spacing: -.01em; background: linear-gradient(to top, rgba(14,20,36,.9), rgba(14,20,36,.45) 55%, transparent); }
 .js .gphoto img { cursor: zoom-in; }
 
+/* ---------- abas de vídeo ---------- */
+.video-tabs { margin-top: clamp(2.5rem, 5vw, 4rem); }
+.tabs-heading { font-size: var(--step-1); margin-bottom: 1rem; }
+.tab-list { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 1.4rem; }
+.tab { font-family: var(--body); font-weight: 500; font-size: var(--step--1); padding: .6em 1.25em; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-mut); cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+.tab:hover { border-color: var(--blue); color: var(--blue); }
+.tab[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.tab[aria-selected="true"]:hover { color: var(--surface); }
+.tab-empty { color: var(--ink-mut); font-family: var(--prose); }
+.video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+.video-card { margin: 0; border-radius: 14px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
+.video-card video { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: var(--ink); }
+.video-card figcaption { padding: .75rem .95rem .9rem; display: flex; flex-direction: column; }
+.video-card figcaption strong { font-family: var(--body); font-weight: 500; color: var(--ink); }
+.video-card figcaption span { font-family: var(--prose); color: var(--ink-mut); font-size: var(--step--1); }
+.video-card figcaption em { font-style: normal; opacity: .6; }
+
 /* ---------- lightbox da galeria (clique na foto abre) ---------- */
 .lightbox { border: none; padding: 0; background: transparent; max-width: 94vw; max-height: 94vh; overflow: visible; }
 .lightbox::backdrop { background: rgba(8, 12, 20, .88); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
