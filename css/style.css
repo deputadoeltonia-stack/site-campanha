@@ -362,10 +362,11 @@ p { margin: 0 0 1rem; }
 .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
 .video-card { margin: 0; border-radius: 14px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
 .video-card video { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: var(--ink); }
-.video-card figcaption { padding: .75rem .95rem .9rem; display: flex; flex-direction: column; }
+.video-card figcaption { padding: .75rem .95rem .9rem; display: flex; flex-direction: column; gap: .35rem; }
 .video-card figcaption strong { font-family: var(--body); font-weight: 500; color: var(--ink); }
 .video-card figcaption span { font-family: var(--prose); color: var(--ink-mut); font-size: var(--step--1); }
 .video-card figcaption em { font-style: normal; opacity: .6; }
+.video-card figcaption p { font-family: var(--prose); color: var(--ink-mut); font-size: var(--step--1); line-height: 1.5; margin: 0; max-width: none; }
 
 /* ---------- lightbox da galeria (clique na foto abre) ---------- */
 .lightbox { border: none; padding: 0; background: transparent; max-width: 94vw; max-height: 94vh; overflow: visible; }
