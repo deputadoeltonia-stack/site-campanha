@@ -418,7 +418,6 @@ p { margin: 0 0 1rem; }
 .footer-grid { display: grid; gap: 2.2rem; padding-bottom: 2.5rem; }
 /* rodapé JÁ é --ink-deep: a placa escura sumiria. Inverte — lima sólida,
    dígitos navy. Único lugar da página com lima como superfície de texto. */
-.footer-tag { font-family: var(--prose); margin-top: .9rem; max-width: 32ch; }
 .footer-mark { display: block; width: min(230px, 70%); height: auto; }
 .footer-partido { display: block; width: min(190px, 62%); height: auto; margin-top: 1.6rem; opacity: .92; }
 .footer-col h4 { color: var(--surface); font-size: .82rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: .14em; }
