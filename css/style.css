@@ -373,7 +373,6 @@ p { margin: 0 0 1rem; }
 .quote { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.4rem, 3vw, 2rem); display: flex; flex-direction: column; gap: 1.1rem; }
 .quote blockquote { margin: 0; font-family: var(--prose); font-size: var(--step-1); line-height: 1.5; color: var(--ink-txt); position: relative; }
 .quote blockquote::before { content: "\201C"; font-family: var(--prose); font-size: 2.4em; line-height: 0; color: var(--blue); vertical-align: -.35em; margin-right: .08em; }
-.quote-lead blockquote { font-size: var(--step-2); font-weight: 500; }
 .quote figcaption { display: flex; flex-direction: column; margin-top: auto; }
 .quote figcaption strong { font-family: var(--body); font-weight: 500; color: var(--ink); }
 .quote figcaption span { font-family: var(--prose); color: var(--ink-mut); font-size: var(--step--1); }
@@ -489,7 +488,13 @@ p { margin: 0 0 1rem; }
 @media (min-width: 680px) {
   .gallery { grid-template-columns: repeat(3, 1fr); }
   .quotes { grid-template-columns: repeat(2, 1fr); }
-  .quote-lead { grid-column: 1 / -1; }
+  /* mesmo truque do .pledges: se sobrar um ímpar sozinho na última linha,
+     centraliza em vez de deixar encostado à esquerda com buraco ao lado. */
+  .quotes > .quote:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc((100% - 1.1rem) / 2); /* mesma largura de uma coluna (gap: 1.1rem) */
+  }
   .footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1.7fr; }
   .two-col { grid-template-columns: .9fr 1.3fr; align-items: start; }
   .col-label { position: sticky; top: 96px; }
