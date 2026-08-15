@@ -221,23 +221,6 @@ p { margin: 0 0 1rem; }
 .hero-photo.no-photo { align-items: center; }
 .hero-photo.no-photo .photo-fallback { display: flex; }
 
-/* ---------- VALORES (pág. 7) do manual ---------- */
-.valores { background: var(--lime); color: var(--ink); padding: clamp(2.75rem, 7vw, 4.5rem) 0; }
-.valores-h {
-  font-family: var(--body); font-weight: 700; text-transform: uppercase; letter-spacing: .22em;
-  font-size: .74rem; color: rgba(23,30,49,.62); margin: 0 0 1.6rem;
-}
-.valores-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
-.valores-list li {
-  font-family: var(--display); font-weight: 800; letter-spacing: -.02em;
-  font-size: clamp(1.05rem, .9rem + 1.1vw, 1.9rem); line-height: 1.22;
-  display: flex; align-items: center; gap: .8rem;
-}
-.valores-list li::after { /* chevron branco à direita, como na página 7 */
-  content: ""; flex: 0 0 clamp(38px, 5vw, 68px); height: clamp(11px, 1.4vw, 19px);
-  background-image: var(--chevron-white); background-repeat: no-repeat; background-size: contain; background-position: left center;
-}
-
 /* ---------- seções ---------- */
 .section { padding-block: var(--section-y); }
 .section-ink  { background: var(--ink); color: var(--surface); position: relative; }
