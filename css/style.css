@@ -42,12 +42,6 @@
   --gold-lt:   var(--lime);   /* acento no escuro */
   --teal:      var(--blue);   /* links no claro */
 
-  /* CHEVRON — elemento assinatura do manual (marca, pattern, grifo, setas).
-     Um único desenho reaproveitado em três escalas; muda só a cor/tamanho. */
-  --chevron-lime: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'%3E%3Cpath d='M0 0 L20 12 L40 0 L40 8 L20 20 L0 8 Z' fill='%23CCFF00'/%3E%3C/svg%3E");
-  --chevron-blue: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='34' viewBox='0 0 60 34'%3E%3Cpath d='M0 0 L30 16 L60 0 L60 11 L30 27 L0 11 Z' fill='%230B3984'/%3E%3C/svg%3E");
-  --chevron-white: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='34' viewBox='0 0 60 34'%3E%3Cpath d='M0 0 L30 16 L60 0 L60 11 L30 27 L0 11 Z' fill='%23FFFFFF'/%3E%3C/svg%3E");
-
   /* linhas */
   --line:    rgba(14,32,56,.14);
   --line-lt: rgba(236,239,243,.16);
@@ -105,13 +99,7 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 700; line-height: 1.0
 p { margin: 0 0 1rem; }
 
 .section-title { font-size: var(--step-3); }
-/* marcador = fita de chevrons do manual, azul no claro e lima no escuro */
-.section-title::before {
-  content: ""; display: block; width: 54px; height: 12px; margin-bottom: 1.1rem;
-  background-image: var(--chevron-blue); background-repeat: repeat-x; background-size: auto 100%;
-}
 .section-title.light { color: var(--surface); }
-.section-title.light::before { background-image: var(--chevron-lime); }
 
 /* ---------- botões ---------- */
 .btn {
@@ -174,13 +162,6 @@ p { margin: 0 0 1rem; }
 
 /* ---------- hero ---------- */
 .hero { position: relative; background: var(--ink); color: var(--surface); overflow: clip; padding-top: clamp(1.5rem, 5vw, 3rem); isolation: isolate; } /* clip, não hidden: hidden criaria scroll container e sequestraria scroll()/sticky */
-.hero::before { /* pattern de chevrons do manual, em textura (não compete com a foto) */
-  content: ""; position: absolute; z-index: -2; inset: 0;
-  background-image: var(--chevron-blue); background-size: 132px 75px;
-  opacity: .13; pointer-events: none;
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 92%);
-          mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 92%);
-}
 .hero::after { /* brilho âmbar */
   content: ""; position: absolute; z-index: -1; inset: auto -10% -30% 25%; height: 460px;
   background: radial-gradient(closest-side, rgba(204, 255, 0,.26), transparent 72%); pointer-events: none;
