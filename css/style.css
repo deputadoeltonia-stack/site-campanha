@@ -173,7 +173,7 @@ p { margin: 0 0 1rem; }
   letter-spacing: -.04em; pointer-events: none; user-select: none;
 }
 .hero-grid { display: grid; gap: clamp(1rem, 4vw, 3rem); align-items: end; }
-.hero-copy { padding-bottom: clamp(2rem, 6vw, 4rem); padding-top: clamp(1.5rem, 4vw, 2.5rem); }
+.hero-copy { padding-bottom: clamp(1.25rem, 3vw, 2.25rem); padding-top: clamp(1.5rem, 4vw, 2.5rem); }
 /* LOCKUP: a marca oficial é o h1. É o que o eleitor precisa gravar —
    vem antes do discurso, não depois dos botões. */
 .hero-lockup { display: flex; flex-direction: column; align-items: flex-start; gap: .6rem; margin: 0 0 clamp(1.5rem, 4vw, 2.1rem); }
@@ -196,7 +196,7 @@ p { margin: 0 0 1rem; }
   pointer-events: none;
 }
 /* meio corpo: caixa 3/4 + cover ancorado no topo mostra ~62% da foto (cabeça até acima do cinto); base encosta no fim do hero (corte reto, intencional) */
-.hero-photo img { align-self: end; width: 100%; max-width: min(660px, 100%); aspect-ratio: 3 / 4; height: auto; object-fit: cover; object-position: 50% 0; filter: drop-shadow(0 28px 40px rgba(0,0,0,.55)) drop-shadow(0 0 2px rgba(204, 255, 0,.35)); }
+.hero-photo img { align-self: end; width: 100%; max-width: min(760px, 100%); aspect-ratio: 3 / 4; height: auto; object-fit: cover; object-position: 50% 0; filter: drop-shadow(0 28px 40px rgba(0,0,0,.55)) drop-shadow(0 0 2px rgba(204, 255, 0,.35)); }
 .photo-fallback { display: none; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; width: min(300px, 78%); aspect-ratio: 3/4; margin-inline: auto; align-self: end; border: 1.5px dashed var(--line-lt); border-radius: var(--radius); color: var(--paper-mut); font-weight: 600; text-transform: uppercase; letter-spacing: .14em; font-size: .78rem; }
 .photo-fallback small { font-family: var(--prose); font-size: .72rem; letter-spacing: 0; text-transform: none; opacity: .8; }
 .hero-photo.no-photo { align-items: center; }
