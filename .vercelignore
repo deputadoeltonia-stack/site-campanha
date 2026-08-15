@@ -1,0 +1,11 @@
+.git
+node_modules
+assets-src
+fonts-src
+scripts
+.impeccable
+.claude-flow
+.env
+.env.local
+.env*
+.DS_Store
