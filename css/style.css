@@ -221,20 +221,12 @@ p { margin: 0 0 1rem; }
 .creds div { display: grid; grid-template-columns: 1fr; gap: .1rem; padding: 1rem 0; border-top: 1px solid var(--line); }
 .creds dt { font-family: var(--display-alt); font-weight: 900; color: var(--gold-deep); font-size: 1.4rem; line-height: 1; margin: 0; white-space: nowrap; }
 .creds dd { margin: 0; font-family: var(--prose); color: var(--ink-mut); line-height: 1.4; }
-/* desktop: número + rótulo ao lado, topo alinhado.
-   A coluna do número se dimensiona pelo MAIOR dt (max-content no pai) e as 3
-   linhas compartilham essa trilha via subgrid — alinhadas entre si sem largura
-   fixa. Largura fixa aqui vazava: "25 anos" mede 115px e "+46 mil" 100px em
-   Geometos Black 1.5rem, contra os 6rem (96px) que a coluna tinha.
-   Sem suporte a subgrid, o div cai na regra mobile (1 coluna, empilhado). */
+/* desktop: número + rótulo lado a lado, topo alinhado. Cada linha tem sua
+   própria coluna max-content (sem subgrid) — robusto em qualquer browser/zoom,
+   só abre mão de alinhar o número entre as 3 linhas pela borda. */
 @media (min-width: 560px) {
-  .creds { grid-template-columns: max-content 1fr; column-gap: 1rem; }
-  .creds div { grid-template-columns: subgrid; grid-column: 1 / -1; align-items: start; gap: .2rem 1rem; }
-  /* Número alinhado à DIREITA: a coluna tem a largura do maior ("25 anos"),
-     então um número curto como "3º" ficaria boiando longe do seu rótulo.
-     Alinhado à direita, todo número encosta na mesma calha de 1rem e a
-     ligação número→texto fica óbvia em todas as linhas. */
-  .creds dt { font-size: 1.5rem; text-align: right; }
+  .creds div { grid-template-columns: max-content 1fr; column-gap: 1rem; align-items: start; gap: .2rem 1rem; }
+  .creds dt { font-size: 1.5rem; }
 }
 
 /* ---------- timeline ----------
