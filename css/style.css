@@ -196,7 +196,7 @@ p { margin: 0 0 1rem; }
 /* LOCKUP: a marca oficial é o h1. É o que o eleitor precisa gravar —
    vem antes do discurso, não depois dos botões. */
 .hero-lockup { display: flex; flex-direction: column; align-items: flex-start; gap: .6rem; margin: 0 0 clamp(1.5rem, 4vw, 2.1rem); }
-.lockup-mark { display: block; width: min(340px, 78%); height: auto; }
+.lockup-mark { display: block; width: min(280px, 68%); height: auto; }
 .plate-label { font-family: var(--body); font-weight: 700; text-transform: uppercase; letter-spacing: .22em; font-size: .7rem; color: var(--gold-lt); }
 
 .hero-title { font-family: var(--display); font-size: var(--step-4); font-weight: 800; color: var(--surface); margin: 0 0 1rem; letter-spacing: -.035em; line-height: 1.08; text-wrap: balance; }
@@ -221,13 +221,7 @@ p { margin: 0 0 1rem; }
 .hero-photo.no-photo { align-items: center; }
 .hero-photo.no-photo .photo-fallback { display: flex; }
 
-/* ---------- MANIFESTO (pág. 11) e VALORES (pág. 7) do manual ---------- */
-.manifesto { background: var(--ink); color: var(--surface); padding: clamp(2.75rem, 7vw, 5rem) 0; }
-.manifesto-line {
-  font-family: var(--display); font-weight: 800; letter-spacing: -.03em; line-height: 1.24;
-  font-size: clamp(1.45rem, 1.1rem + 2vw, 2.9rem); max-width: 24ch; margin: 0; text-wrap: balance;
-}
-
+/* ---------- VALORES (pág. 7) do manual ---------- */
 .valores { background: var(--lime); color: var(--ink); padding: clamp(2.75rem, 7vw, 4.5rem) 0; }
 .valores-h {
   font-family: var(--body); font-weight: 700; text-transform: uppercase; letter-spacing: .22em;
@@ -575,48 +569,7 @@ p { margin: 0 0 1rem; }
   @keyframes readRuler { from { scale: 0 1; } to { scale: 1 1; } }
 }
 
-/* ---------- C) DESTAQUE VIVO no hero ----------
-   O <em> só tinha cor. Pintamos uma barra marca-texto atrás dela
-   (superfície real p/ o grifo e p/ o brilho varrer). Evitamos recortar
-   gradiente dentro da própria letra: isso é ban do design system.
-   Sem gate: clip-path e background-position são pintura, não transform. */
-.hero-title em, .manifesto-line em { position: relative; isolation: isolate; font-style: normal; color: var(--lime); }
-.hero-title em::before, .manifesto-line em::before,
-.hero-title em::after,  .manifesto-line em::after {
-  content: "";
-  position: absolute;
-  left: -.08em; right: -.08em; bottom: -.02em;
-  height: .26em;
-  z-index: -1; pointer-events: none;
-}
-
-.hero-title em::before, .manifesto-line em::before { /* grifo = fita de chevrons do manual, se desenhando junto da entrada */
-  background-image: var(--chevron-lime);
-  background-repeat: repeat-x; background-size: auto 100%; background-position: 0 50%;
-  clip-path: inset(0 100% 0 0); /* base = from */
-  animation: emDraw .9s var(--ease) 1.05s forwards;
-}
-@keyframes emDraw {
-  from { clip-path: inset(0 100% 0 0); }
-  to   { clip-path: inset(0 0 0 0); }
-}
-
-.hero-title em::after, .manifesto-line em::after { /* brilho varrendo, para sempre */
-  background-image: linear-gradient(100deg, transparent 35%, rgba(255,244,220,.85) 50%, transparent 65%);
-  background-repeat: no-repeat;
-  background-size: 55% 100%;
-  background-position: -150% 0; /* base = from */
-  /* o brilho varre DENTRO da fita de chevrons, senão vira um retângulo por cima */
-  -webkit-mask-image: var(--chevron-lime); -webkit-mask-repeat: repeat-x; -webkit-mask-size: auto 100%; -webkit-mask-position: 0 50%;
-          mask-image: var(--chevron-lime);         mask-repeat: repeat-x;         mask-size: auto 100%;         mask-position: 0 50%;
-  animation: emGlare 5s linear 2s infinite;
-}
-/* size 55% => só sai do quadro fora de [-122%, 222%]; -150%/260% garante
-   saída inteira dos dois lados (endpoint curto deixa lasca parada). */
-@keyframes emGlare {
-  from { background-position: -150% 0; }
-  to   { background-position: 260% 0; }
-}
+.hero-title em { font-style: normal; color: var(--lime); }
 
 /* ---------- D) TRAJETÓRIA: ignição por scroll ----------
    O scroll é o motor: sem loop, sem relógio, sem JS. Cada li tem sua
