@@ -207,7 +207,8 @@ p { margin: 0 0 1rem; }
   background: radial-gradient(58% 52% at 50% 42%, rgba(150,182,225,.20), transparent 72%);
   pointer-events: none;
 }
-.hero-photo img { align-self: end; max-height: min(82vh, 760px); width: auto; object-fit: contain; object-position: bottom center; filter: drop-shadow(0 28px 40px rgba(0,0,0,.55)) drop-shadow(0 0 2px rgba(204, 255, 0,.35)); }
+/* meio corpo: caixa 3/4 + cover ancorado no topo mostra ~62% da foto (cabeça até acima do cinto); base encosta no fim do hero (corte reto, intencional) */
+.hero-photo img { align-self: end; width: 100%; max-width: min(660px, 100%); aspect-ratio: 3 / 4; height: auto; object-fit: cover; object-position: 50% 0; filter: drop-shadow(0 28px 40px rgba(0,0,0,.55)) drop-shadow(0 0 2px rgba(204, 255, 0,.35)); }
 .photo-fallback { display: none; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; width: min(300px, 78%); aspect-ratio: 3/4; margin-inline: auto; align-self: end; border: 1.5px dashed var(--line-lt); border-radius: var(--radius); color: var(--paper-mut); font-weight: 600; text-transform: uppercase; letter-spacing: .14em; font-size: .78rem; }
 .photo-fallback small { font-family: var(--prose); font-size: .72rem; letter-spacing: 0; text-transform: none; opacity: .8; }
 .hero-photo.no-photo { align-items: center; }
@@ -482,7 +483,7 @@ p { margin: 0 0 1rem; }
   .header-cta { display: inline-flex; }
   .menu-toggle, .mobile-menu { display: none; }
   .sticky-cta { display: none; }
-  .hero-grid { grid-template-columns: 1fr .95fr; align-items: end; }
+  .hero-grid { grid-template-columns: 1fr 1.05fr; align-items: end; }
   .form-grid { grid-template-columns: 1fr 1fr; align-items: center; }
 }
 
