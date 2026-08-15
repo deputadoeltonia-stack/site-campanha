@@ -46,6 +46,7 @@
      Um único desenho reaproveitado em três escalas; muda só a cor/tamanho. */
   --chevron-lime: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'%3E%3Cpath d='M0 0 L20 12 L40 0 L40 8 L20 20 L0 8 Z' fill='%23CCFF00'/%3E%3C/svg%3E");
   --chevron-blue: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='34' viewBox='0 0 60 34'%3E%3Cpath d='M0 0 L30 16 L60 0 L60 11 L30 27 L0 11 Z' fill='%230B3984'/%3E%3C/svg%3E");
+  --chevron-white: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='34' viewBox='0 0 60 34'%3E%3Cpath d='M0 0 L30 16 L60 0 L60 11 L30 27 L0 11 Z' fill='%23FFFFFF'/%3E%3C/svg%3E");
 
   /* linhas */
   --line:    rgba(14,32,56,.14);
@@ -104,9 +105,13 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 700; line-height: 1.0
 p { margin: 0 0 1rem; }
 
 .section-title { font-size: var(--step-3); }
-.section-title::before { content: ""; display: block; width: 42px; height: 3px; background: var(--blue); border-radius: 2px; margin-bottom: 1.1rem; } /* azul no claro */
+/* marcador = fita de chevrons do manual, azul no claro e lima no escuro */
+.section-title::before {
+  content: ""; display: block; width: 54px; height: 12px; margin-bottom: 1.1rem;
+  background-image: var(--chevron-blue); background-repeat: repeat-x; background-size: auto 100%;
+}
 .section-title.light { color: var(--surface); }
-.section-title.light::before { background: var(--lime); } /* lima no escuro */
+.section-title.light::before { background-image: var(--chevron-lime); }
 
 /* ---------- botões ---------- */
 .btn {
@@ -228,6 +233,29 @@ p { margin: 0 0 1rem; }
 .photo-fallback small { font-family: var(--prose); font-size: .72rem; letter-spacing: 0; text-transform: none; opacity: .8; }
 .hero-photo.no-photo { align-items: center; }
 .hero-photo.no-photo .photo-fallback { display: flex; }
+
+/* ---------- MANIFESTO (pág. 11) e VALORES (pág. 7) do manual ---------- */
+.manifesto { background: var(--ink); color: var(--surface); padding: clamp(2.75rem, 7vw, 5rem) 0; }
+.manifesto-line {
+  font-family: var(--display); font-weight: 800; letter-spacing: -.03em; line-height: 1.24;
+  font-size: clamp(1.45rem, 1.1rem + 2vw, 2.9rem); max-width: 24ch; margin: 0; text-wrap: balance;
+}
+
+.valores { background: var(--lime); color: var(--ink); padding: clamp(2.75rem, 7vw, 4.5rem) 0; }
+.valores-h {
+  font-family: var(--body); font-weight: 700; text-transform: uppercase; letter-spacing: .22em;
+  font-size: .74rem; color: rgba(23,30,49,.62); margin: 0 0 1.6rem;
+}
+.valores-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
+.valores-list li {
+  font-family: var(--display); font-weight: 800; letter-spacing: -.02em;
+  font-size: clamp(1.05rem, .9rem + 1.1vw, 1.9rem); line-height: 1.22;
+  display: flex; align-items: center; gap: .8rem;
+}
+.valores-list li::after { /* chevron branco à direita, como na página 7 */
+  content: ""; flex: 0 0 clamp(38px, 5vw, 68px); height: clamp(11px, 1.4vw, 19px);
+  background-image: var(--chevron-white); background-repeat: no-repeat; background-size: contain; background-position: left center;
+}
 
 /* ---------- seções ---------- */
 .section { padding-block: var(--section-y); }
@@ -562,16 +590,17 @@ p { margin: 0 0 1rem; }
    (superfície real p/ o grifo e p/ o brilho varrer). Evitamos recortar
    gradiente dentro da própria letra: isso é ban do design system.
    Sem gate: clip-path e background-position são pintura, não transform. */
-.hero-title em { position: relative; isolation: isolate; }
-.hero-title em::before,
-.hero-title em::after {
+.hero-title em, .manifesto-line em { position: relative; isolation: isolate; font-style: normal; color: var(--lime); }
+.hero-title em::before, .manifesto-line em::before,
+.hero-title em::after,  .manifesto-line em::after {
   content: "";
   position: absolute;
   left: -.08em; right: -.08em; bottom: -.02em;
   height: .26em;
   z-index: -1; pointer-events: none;
 }
-.hero-title em::before { /* grifo = fita de chevrons do manual, se desenhando junto da entrada */
+
+.hero-title em::before, .manifesto-line em::before { /* grifo = fita de chevrons do manual, se desenhando junto da entrada */
   background-image: var(--chevron-lime);
   background-repeat: repeat-x; background-size: auto 100%; background-position: 0 50%;
   clip-path: inset(0 100% 0 0); /* base = from */
@@ -581,7 +610,8 @@ p { margin: 0 0 1rem; }
   from { clip-path: inset(0 100% 0 0); }
   to   { clip-path: inset(0 0 0 0); }
 }
-.hero-title em::after { /* brilho varrendo, para sempre */
+
+.hero-title em::after, .manifesto-line em::after { /* brilho varrendo, para sempre */
   background-image: linear-gradient(100deg, transparent 35%, rgba(255,244,220,.85) 50%, transparent 65%);
   background-repeat: no-repeat;
   background-size: 55% 100%;
