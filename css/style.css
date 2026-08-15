@@ -22,8 +22,8 @@
   --ink:      #171E31;   /* RGB 23 30 49 — seções escuras, títulos no claro */
   --ink-2:    #232E49;
   --ink-deep: #0E1424;   /* rodapé */
-  --bg:       #ECEFF3;   /* porcelana fria (NÃO creme) */
-  --bg-2:     #E0E6EC;   /* seção suave */
+  --bg:       #F5F5F5;   /* RGB 245 245 245 — claro oficial digital do manual ID 26 */
+  --bg-2:     #E9EAEB;   /* seção suave */
   --surface:  #FFFFFF;
 
   /* texto */
@@ -41,6 +41,11 @@
   --gold-deep: var(--blue);   /* onde era texto ouro no CLARO → azul */
   --gold-lt:   var(--lime);   /* acento no escuro */
   --teal:      var(--blue);   /* links no claro */
+
+  /* CHEVRON — elemento assinatura do manual (marca, pattern, grifo, setas).
+     Um único desenho reaproveitado em três escalas; muda só a cor/tamanho. */
+  --chevron-lime: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'%3E%3Cpath d='M0 0 L20 12 L40 0 L40 8 L20 20 L0 8 Z' fill='%23CCFF00'/%3E%3C/svg%3E");
+  --chevron-blue: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='34' viewBox='0 0 60 34'%3E%3Cpath d='M0 0 L30 16 L60 0 L60 11 L30 27 L0 11 Z' fill='%230B3984'/%3E%3C/svg%3E");
 
   /* linhas */
   --line:    rgba(14,32,56,.14);
@@ -164,6 +169,13 @@ p { margin: 0 0 1rem; }
 
 /* ---------- hero ---------- */
 .hero { position: relative; background: var(--ink); color: var(--surface); overflow: clip; padding-top: clamp(1.5rem, 5vw, 3rem); isolation: isolate; } /* clip, não hidden: hidden criaria scroll container e sequestraria scroll()/sticky */
+.hero::before { /* pattern de chevrons do manual, em textura (não compete com a foto) */
+  content: ""; position: absolute; z-index: -2; inset: 0;
+  background-image: var(--chevron-blue); background-size: 132px 75px;
+  opacity: .13; pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 92%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 92%);
+}
 .hero::after { /* brilho âmbar */
   content: ""; position: absolute; z-index: -1; inset: auto -10% -30% 25%; height: 460px;
   background: radial-gradient(closest-side, rgba(204, 255, 0,.26), transparent 72%); pointer-events: none;
@@ -550,12 +562,13 @@ p { margin: 0 0 1rem; }
 .hero-title em::after {
   content: "";
   position: absolute;
-  left: -.08em; right: -.08em; bottom: .04em;
-  height: .3em; border-radius: 3px;
+  left: -.08em; right: -.08em; bottom: -.02em;
+  height: .26em;
   z-index: -1; pointer-events: none;
 }
-.hero-title em::before { /* grifo se desenhando, uma vez, junto da entrada */
-  background: linear-gradient(90deg, rgba(204, 255, 0,.58), rgba(204, 255, 0,.42));
+.hero-title em::before { /* grifo = fita de chevrons do manual, se desenhando junto da entrada */
+  background-image: var(--chevron-lime);
+  background-repeat: repeat-x; background-size: auto 100%; background-position: 0 50%;
   clip-path: inset(0 100% 0 0); /* base = from */
   animation: emDraw .9s var(--ease) 1.05s forwards;
 }
@@ -568,6 +581,9 @@ p { margin: 0 0 1rem; }
   background-repeat: no-repeat;
   background-size: 55% 100%;
   background-position: -150% 0; /* base = from */
+  /* o brilho varre DENTRO da fita de chevrons, senão vira um retângulo por cima */
+  -webkit-mask-image: var(--chevron-lime); -webkit-mask-repeat: repeat-x; -webkit-mask-size: auto 100%; -webkit-mask-position: 0 50%;
+          mask-image: var(--chevron-lime);         mask-repeat: repeat-x;         mask-size: auto 100%;         mask-position: 0 50%;
   animation: emGlare 5s linear 2s infinite;
 }
 /* size 55% => só sai do quadro fora de [-122%, 222%]; -150%/260% garante
