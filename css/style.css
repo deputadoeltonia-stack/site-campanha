@@ -173,6 +173,18 @@ p { margin: 0 0 1rem; }
   letter-spacing: -.04em; pointer-events: none; user-select: none;
 }
 .hero-grid { display: grid; gap: clamp(1rem, 4vw, 3rem); align-items: end; }
+/* celular (empilhado, <940px): a seção ocupa a tela toda na abertura e a
+   foto fica encostada no rodapé da viewport — sem depender de altura de
+   dispositivo específico. svh = viewport "pequena" (com a barra do
+   navegador visível), que é o estado real na primeira pintura. */
+@media (max-width: 939px) {
+  .hero { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; }
+  /* align-items/align-self:end do layout grid original viram propriedade
+     flex de verdade aqui (eixo cruzado = horizontal numa coluna) — sem
+     resetar pra stretch, a foto encolhe e vai pra direita. */
+  .hero-grid { flex: 1; display: flex; flex-direction: column; align-items: stretch; }
+  .hero-photo { margin-top: auto; align-self: stretch; }
+}
 .hero-copy { padding-bottom: clamp(1.25rem, 3vw, 2.25rem); padding-top: clamp(1.5rem, 4vw, 2.5rem); }
 /* LOCKUP: a marca oficial é o h1. É o que o eleitor precisa gravar —
    vem antes do discurso, não depois dos botões. */
