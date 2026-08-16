@@ -456,6 +456,15 @@ body[data-tema="tozi"] {
   --display: "Avenir LT Std", system-ui, -apple-system, "Segoe UI", sans-serif;
   --titulo: "Geometos Neue", "Geometos", var(--display);
 }
+/* Na peca do Tozi so o campo DELE e azul; os aliados impressos (Dr. Elton e
+   o governador, agora fixos) seguem verdes como os demais, com foto sem
+   destaque. Sem isto o azul do --cx-travado pintaria os tres. */
+body[data-tema="tozi"] .campo.travado:not(.proprio) .digito.preenchido {
+  background: var(--limao); border-color: var(--limao); color: var(--marinho);
+}
+body[data-tema="tozi"] .campo.travado:not(.proprio) .foto-travada {
+  border-color: var(--linha); border-width: 1px;
+}
 /* Selo chapado no azul, sem o anel verde; e os numerais inclinados da peça.
    A inclinação do selo é coisa da peça do Dr. Elton, não das outras. */
 body:is([data-tema="tozi"], [data-tema="dulce"]) .selo { transform: none; }

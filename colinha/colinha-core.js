@@ -176,6 +176,7 @@ export function montarColinha(estado, config, dados) {
         partido: config.partido,
         foto: config.foto ?? null,
         travado: true,
+        proprio: true, // o campo do candidato do site — o unico azul no Tozi
         erro: null,
       }
     }
@@ -194,6 +195,7 @@ export function montarColinha(estado, config, dados) {
         partido: achado?.[1] ?? null,
         foto: achado?.[2] || null,
         travado: true,
+        proprio: false, // aliado impresso: travado, mas sem a cor do candidato
         erro: null,
       }
     }

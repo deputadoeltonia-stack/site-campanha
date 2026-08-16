@@ -100,7 +100,7 @@ function linhaHTML(slot) {
         aria-label="Buscar ${slot.rotulo} por nome">${fotoInterna(slot)}</button>`
 
   return `
-    <div class="campo${travado ? ' travado' : ''}" id="campo-${slot.id}">
+    <div class="campo${travado ? ' travado' : ''}${slot.proprio ? ' proprio' : ''}" id="campo-${slot.id}">
       ${foto}
       <div class="campo-corpo">
         <p class="rotulo">

@@ -203,7 +203,7 @@ function colunaDe(t) {
 function desenharFoto(ctx, t, slot, img, x, y) {
   // Na colinha da Dulce os campos ja preenchidos nao levam destaque na foto:
   // ficam com o mesmo fio fino dos campos livres (t.fotoSemDestaque).
-  const destacar = slot.travado && !t.fotoSemDestaque
+  const destacar = slot.proprio && !t.fotoSemDestaque
   if (img) {
     desenharCover(ctx, img, x, y, FOTO_L, FOTO_A)
     ctx.strokeStyle = destacar ? (t.travado ?? t.destaque) : t.linha
@@ -663,8 +663,9 @@ export async function desenhar(colinha, config) {
       const x = colunaDe(t) + i * (CAIXA + GAP)
       const digito = (slot.numero ?? '')[i] ?? ''
 
-      // O campo travado pode ter cor propria (na peca do Tozi ele e azul).
-      const cheia = slot.travado ? (t.travado ?? t.destaque) : t.destaque
+      // So o campo do PROPRIO candidato leva a cor propria (azul na peca do
+      // Tozi); aliado fixo sai verde como os demais.
+      const cheia = slot.proprio ? (t.travado ?? t.destaque) : t.destaque
 
       ctx.fillStyle = digito ? cheia : t.caixa
       retanguloArredondado(ctx, x, topo, CAIXA, CAIXA, 10)
@@ -675,7 +676,7 @@ export async function desenhar(colinha, config) {
       ctx.stroke()
 
       if (digito) {
-        ctx.fillStyle = slot.travado ? (t.travadoTxt ?? t.txt) : t.txt
+        ctx.fillStyle = slot.proprio ? (t.travadoTxt ?? t.txt) : t.txt
         ctx.font = fonte(t, t.peca ? 900 : 800, SEMI, tamDigito, { italico: !!t.digitoItalico })
         // Centra pela TINTA do algarismo, nao pelo textBaseline 'middle': o
         // meio da caixa de linha fica entre ascent e descent da fonte, que sao
