@@ -32,7 +32,8 @@ var CABECALHO = ['Data', 'Nome', 'Telefone', 'Consentimento LGPD', 'Origem'];
  * lead por erro de digitação num site seria pior que uma linha fora de lugar.
  */
 var ABA_POR_ORIGEM = {
-  'site-tozi': 'Pagina Tozi'
+  'site-tozi': 'Pagina Tozi',
+  'site-dulcerita': 'Pagina Dulce'
 };
 
 function setup() {
