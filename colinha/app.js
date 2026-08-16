@@ -1,6 +1,6 @@
 import {
   CARGOS, configPara, hostDeDev, criarEstado, lerURL, lerSalvo, paraSalvar,
-  montarColinha, erroSenadores, estaCompleta, slotTravado, limpar,
+  montarColinha, erroSenadores, estaCompleta, slotTravado, limpar, linkDeVolta,
 } from './colinha-core.js'
 import { desenhar } from './imagem.js'
 import { configurarBusca, abrirBusca } from './busca.js'
@@ -23,6 +23,16 @@ const el = {
 
 document.body.dataset.tema = config.tema
 
+// Embutida num site, a pagina ganha o link de volta para a raiz dele.
+{
+  const volta = linkDeVolta(location.pathname)
+  if (volta) {
+    const a = document.getElementById('volta')
+    a.href = volta
+    a.hidden = false
+  }
+}
+
 // Selo do candidato no topo, como na peca impressa. Le da config e so da
 // config, pelo mesmo motivo do campo travado. Sem campo travado (numero ainda
 // nao definido), o selo simplesmente nao aparece.
@@ -30,17 +40,11 @@ document.body.dataset.tema = config.tema
   const travadoId = slotTravado(config)
   if (travadoId) {
     const cargoInfo = CARGOS.find((c) => c.id === travadoId)
-    document.getElementById('selo-cargo').textContent = cargoInfo.rotulo
+    document.getElementById('selo-cargo').textContent = config.rotulo ?? cargoInfo.rotulo
     document.getElementById('selo-nome').textContent = config.nome
     document.getElementById('selo-numero').textContent = config.numero
     document.getElementById('selo').hidden = false
 
-    // Na peça do Tozi o selo não fica no topo: ele flutua no corpo, à direita,
-    // no vazio que os senadores deixam (3 dígitos só). Mover o nó é a única
-    // forma de o CSS posicioná-lo lá — o topo e a folha são irmãos.
-    if (config.tema === 'tozi') {
-      document.querySelector('.folha').prepend(document.getElementById('selo'))
-    }
   }
 }
 
@@ -467,6 +471,17 @@ async function iniciar() {
   }
 
   montarMarcacao()
+
+  // Na peça do Tozi e da Dulce o selo não fica no topo: ele flutua à direita
+  // dos senadores, no vazio que 3 dígitos deixam. Ancorado no próprio campo
+  // (e não em top fixo na folha) ele acompanha o layout — quando o aviso de
+  // "Começar de novo" aparece e empurra tudo para baixo, o selo desce junto
+  // em vez de cair por cima dos números.
+  if (config.tema !== 'elton' && slotTravado(config)) {
+    document.getElementById('campo-senador1')
+      .appendChild(document.getElementById('selo'))
+  }
+
   render()
   el.carregando.hidden = true
   el.form.hidden = false

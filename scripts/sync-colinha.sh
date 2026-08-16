@@ -3,8 +3,8 @@
 # Fonte da verdade: ~/Projetos/colinha-digital — qualquer mudança lá
 # (ex.: dataset 2026 via build/importar_tse.py + importar_fotos.py)
 # entra no site rodando este script de novo.
-# fotos/ (13MB, rebuildável) fica fora do git — ver .gitignore — mas
-# entra no deploy Netlify (drag-drop leva a pasta inteira).
+# fotos/ (13MB) vai no git: o deploy e por push (Vercel), gitignorar
+# aqui significa 404 em producao.
 set -e
 SRC="$HOME/Projetos/colinha-digital"
 DST="$(cd "$(dirname "$0")/.." && pwd)/colinha"

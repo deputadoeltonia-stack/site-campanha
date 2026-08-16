@@ -27,13 +27,21 @@ export const TEMAS = {
     simbolo: 'marca/ondas.svg', rosto: 'marca/rosto.svg',
     seloNoCorpo: true, // o selo na faixa dos senadores, como na peca
     semVisto: true,    // a peca dele nao traz o tique de conferido
+    digitoItalico: true, // numerais inclinados da peca dele
     titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
   },
   dulce: {
-    topo: '#6d1f3a', topoRisco: '#7d2a47', destaque: '#e8a13d',
-    fundo: '#faf3ef', fundo2: '#f2e3da', caixa: '#ffffff', linha: '#ded0d5',
-    txt: '#2b2126', rot: '#6e5f66', visto: '#8a5a12',
+    topo: '#094b68', topoRisco: '#0a6089', destaque: '#84bf41',
+    fundo: '#e3e4e3', fundo2: '#d9e2df', caixa: '#ffffff', linha: '#c8cac8',
+    txt: '#10333f', rot: '#48626e', visto: '#1f7a68',
+    travadoTxt: '#10333f', // caixa travada segue verde; so o digito escurece
+    // Selo navy sem anel (anel na cor do fundo = invisivel), numero mint.
+    selo: '#174156', seloAnel: '#174156', seloNumero: '#5ac2ad',
+    padrao: 'marca/pessoinhas.svg', // textura de pessoinhas do topo/rodape
+    titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
+    texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
+    seloNoCorpo: true, semVisto: true,
   },
 }
 
@@ -186,7 +194,7 @@ function desenharFoto(ctx, t, slot, img, x, y) {
   }
 }
 
-function desenharTopo(ctx, t, simbolo) {
+function desenharTopo(ctx, t, simbolo, padrao) {
   ctx.fillStyle = t.topo
   ctx.fillRect(0, 0, L, TOPO)
 
@@ -196,7 +204,11 @@ function desenharTopo(ctx, t, simbolo) {
   ctx.beginPath()
   ctx.rect(0, 0, L, TOPO)
   ctx.clip()
-  if (simbolo) {
+  if (padrao) {
+    // Textura repetida (pessoinhas da Dulce), como o background-image da tela.
+    ctx.fillStyle = ctx.createPattern(padrao, 'repeat')
+    ctx.fillRect(0, 0, L, TOPO)
+  } else if (simbolo) {
     const larg = L * 1.25
     const alt = larg * (simbolo.height / simbolo.width)
     ctx.drawImage(simbolo, -L * 0.1, TOPO - alt * 0.7, larg, alt)
@@ -219,7 +231,9 @@ function desenharTopo(ctx, t, simbolo) {
   ctx.font = fonte(t, 800, COND, 62)
   ctx.fillText('COMO VOTAR', MARGEM, 96)
 
-  if (!t.rosto) {
+  // O tique ao lado do titulo e assinatura da peca do Dr. Elton; as pecas
+  // com identidade propria (fonte propria) nao o trazem.
+  if (!t.titulo) {
     const largura = ctx.measureText('COMO VOTAR').width
     ctx.strokeStyle = t.destaque
     ctx.lineWidth = 11
@@ -299,7 +313,7 @@ function desenharSelo(ctx, t, slot) {
   const base = linhas.length === 2 ? cy - 14 : cy + 2
   linhas.forEach((l, i) => ctx.fillText(l, cx, base + i * (tam + 2)))
 
-  ctx.fillStyle = t.seloAnel ?? t.destaque
+  ctx.fillStyle = t.seloNumero ?? t.seloAnel ?? t.destaque
   ctx.font = fonte(t, 800, COND, 44, { italico: true })
   ctx.fillText(slot.numero, cx, cy + 64)
   ctx.restore()
@@ -325,8 +339,8 @@ export async function desenhar(colinha, config) {
   const fotos = await carregarFotos(colinha)
   // Simbolo e rosto do manual, quando o tema tem. Falha vira null e o desenho
   // cai no risco geometrico — a imagem sai sem a marca, nunca quebrada.
-  const [simbolo, rosto] = await Promise.all([
-    carregarArquivo(t.simbolo), carregarArquivo(t.rosto),
+  const [simbolo, rosto, padrao] = await Promise.all([
+    carregarArquivo(t.simbolo), carregarArquivo(t.rosto), carregarArquivo(t.padrao),
   ])
   const cv = document.createElement('canvas')
   cv.width = L
@@ -339,7 +353,7 @@ export async function desenhar(colinha, config) {
   ctx.fillStyle = degrade
   ctx.fillRect(0, 0, L, A)
 
-  desenharTopo(ctx, t, simbolo)
+  desenharTopo(ctx, t, simbolo, padrao)
 
   // Rosto em traco no canto de cima, invadindo o topo — a moldura da peca.
   if (rosto) {
@@ -401,7 +415,7 @@ export async function desenhar(colinha, config) {
 
       if (digito) {
         ctx.fillStyle = slot.travado ? (t.travadoTxt ?? t.txt) : t.txt
-        ctx.font = fonte(t, 800, SEMI, 66, { italico: !!t.titulo })
+        ctx.font = fonte(t, 800, SEMI, 66, { italico: !!t.digitoItalico })
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.fillText(digito, x + CAIXA / 2, topo + CAIXA / 2 + 3)

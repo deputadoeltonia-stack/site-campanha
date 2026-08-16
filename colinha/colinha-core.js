@@ -25,9 +25,10 @@ export const CANDIDATOS = {
     nome: 'PROFESSOR TOZI', cargo: 7, numero: '44447', partido: 'UNIÃO', tema: 'tozi',
     foto: 'tozi',
   },
+  // Numero confirmado pelo santinho impresso 7x10 da campanha (15/08/2026).
   'colinha2026.dreltonai.com.br': {
-    nome: 'DULCE RITA', cargo: 7, numero: null, partido: null, tema: 'dulce',
-    foto: 'dulce',
+    nome: 'DULCE RITA', cargo: 7, numero: '44400', partido: 'UNIÃO', tema: 'dulce',
+    foto: 'dulce', rotulo: 'Deputada estadual', // flexao do cargo, so no campo dela
   },
 }
 
@@ -52,6 +53,14 @@ export function hostDeDev(hostname, busca) {
 
 export function buscar(dados, cargo, numero) {
   return dados?.[String(cargo)]?.[numero] ?? null
+}
+
+// Embutida num site (ex.: /colinha/ dentro do site do Dr. Elton) a pagina
+// ganha um link de volta para a raiz do site. Nos subdominios proprios ela
+// vive na raiz e o link nao existe.
+export function linkDeVolta(pathname) {
+  const p = String(pathname ?? '/')
+  return p === '/' || p === '/index.html' ? null : '../'
 }
 
 // --- estado -----------------------------------------------------------
@@ -115,6 +124,7 @@ export function montarColinha(estado, config, dados) {
       // do config (config.foto), nunca do dataset.
       return {
         ...c,
+        rotulo: config.rotulo ?? c.rotulo,
         numero: String(config.numero),
         nome: config.nome,
         partido: config.partido,

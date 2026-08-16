@@ -88,6 +88,16 @@ body {
 
 /* --- topo -------------------------------------------------------------- */
 
+/* link de volta — so aparece quando a colinha esta embutida num site */
+.volta {
+  display: block; text-align: center;
+  background: var(--marinho-2); color: #fff;
+  font-weight: 600; font-size: .82rem; letter-spacing: .03em;
+  padding: .6rem 1rem; text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+}
+.volta:hover { text-decoration: underline; }
+
 .topo {
   background: var(--marinho);
   color: #fff;
@@ -363,18 +373,6 @@ body[data-tema="tozi"] {
   --display: "Avenir LT Std", system-ui, -apple-system, "Segoe UI", sans-serif;
   --titulo: "Geometos Neue", "Geometos", var(--display);
 }
-/* O símbolo da marca (linhas de pauta que se deformam num sol nascente) no
-   lugar dos chevrons do Elton. É o mesmo arquivo que o site-tozi usa. */
-body[data-tema="tozi"] .topo {
-  /* o véu por cima rebaixa o símbolo a textura: sem ele o azul 2132C cheio
-     briga com o texto branco do topo */
-  background-image:
-    linear-gradient(rgba(26, 23, 78, .74), rgba(26, 23, 78, .74)),
-    url("marca/ondas.svg");
-  background-repeat: no-repeat;
-  background-position: center, left bottom -30%;
-  background-size: cover, 125% auto;
-}
 /* Selo chapado no azul, sem o anel verde; e os numerais inclinados da peça. */
 body[data-tema="tozi"] .selo { background: var(--acento); border-color: #fff; }
 body[data-tema="tozi"] .selo-numero { color: #fff; }
@@ -382,14 +380,14 @@ body[data-tema="tozi"] .selo-numero,
 body[data-tema="tozi"] .digito { font-style: italic; }
 /* Geometos não tem eixo de largura: o font-stretch do tema padrão viraria
    síntese e engorda a letra. */
-body[data-tema="tozi"] .marca,
-body[data-tema="tozi"] .selo-nome,
-body[data-tema="tozi"] .selo-cargo,
-body[data-tema="tozi"] .digito { font-stretch: normal; }
+body:is([data-tema="tozi"], [data-tema="dulce"]) .marca,
+body:is([data-tema="tozi"], [data-tema="dulce"]) .selo-nome,
+body:is([data-tema="tozi"], [data-tema="dulce"]) .selo-cargo,
+body:is([data-tema="tozi"], [data-tema="dulce"]) .digito { font-stretch: normal; }
 /* O nome inteiro não cabe no selo em Geometos, que é mais larga que a Archivo
    condensada; e quebrar "PROFESSOR" no meio (overflow-wrap: anywhere) fica
    pior que diminuir. */
-body[data-tema="tozi"] .selo-nome {
+body:is([data-tema="tozi"], [data-tema="dulce"]) .selo-nome {
   font-size: .78rem; overflow-wrap: normal; letter-spacing: 0;
 }
 
@@ -407,21 +405,21 @@ body[data-tema="tozi"] .topo {
   background-size: cover, 42% auto, 42% auto;
   padding-bottom: 1.4rem;
 }
-body[data-tema="tozi"] .topo-int { align-items: flex-start; }
-body[data-tema="tozi"] .marca {
+body:is([data-tema="tozi"], [data-tema="dulce"]) .topo-int { align-items: flex-start; }
+body:is([data-tema="tozi"], [data-tema="dulce"]) .marca {
   flex: none; font-size: 1.25rem; line-height: 1; white-space: nowrap;
 }
 /* Título ao lado dos passos é o arranjo da peça, mas ela é bem mais larga em
    proporção que um celular: abaixo disso a coluna dos passos fica com três
    linhas por item e o topo engorda. Aí eles voltam a ficar um sob o outro. */
 @media (min-width: 26rem) {
-  body[data-tema="tozi"] .topo-txt {
+  body:is([data-tema="tozi"], [data-tema="dulce"]) .topo-txt {
     display: flex; align-items: center; gap: .8rem;
   }
-  body[data-tema="tozi"] .marca { font-size: 1.08rem; margin: 0; }
+  body:is([data-tema="tozi"], [data-tema="dulce"]) .marca { font-size: 1.08rem; margin: 0; }
 }
 /* Na peça o "COMO VOTAR" vem sozinho — o tique é assinatura do Dr. Elton. */
-body[data-tema="tozi"] .visto-marca { display: none; }
+body:is([data-tema="tozi"], [data-tema="dulce"]) .visto-marca { display: none; }
 /* Os passos da peça são numerados em azul, não no verde do Dr. Elton. O vão à
    direita é onde o rosto entra. */
 body[data-tema="tozi"] .passos {
@@ -432,7 +430,7 @@ body[data-tema="tozi"] .passos li::before {
 }
 
 /* O rosto em traço invade o corpo pelo canto direito, como na peça. */
-body[data-tema="tozi"] .folha {
+body:is([data-tema="tozi"], [data-tema="dulce"]) .folha {
   position: relative;
   padding-top: 1.6rem;
 }
@@ -445,31 +443,63 @@ body[data-tema="tozi"] .folha::before {
 }
 /* O selo (movido para cá pelo app.js) ocupa o vazio à direita dos senadores,
    que só têm 3 dígitos — o mesmo lugar que ele tem na peça. */
-body[data-tema="tozi"] .folha > .selo {
+/* O selo vive dentro do campo do senador (1º voto) e transborda sobre o de
+   baixo — ancorado ali, desce junto quando um aviso empurra o formulário. */
+body:is([data-tema="tozi"], [data-tema="dulce"]) .campo { position: relative; }
+body:is([data-tema="tozi"], [data-tema="dulce"]) .campo > .selo {
   position: absolute; z-index: 1;
-  right: .4rem; top: 15.2rem;
+  right: 0; top: -.3rem;
   width: 7rem;
 }
+/* A mensagem de erro do campo que hospeda o selo quebraria por baixo dele. */
+body:is([data-tema="tozi"], [data-tema="dulce"]) .campo:has(> .selo) .erro {
+  padding-right: 7.4rem;
+}
 /* A peça não tem o tique de conferido: o campo dele já vem preenchido. */
-body[data-tema="tozi"] .visto { display: none; }
-body[data-tema="tozi"] .rotulo { font-size: .82rem; }
+body:is([data-tema="tozi"], [data-tema="dulce"]) .visto { display: none; }
+body:is([data-tema="tozi"], [data-tema="dulce"]) .rotulo { font-size: .82rem; }
 
 /* A foto de cada cargo fica à esquerda, como no tema padrão: é ela que abre a
    busca por nome, e ver o rosto do candidato é metade do "confira o nome e a
    foto". A peça impressa não tem essa coluna, mas ela é o app funcionando. */
 
 /* Rodapé com a faixa de listras da peça. */
-body[data-tema="tozi"] .rodape {
+body:is([data-tema="tozi"], [data-tema="dulce"]) .rodape {
   margin: 1.6rem -.9rem 0;
   padding: 1rem .9rem calc(1rem + env(safe-area-inset-bottom));
-  background: var(--marinho) url("marca/ondas.svg") center/150% auto no-repeat;
+  background: var(--marinho);
   color: rgba(255, 255, 255, .82);
 }
+body[data-tema="tozi"] .rodape {
+  background: var(--marinho) url("marca/ondas.svg") center/150% auto no-repeat;
+}
+/* Dulce Rita: paleta do site-dulcerita (identidade 2026) sobre o layout do
+   verso do santinho 7x10 dela. A peça é conjunta com o Dr. Elton: o campo
+   travado dela também sai verde, como os demais — a marca fica no petróleo
+   do topo, no selo navy com número mint e no padrão de pessoinhas. */
 body[data-tema="dulce"] {
-  --marinho: #6d1f3a; --marinho-2: #7d2a47; --limao: #e8a13d;
-  --limao-esc: #8a5a12; --bg: #faf3ef; --bg-2: #f2e3da;
-  --txt: #2b2126; --rot: #6e5f66; --mut: #6e5f66;
-  --linha: #ded0d5; --marca: #6d1f3a; --acento: #6d1f3a;
+  --marinho: #094b68; --marinho-2: #0a6089; --limao: #84bf41;
+  --limao-esc: #1f7a68; --bg: #e3e4e3; --bg-2: #d9e2df;
+  --txt: #10333f; --rot: #48626e; --mut: #48626e;
+  --linha: #c8cac8; --marca: #094b68; --acento: #0a6089;
+  --cx-travado: #84bf41; --cx-travado-txt: #10333f;
+  --display: "Avenir LT Std", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --titulo: "Geometos Neue", "Geometos", var(--display);
+}
+/* O padrão de pessoinhas de mãos dadas, textura do topo e do rodapé. */
+body[data-tema="dulce"] .topo {
+  background-image: url("marca/pessoinhas.svg");
+  background-size: 3.4rem auto;
+  padding-bottom: 1.4rem;
+}
+body[data-tema="dulce"] .passos { flex: 1; min-width: 0; font-size: .8rem; }
+body[data-tema="dulce"] .passos li::before { background: #5ac2ad; color: #0f2d3d; }
+body[data-tema="dulce"] .tecla { background: #b9d13d; color: #0f2d3d; }
+/* Selo navy chapado com número mint, sem anel — como no santinho. */
+body[data-tema="dulce"] .selo { background: #174156; border-color: transparent; }
+body[data-tema="dulce"] .selo-numero { color: #5ac2ad; font-style: italic; }
+body[data-tema="dulce"] .rodape {
+  background: var(--marinho) url("marca/pessoinhas.svg") 0 0/3.4rem auto;
 }
 
 /* --- gaveta de busca por nome (bottom sheet) -------------------------- */
