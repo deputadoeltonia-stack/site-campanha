@@ -10,9 +10,13 @@
 </head>
 <body>
 
-<a id="volta" class="volta" hidden>‹ Voltar ao site</a>
-
 <header class="topo">
+  <div class="topo-volta" id="volta-area" hidden>
+    <a id="volta" class="volta">
+      <svg viewBox="0 0 10 16" aria-hidden="true"><path d="M8 1 L2 8 L8 15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Voltar ao site
+    </a>
+  </div>
   <div class="topo-int">
     <div class="topo-txt">
       <h1 class="marca">
@@ -68,6 +72,8 @@
   </p>
 
 </main>
+
+<div class="faixa" aria-hidden="true"></div>
 
 <div id="busca" class="busca" hidden role="dialog" aria-modal="true" aria-labelledby="busca-titulo">
   <div class="busca-painel">

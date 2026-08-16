@@ -27,9 +27,8 @@ document.body.dataset.tema = config.tema
 {
   const volta = linkDeVolta(location.pathname)
   if (volta) {
-    const a = document.getElementById('volta')
-    a.href = volta
-    a.hidden = false
+    document.getElementById('volta').href = volta
+    document.getElementById('volta-area').hidden = false
   }
 }
 

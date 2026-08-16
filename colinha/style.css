@@ -76,7 +76,10 @@ html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
-  padding: 0 0 calc(2rem + env(safe-area-inset-bottom));
+  padding: 0;
+  /* coluna cheia: a faixa lima do pe fecha a pagina mesmo em tela alta */
+  min-height: 100svh;
+  display: flex; flex-direction: column;
   background: var(--bg);
   background-image: linear-gradient(170deg, var(--bg) 55%, var(--bg-2) 100%);
   background-attachment: fixed;
@@ -88,24 +91,27 @@ body {
 
 /* --- topo -------------------------------------------------------------- */
 
-/* link de volta — so aparece quando a colinha esta embutida num site */
+/* link de volta — pill discreto no topo, so quando embutida num site */
+.topo-volta { max-width: 26rem; margin: 0 auto .7rem; }
 .volta {
-  display: block; text-align: center;
-  background: var(--marinho-2); color: #fff;
-  font-weight: 600; font-size: .82rem; letter-spacing: .03em;
-  padding: .6rem 1rem; text-decoration: none;
-  border-bottom: 1px solid rgba(255, 255, 255, .12);
+  display: inline-flex; align-items: center; gap: .45rem;
+  background: rgba(255, 255, 255, .14); color: #fff;
+  font-weight: 600; font-size: .78rem; letter-spacing: .02em;
+  padding: .38rem .9rem .38rem .7rem; border-radius: 999px;
+  text-decoration: none;
+  transition: background .18s cubic-bezier(.25, 1, .5, 1), color .18s cubic-bezier(.25, 1, .5, 1);
 }
-.volta:hover { text-decoration: underline; }
+.volta svg { width: .5rem; height: auto; flex: none; }
+.volta:hover, .volta:focus-visible { background: var(--limao); color: var(--marinho); }
+@media (prefers-reduced-motion: reduce) { .volta { transition: none; } }
 
 .topo {
   background: var(--marinho);
   color: #fff;
   padding: 1rem .9rem 1.05rem;
-  /* chevrons discretos, o padrao da peca impressa */
-  background-image:
-    repeating-linear-gradient(115deg,
-      var(--marinho-2) 0 2px, transparent 2px 13px);
+  /* fileiras de chevrons, o padrao do topo da peca impressa */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cpath d='M0 7 L32 23 L64 7' fill='none' stroke='%231c3357' stroke-width='9'/%3E%3C/svg%3E");
+  background-size: 4rem auto;
 }
 
 .topo-int {
@@ -187,7 +193,16 @@ body {
 
 /* --- folha ------------------------------------------------------------- */
 
-.folha { max-width: 26rem; margin: 0 auto; padding: 1rem .9rem 0; }
+.folha { width: 100%; max-width: 26rem; margin: 0 auto; padding: 1rem .9rem 2rem; flex: 1 0 auto; }
+
+/* faixa lima de chevrons que fecha a peca impressa */
+.faixa {
+  flex: none; height: calc(2.3rem + env(safe-area-inset-bottom));
+  background-color: var(--limao);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cpath d='M0 7 L32 23 L64 7' fill='none' stroke='%236f8f26' stroke-width='9' stroke-opacity='.35'/%3E%3C/svg%3E");
+  background-size: 2.6rem auto;
+}
+body:is([data-tema="tozi"], [data-tema="dulce"]) .faixa { display: none; }
 
 .aviso {
   display: flex; align-items: center; justify-content: space-between;
