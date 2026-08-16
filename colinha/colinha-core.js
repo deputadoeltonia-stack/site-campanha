@@ -51,8 +51,11 @@ export const CANDIDATOS = {
     nome: 'DULCE RITA', cargo: 7, numero: '44400', partido: 'UNIÃO', tema: 'dulce',
     foto: 'dulce', rotulo: 'Deputada estadual', // flexao do cargo, so no campo dela
     // O verso do santinho dela ja vem com o federal (Dr. Elton, peca conjunta)
-    // e o governador preenchidos. Sugestao = editavel, como no tema do Elton.
-    sugestao: { federal: '4412', governador: '10' },
+    // e o governador impressos. FIXO, nao sugestao: o eleitor nao muda nenhum
+    // dos dois, e a garantia e a mesma do campo dela — nenhum desses slots
+    // existe no objeto de estado, entao nao ha caminho de escrita nem por URL
+    // nem por localStorage.
+    fixos: { federal: '4412', governador: '10' },
   },
 }
 
@@ -94,14 +97,27 @@ export function linkDeVolta(pathname) {
 // estado passa por criarEstado, entao a exclusao vale para URL, para
 // localStorage e para qualquer fonte futura.
 
+// O slot do PROPRIO candidato do site. E o que ganha o selo no topo.
 export function slotTravado(config) {
   if (!config?.numero) return null
   return CARGOS.find((c) => c.cargo === config.cargo)?.id ?? null
 }
 
+// Todos os slots que o eleitor nao edita: o do proprio candidato mais os
+// aliados que a peca ja traz impressos (config.fixos). Os dois casos tem a
+// MESMA garantia — nenhum deles entra no objeto de estado, entao nao existe
+// caminho de escrita por URL, por localStorage ou por qualquer fonte futura.
+export function slotsTravados(config) {
+  const proprio = slotTravado(config)
+  const aliados = Object.keys(config?.fixos ?? {}).filter(
+    (id) => id !== proprio && CARGOS.some((c) => c.id === id),
+  )
+  return new Set(proprio ? [proprio, ...aliados] : aliados)
+}
+
 export function criarEstado(config) {
-  const travado = slotTravado(config)
-  const livres = CARGOS.filter((c) => c.id !== travado)
+  const travados = slotsTravados(config)
+  const livres = CARGOS.filter((c) => !travados.has(c.id))
   // Sugestao da config preenche o valor inicial de um campo livre (na peca do
   // Dr. Elton, o governador). lerURL/lerSalvo sobrescrevem depois: o que o
   // eleitor apagou de proposito continua apagado ao restaurar.
@@ -159,6 +175,24 @@ export function montarColinha(estado, config, dados) {
         nome: config.nome,
         partido: config.partido,
         foto: config.foto ?? null,
+        travado: true,
+        erro: null,
+      }
+    }
+    // Aliado impresso na peca (Dr. Elton e o governador, na colinha da Dulce).
+    // O NUMERO vem da config e so da config, como no campo do proprio
+    // candidato: o estado nao e consultado nem que tenha a chave. Nome, sigla
+    // e foto seguem saindo do dataset do TSE — a config guarda so o que a
+    // peca imprime, que e o numero.
+    if (c.id in (config?.fixos ?? {})) {
+      const numero = limpar(config.fixos[c.id], c.digitos)
+      const achado = numero.length === c.digitos ? buscar(dados, c.cargo, numero) : null
+      return {
+        ...c,
+        numero,
+        nome: achado?.[0] ?? null,
+        partido: achado?.[1] ?? null,
+        foto: achado?.[2] || null,
         travado: true,
         erro: null,
       }

@@ -5,6 +5,8 @@
 // O visual imita o santinho impresso "COMO VOTAR": topo escuro, corpo claro,
 // e um quadrado por digito — preenchido na cor da marca, vazio em branco.
 
+import { slotTravado } from './colinha-core.js'
+
 const L = 1080
 const A = 1350
 
@@ -56,9 +58,16 @@ export const TEMAS = {
     // Selo petroleo-escuro inclinado sem anel: wordmark + trio + numero mint.
     selo: '#0a4b69', seloAnel: '#0a4b69', seloNumero: '#5bc2ad',
     seloTorto: true,
+    seloLinha: 5.15, // ultima linha (presidente), como na tela, folgado da faixa
     seloLogo: 'marca/logo-dulce-l1.png',
     seloLogo2: 'marca/logo-dulce-l2.png',
     seloTrio: 'marca/pessoinhas-trio.svg',
+    // Rotulo do cargo na display da campanha, como na peca. A Avenir nao serve
+    // aqui: o arquivo avenir-500.woff2 e o 65 Medium e o @font-face declara
+    // cobrir 500-800, entao pedir 800 devolve o Medium — sai leve demais
+    // perto do impresso. A Geometos Neue e Black de verdade (usWeightClass 900).
+    rotuloDisplay: true,
+    fotoSemDestaque: true, // campo pre-definido sem borda verde
     topoLiso: true, coracao: 'marca/coracao.svg', // coracao suave a direita
     padrao: 'marca/padrao-dulce-topo.svg', // pessoinhas tom sobre tom no topo
     corpoPadrao: 'marca/padrao-dulce-corpo.svg', // mint na direita do corpo
@@ -187,10 +196,13 @@ function colunaDe(t) {
 }
 
 function desenharFoto(ctx, t, slot, img, x, y) {
+  // Na colinha da Dulce os campos ja preenchidos nao levam destaque na foto:
+  // ficam com o mesmo fio fino dos campos livres (t.fotoSemDestaque).
+  const destacar = slot.travado && !t.fotoSemDestaque
   if (img) {
     desenharCover(ctx, img, x, y, FOTO_L, FOTO_A)
-    ctx.strokeStyle = slot.travado ? (t.travado ?? t.destaque) : t.linha
-    ctx.lineWidth = slot.travado ? 4 : 2
+    ctx.strokeStyle = destacar ? (t.travado ?? t.destaque) : t.linha
+    ctx.lineWidth = destacar ? 4 : 2
     retanguloArredondado(ctx, x, y, FOTO_L, FOTO_A, 8)
     ctx.stroke()
     return
@@ -200,8 +212,8 @@ function desenharFoto(ctx, t, slot, img, x, y) {
   ctx.fillStyle = slot.nome ? t.topo : t.caixa
   retanguloArredondado(ctx, x, y, FOTO_L, FOTO_A, 8)
   ctx.fill()
-  ctx.strokeStyle = slot.travado ? (t.travado ?? t.destaque) : t.linha
-  ctx.lineWidth = slot.travado ? 4 : 2
+  ctx.strokeStyle = destacar ? (t.travado ?? t.destaque) : t.linha
+  ctx.lineWidth = destacar ? 4 : 2
   retanguloArredondado(ctx, x, y, FOTO_L, FOTO_A, 8)
   ctx.stroke()
 
@@ -255,9 +267,14 @@ function desenharTopo(ctx, t, simbolo, padrao) {
   ctx.rect(0, 0, L, TOPO)
   ctx.clip()
   if (padrao) {
-    // Textura repetida (pessoinhas da Dulce), como o background-image da tela.
-    ctx.fillStyle = ctx.createPattern(padrao, 'repeat')
-    ctx.fillRect(0, 0, L, TOPO)
+    // Como na peca (e na tela): UMA faixa de pessoinhas encostada no pe do
+    // cabecalho, repetindo so na horizontal. 64% da altura da faixa e a
+    // proporcao medida na pagina 2 do santinho — o terco de cima fica liso.
+    const alt = TOPO * 0.64
+    const larg = alt * (padrao.width / padrao.height)
+    for (let x = 0; x < L; x += larg) {
+      ctx.drawImage(padrao, x, TOPO - alt, larg, alt)
+    }
   } else if (simbolo) {
     const larg = L * 1.25
     const alt = larg * (simbolo.height / simbolo.width)
@@ -345,8 +362,10 @@ function desenharSelo(ctx, t, slot, imgSelo, seloLogo, seloLogo2, seloTrio) {
   const raio = 96
   const cx = L - MARGEM - raio
   // Na peca o selo desce para a faixa dos senadores, que so tem 3 digitos e
-  // deixa a direita vazia.
-  const cy = t.seloNoCorpo ? Y0 + ALTURA_LINHA * 2.32 : 150
+  // deixa a direita vazia. Na tela (e aqui) esse vazio nao e permanente: com o
+  // nome do senador resolvido, e ali que o texto cai. Por isso o tema pode
+  // escolher outra linha — a Dulce usa a ultima, onde o vao nao fecha.
+  const cy = t.seloNoCorpo ? Y0 + ALTURA_LINHA * (t.seloLinha ?? 2.32) : 150
 
   ctx.save()
   ctx.beginPath()
@@ -552,8 +571,12 @@ export async function desenhar(colinha, config) {
     ctx.drawImage(rosto, L - larg - MARGEM * 0.45, 10, larg, alt)
   }
 
-  const travado = colinha.find((s) => s.travado)
-  if (travado) desenharSelo(ctx, t, travado, imgSelo, seloLogo, seloLogo2, seloTrio)
+  // O selo e o do PROPRIO candidato do site: procura pelo cargo da config, e
+  // nao pelo primeiro `travado`. Com os aliados da peca tambem fixos, o
+  // primeiro travado passou a ser o federal — e o selo saiu com o wordmark
+  // dela e o numero do Dr. Elton.
+  const proprio = colinha.find((s) => s.id === slotTravado(config))
+  if (proprio) desenharSelo(ctx, t, proprio, imgSelo, seloLogo, seloLogo2, seloTrio)
 
   ctx.textAlign = 'left'
   let y = Y0
@@ -561,7 +584,8 @@ export async function desenhar(colinha, config) {
   for (const slot of colinha) {
     // Rotulo do cargo, e o nome resolvido logo depois da barra. Na peca do
     // Dr. Elton o rotulo sai na display da campanha, nao na fonte de texto.
-    ctx.font = fonte(t, 800, COND, t.peca ? 30 : 32, { texto: !t.peca })
+    const display = t.peca || t.rotuloDisplay
+    ctx.font = fonte(t, 800, COND, display ? 30 : 32, { texto: !display })
     ctx.fillStyle = t.rot
     const cargo = slot.rotulo.toUpperCase()
     const coluna = colunaDe(t)

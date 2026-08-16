@@ -524,6 +524,13 @@ body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo > .
 }
 /* Na arte do Dr. Elton o botton e maior e desce um pouco mais na faixa. */
 body[data-tema="elton"] .campo > .selo { width: 7.5rem; top: -.1rem; }
+/* Na Dulce o selo vive no ULTIMO campo (ver app.js) e comeca na altura das
+   CAIXAS, nao do rotulo: o rotulo cresce quando o nome do candidato resolve,
+   e era ali que o selo cobria os senadores. Abaixo dele o vao de um cargo de
+   2 digitos e permanente, e o que sobra transborda para o respiro antes dos
+   botoes — que ganha folga equivalente logo abaixo. */
+body[data-tema="dulce"] .campo > .selo { top: 1.5rem; width: 6.6rem; }
+body[data-tema="dulce"] .acoes { margin-top: 3.6rem; }
 /* A mensagem de erro do campo que hospeda o selo quebraria por baixo dele. */
 body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo:has(> .selo) .erro {
   padding-right: 7.4rem;
@@ -538,8 +545,9 @@ body[data-tema="elton"] .campo.travado .partido { display: none; }
    busca por nome, e ver o rosto do candidato é metade do "confira o nome e a
    foto". A peça impressa não tem essa coluna, mas ela é o app funcionando. */
 
-/* Rodapé com a faixa de listras da peça. */
-body:is([data-tema="tozi"], [data-tema="dulce"]) .rodape {
+/* Rodapé com a faixa de listras da peça. (Só o Tozi: na Dulce o rodapé é o
+   texto solto, sem caixa — ver o bloco do tema dela.) */
+body[data-tema="tozi"] .rodape {
   margin: 1.6rem -.9rem 0;
   padding: 1rem .9rem calc(1rem + env(safe-area-inset-bottom));
   background: var(--marinho);
@@ -569,10 +577,18 @@ body[data-tema="dulce"] .digito { color: var(--txt); }
 /* Topo da peca: pessoinhas tom sobre tom. O coracao mint aparece DESFOCADO,
    um brilho suave — por isso pseudo com blur, nao background (filter nao pega
    numa camada só do background). */
+/* O padrao da peca nao e um campo infinito: sao as pessoinhas (Λ com cabeca —
+   duas bolinhas e um coracao, nessa ordem) grandes, em duas filas, encostadas
+   no PE da faixa, com o terco de cima liso. Dai repeat-x, bottom e a altura em
+   %: medido na pagina 2 do santinho, o bloco ocupa 63,5% da faixa (264px de
+   416px) e cada figura vale 135px — proporcao que o `auto 64%` mantem em
+   qualquer altura de cabecalho. O tile tem 3 figuras porque a cabeca so fecha
+   o ciclo de tres. */
 body[data-tema="dulce"] .topo {
   background-image: url("marca/padrao-dulce-topo.svg");
-  background-repeat: repeat;
-  background-size: 4.2rem auto;
+  background-repeat: repeat-x;
+  background-position: left bottom;
+  background-size: auto 64%;
   padding-bottom: 1.4rem;
 }
 /* Na peca o coracao fica logo depois do CONFIRMA — ancorado nos passos, e nao
@@ -648,7 +664,12 @@ body[data-tema="dulce"] .acoes button.secundario { background: var(--bg); }
 /* A peça fecha com a faixa petróleo colada na borda de baixo: o rodapé é a
    faixa (full-bleed, herdado da regra tozi/dulce acima), empurrado para o pé
    pelo margin-top: auto. */
-body[data-tema="dulce"] .rodape { margin-top: auto; }
+/* Rodape sem caixa: so o texto, no cinza discreto do tema (o base .rodape ja
+   faz isso). O margin-top: auto so empurra para o pe da pagina. */
+body[data-tema="dulce"] .rodape { margin-top: auto; padding-bottom: env(safe-area-inset-bottom); }
+/* A foto do campo pre-definido nao leva destaque verde: fica com o mesmo fio
+   fino dos campos livres. */
+body[data-tema="dulce"] .foto-travada { border-color: var(--linha); border-width: 1px; }
 /* Respiro garantido entre o ultimo botao e a faixa, mesmo com a pagina cheia
    (o margin-top: auto colapsa a zero quando o conteudo enche). */
 body[data-tema="dulce"] .acoes { margin-bottom: 1.4rem; }

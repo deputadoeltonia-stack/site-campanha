@@ -532,8 +532,15 @@ async function iniciar() {
   // aviso de "Começar de novo" aparece e empurra tudo para baixo, o selo
   // desce junto em vez de cair por cima dos números.
   if (slotTravado(config)) {
-    document.getElementById('campo-senador1')
-      .appendChild(document.getElementById('selo'))
+    // Na peca impressa o selo ocupa o vazio a direita dos senadores, que so
+    // tem 3 digitos. Na tela esse vazio nao e permanente: assim que o eleitor
+    // digita o numero, o NOME do senador ocupa exatamente aquela faixa e o
+    // selo passa por cima. Na colinha da Dulce ele desce para o ultimo campo
+    // e fica ancorado na faixa das CAIXAS (abaixo do rotulo, ver o CSS), que
+    // e vao permanente em cargo de 2 digitos, transbordando para o respiro
+    // antes dos botoes — fecha a folha como uma assinatura.
+    const ancora = config.tema === 'dulce' ? 'campo-presidente' : 'campo-senador1'
+    document.getElementById(ancora).appendChild(document.getElementById('selo'))
   }
 
   render()
