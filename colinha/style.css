@@ -558,19 +558,23 @@ body[data-tema="dulce"] {
    não no petróleo do topo. */
 body[data-tema="dulce"] .nome,
 body[data-tema="dulce"] .digito { color: var(--txt); }
-/* Topo da peca: pessoinhas tom sobre tom. O coracao mint aparece DESFOCADO à
-   direita do CONFIRMA, um brilho suave — por isso pseudo com blur, nao
-   background (filter nao pega numa camada só do background). */
+/* Topo da peca: pessoinhas tom sobre tom. O coracao mint aparece DESFOCADO,
+   um brilho suave — por isso pseudo com blur, nao background (filter nao pega
+   numa camada só do background). */
 body[data-tema="dulce"] .topo {
-  position: relative;
   background-image: url("marca/padrao-dulce-topo.svg");
   background-repeat: repeat;
   background-size: 4.2rem auto;
   padding-bottom: 1.4rem;
 }
-body[data-tema="dulce"] .topo::after {
+/* Na peca o coracao fica logo depois do CONFIRMA — ancorado nos passos, e nao
+   na borda do .topo, ele acompanha a coluna de conteudo em vez de voar para o
+   canto da tela quando a janela e larga. Centro a 74% da altura do bloco, como
+   na arte (medido na peca 7x10). */
+body[data-tema="dulce"] .passos { position: relative; }
+body[data-tema="dulce"] .passos::after {
   content: ""; position: absolute;
-  right: .7rem; top: 50%; transform: translateY(-50%);
+  right: -.2rem; top: 74%; transform: translateY(-50%);
   width: 3.4rem; height: 3.2rem;
   background: url("marca/coracao.svg") center/contain no-repeat;
   filter: blur(7px); opacity: .8;
