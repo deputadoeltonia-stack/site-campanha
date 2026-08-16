@@ -203,7 +203,15 @@ p { margin: 0 0 1rem; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: .8rem; margin-bottom: 2.2rem; }
 
 .hero-photo { position: relative; align-self: end; display: flex; justify-content: center; min-height: 340px; }
-@media (min-width: 940px) { .hero-photo { justify-content: flex-end; } } /* ancora na borda, sem flutuar */
+@media (min-width: 940px) {
+  /* ancora na borda e ROMPE a margem direita do wrap ate a borda da tela
+     (breakout, teto -140px): ele maior sem cortar nada — o max-width do img
+     e o clip do .hero seguram o resto */
+  .hero-photo {
+    justify-content: flex-end;
+    margin-right: clamp(-140px, calc((var(--wrap) - 100vw) / 2 - var(--gutter)), 0px);
+  }
+}
 .hero-photo::before { /* halo frio: separa o blazer navy do fundo navy */
   content: ""; position: absolute; z-index: -1; inset: 6% 4% 0 4%;
   background: radial-gradient(58% 52% at 50% 42%, rgba(150,182,225,.20), transparent 72%);
