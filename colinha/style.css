@@ -159,11 +159,14 @@ body[data-tema="elton"] {
   font-size: .68rem; font-weight: 700; line-height: 0; /* so o glifo conta no centro */
 }
 
-/* A tecla da urna, destacada como na peca impressa. */
+/* A tecla da urna, destacada como na peca impressa. Alinhada pelo meio da
+   linha (baseline + padding assimetrico deixavam a caixa ~1px alta em
+   relacao ao texto "Aperte"). */
 .tecla {
   display: inline-block;
+  vertical-align: middle;
   background: var(--lima); color: var(--marinho);
-  padding: .12em .45em .16em; border-radius: .3em;
+  padding: .13em .45em; border-radius: .3em;
   line-height: 1.05; font-weight: 800;
 }
 
