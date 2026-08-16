@@ -241,10 +241,29 @@ body:is([data-tema="tozi"], [data-tema="dulce"]) .faixa { display: none; }
 
 .aviso {
   display: flex; align-items: center; justify-content: space-between;
-  gap: .5rem; margin: 0 0 .85rem; padding: .5rem .7rem;
+  gap: .5rem; margin: 0 0 .85rem; padding: .4rem .45rem .4rem .85rem;
   background: var(--surface); border: 1px solid var(--linha);
   border-radius: var(--raio); font-size: .78rem; color: var(--mut);
 }
+
+/* "Comecar de novo" apaga o que o eleitor digitou, mas era um link sublinhado:
+   sem cara de alvo tocavel e sem dizer o que faz. Vira pill com a seta de
+   recomeco. De CONTORNO, nao cheio: e utilitario, nao pode competir com
+   "Salvar imagem" nem virar um alvo grande de toque acidental — quem enche
+   seis campos e apaga sem querer refaz tudo. */
+.recomecar {
+  display: inline-flex; align-items: center; gap: .45rem;
+  flex: none; min-height: 44px; padding: .5rem .9rem;
+  font: inherit; font-size: .8rem; font-weight: 700;
+  color: var(--marca); background: transparent;
+  border: 2px solid var(--marca); border-radius: 999px;
+  cursor: pointer;
+  transition: background-color .16s cubic-bezier(.25, 1, .5, 1),
+              color .16s cubic-bezier(.25, 1, .5, 1);
+}
+.recomecar svg { width: 1.1em; height: 1.1em; flex: none; }
+.recomecar:hover, .recomecar:focus-visible { background: var(--marca); color: var(--marca-txt); }
+.recomecar:active { transform: scale(.97); }
 
 .link {
   background: none; border: 0; padding: 0; font: inherit;
