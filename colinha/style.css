@@ -563,17 +563,30 @@ body[data-tema="dulce"] .selo-l1 { width: 4.3rem; display: block; }
 body[data-tema="dulce"] .selo-l2wrap { display: flex; align-items: flex-end; gap: .22rem; }
 body[data-tema="dulce"] .selo-l2 { width: 3.05rem; display: block; }
 body[data-tema="dulce"] .selo-trio { width: 1.25rem; display: block; }
-/* Pessoinhas mint na lateral direita do corpo, como na peça. */
+/* Pessoinhas mint na lateral direita do corpo, como na peça — ATRAS de todo
+   o conteudo. Sem o z-index negativo o pseudo-elemento posicionado pinta por
+   cima de qualquer irmao estatico: botoes, aviso e rodape ficavam por baixo
+   do padrao. -1 o poe acima so do fundo da pagina. */
 body[data-tema="dulce"] .folha::before {
   content: ""; position: absolute; inset: 0 -.9rem 0 auto; width: 58%;
+  z-index: -1;
   background: url("marca/padrao-dulce-corpo.svg") right top/4.6rem auto repeat;
   opacity: .5; pointer-events: none;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 45%);
   mask-image: linear-gradient(90deg, transparent, #000 45%);
 }
+/* O botao de contorno e transparente: sobre o padrao, as pessoinhas vazavam
+   para dentro do texto. Fundo da pagina no lugar de transparencia. */
+body[data-tema="dulce"] .acoes button.secundario { background: var(--bg); }
 body[data-tema="dulce"] .rodape {
   background: var(--marinho) url("marca/padrao-dulce-topo.svg") 0 0/4.2rem auto;
+  margin-top: auto;
 }
+/* A folha tem flex: 1 e estica ate o pe da tela; sem isto o rodape parava no
+   meio e sobrava um vao cinza com padrao solto embaixo. Coluna flex + auto
+   no rodape fecham a pagina com a faixa navy, como a peca fecha. */
+body[data-tema="dulce"] .folha { display: flex; flex-direction: column; }
+body[data-tema="dulce"] .folha > * { flex: none; }
 
 /* --- gaveta de busca por nome (bottom sheet) -------------------------- */
 

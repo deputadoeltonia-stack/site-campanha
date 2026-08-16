@@ -37,14 +37,6 @@ export const CANDIDATOS = {
   'tozisite-git-main-elton8.vercel.app': { alias: 'colinhavirtual.dreltonai.com.br' },
   'proftozi.com.br': { alias: 'colinhavirtual.dreltonai.com.br' },
   'www.proftozi.com.br': { alias: 'colinhavirtual.dreltonai.com.br' },
-  // Dominios de producao 2026 (HostGator). Sem estes aliases o site de cada
-  // candidato abre a colinha do Dr. Elton, que e o PADRAO — e em silencio.
-  'proftozi44447.com.br': { alias: 'colinhavirtual.dreltonai.com.br' },
-  'www.proftozi44447.com.br': { alias: 'colinhavirtual.dreltonai.com.br' },
-  'drelton4412.com.br': { alias: 'colinha.dreltonai.com.br' },
-  'www.drelton4412.com.br': { alias: 'colinha.dreltonai.com.br' },
-  'dulcerita44400.com.br': { alias: 'colinha2026.dreltonai.com.br' },
-  'www.dulcerita44400.com.br': { alias: 'colinha2026.dreltonai.com.br' },
   // Site da Dulce Rita (projeto Vercel "dulcesite") tambem embute /colinha/.
   // Dominio de producao e sitedulce.vercel.app — um alias errado aqui abre a
   // colinha do Dr. Elton dentro do site dela, em silencio.
