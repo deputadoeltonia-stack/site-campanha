@@ -216,12 +216,13 @@ body[data-tema="elton"] {
   color: var(--limao); letter-spacing: .04em;
 }
 
-/* No Dr. Elton o selo e o botton oficial do manual, uma imagem: o circulo,
-   os chevrons e o Gunterz inclinado do 4412 ja vem prontos de la. */
-body[data-tema="elton"] .selo {
+/* Campanha com adesivo oficial (Dr. Elton e Dulce): o selo e a propria arte,
+   uma imagem — circulo, tipografia e a inclinacao do lockup ja vem prontos
+   dela, entao nada de fundo, anel ou rotacao por cima. */
+body:is([data-tema="elton"], [data-tema="dulce"]) .selo {
   background: none; border: 0; padding: 0; transform: none;
-  filter: drop-shadow(0 3px 7px rgba(14, 31, 58, .28));
 }
+body[data-tema="elton"] .selo { filter: drop-shadow(0 3px 7px rgba(14, 31, 58, .28)); }
 .selo-badge { display: block; width: 100%; height: auto; }
 
 /* --- folha ------------------------------------------------------------- */
@@ -529,7 +530,9 @@ body[data-tema="elton"] .campo > .selo { width: 7.5rem; top: -.1rem; }
    e era ali que o selo cobria os senadores. Abaixo dele o vao de um cargo de
    2 digitos e permanente, e o que sobra transborda para o respiro antes dos
    botoes — que ganha folga equivalente logo abaixo. */
-body[data-tema="dulce"] .campo > .selo { top: 1.5rem; width: 6.6rem; }
+/* 6.2rem = 23,9% da largura da folha, a mesma proporcao que o adesivo tem na
+   peca impressa (526px de 2204px). */
+body[data-tema="dulce"] .campo > .selo { top: 1.5rem; width: 6.2rem; }
 body[data-tema="dulce"] .acoes { margin-top: 3.6rem; }
 /* A mensagem de erro do campo que hospeda o selo quebraria por baixo dele. */
 body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo:has(> .selo) .erro {
@@ -539,7 +542,7 @@ body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo:has
 body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .rotulo { font-size: .82rem; }
 /* Na peca o campo travado sai sem a sigla do partido ("DEPUTADO FEDERAL |
    DR. ELTON", nada de UNIÃO) — e sem ela o rotulo cabe numa linha so. */
-body[data-tema="elton"] .campo.travado .partido { display: none; }
+body:is([data-tema="elton"], [data-tema="dulce"]) .campo.travado .partido { display: none; }
 
 /* A foto de cada cargo fica à esquerda, como no tema padrão: é ela que abre a
    busca por nome, e ver o rosto do candidato é metade do "confira o nome e a
@@ -618,18 +621,8 @@ body[data-tema="dulce"] .tecla {
   background: linear-gradient(180deg, #bfd736, #68bd46);
   color: var(--txt);
 }
-/* Selo petróleo-escuro chapado, inclinado como na peça, sem anel. O conteúdo
-   (cargo em duas linhas + wordmark + trio + número mint) vem do app.js. */
-body[data-tema="dulce"] .selo { background: #0a4b69; border-color: transparent; transform: rotate(-8deg); }
-body[data-tema="dulce"] .selo-cargo { font-size: .52rem; letter-spacing: .1em; line-height: 1.3; }
-body[data-tema="dulce"] .selo-numero { color: #5bc2ad; font-style: italic; font-size: 1.35rem; }
-body[data-tema="dulce"] .selo-barra { color: var(--limao); font-weight: 900; }
-/* Wordmark em duas linhas ("DULCE" / "RITΛ" + trio), como no selo da peça. */
-body[data-tema="dulce"] .selo-lockup { display: flex; flex-direction: column; align-items: center; gap: .12rem; }
-body[data-tema="dulce"] .selo-l1 { width: 4.3rem; display: block; }
-body[data-tema="dulce"] .selo-l2wrap { display: flex; align-items: flex-end; gap: .22rem; }
-body[data-tema="dulce"] .selo-l2 { width: 3.05rem; display: block; }
-body[data-tema="dulce"] .selo-trio { width: 1.25rem; display: block; }
+/* O selo dela e o adesivo oficial em imagem (ver o bloco de temas com arte,
+   acima) — o lockup montado a mao saiu junto com as regras que o vestiam. */
 /* Pessoinhas mint na lateral direita do corpo, como na peça — ATRAS de todo
    o conteudo. Sem o z-index negativo o pseudo-elemento posicionado pinta por
    cima de qualquer irmao estatico: botoes, aviso e rodape ficavam por baixo

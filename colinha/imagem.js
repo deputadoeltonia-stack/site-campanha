@@ -24,6 +24,7 @@ export const TEMAS = {
     // O selo e o botton oficial do manual (ID 26 ELTON p.14), em imagem; se
     // ela falhar ao carregar, cai no circulo desenhado.
     selo: '#13284a', seloAnel: '#13284a', seloImagem: 'marca/selo-elton.png',
+    seloSombra: true,
     seloNoCorpo: true, // na arte ele flutua na faixa dos senadores
     digitoItalico: true, // Gunterz Bold Italic da peca; Geometos inclinada aqui
     // peca: true liga o que so a peca do Dr. Elton tem — pincel no titulo,
@@ -55,26 +56,25 @@ export const TEMAS = {
     fundo: '#e7e8e8', fundo2: '#e7e8e8', caixa: '#ffffff', linha: '#d3d4d4',
     txt: '#062240', rot: '#6d6f71',
     travadoTxt: '#062240', // caixa travada segue verde; so o digito escurece
-    // Selo petroleo-escuro inclinado sem anel: wordmark + trio + numero mint.
-    selo: '#0a4b69', seloAnel: '#0a4b69', seloNumero: '#5bc2ad',
-    seloTorto: true,
-    seloLinha: 5.15, // ultima linha (presidente), como na tela, folgado da faixa
-    seloLogo: 'marca/logo-dulce-l1.png',
-    seloLogo2: 'marca/logo-dulce-l2.png',
-    seloTrio: 'marca/pessoinhas-trio.svg',
+    // O selo e o adesivo oficial, extraido em vetor do santinho (ja com o
+    // 44400 e com a inclinacao do lockup na propria arte). Raio 129 = 23,9%
+    // da largura, a proporcao que ele tem na peca impressa.
+    seloImagem: 'marca/selo-dulce.png',
+    seloRaio: 129,
+    seloCy: 205, // montado na quebra do cabecalho, no canto sem texto
+    seloNoCorpo: false,
     // Rotulo do cargo na display da campanha, como na peca. A Avenir nao serve
     // aqui: o arquivo avenir-500.woff2 e o 65 Medium e o @font-face declara
     // cobrir 500-800, entao pedir 800 devolve o Medium — sai leve demais
     // perto do impresso. A Geometos Neue e Black de verdade (usWeightClass 900).
     rotuloDisplay: true,
     fotoSemDestaque: true, // campo pre-definido sem borda verde
-    topoLiso: true, coracao: 'marca/coracao.svg', // coracao suave a direita
+    topoLiso: true, // sem coracao: o adesivo ocupa o canto direito do topo
     padrao: 'marca/padrao-dulce-topo.svg', // pessoinhas tom sobre tom no topo
     corpoPadrao: 'marca/padrao-dulce-corpo.svg', // mint na direita do corpo
     rodapeBanda: '#005474', // a faixa petroleo que fecha a peca
     titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
-    seloNoCorpo: true,
   },
 }
 
@@ -347,13 +347,21 @@ function desenharSelo(ctx, t, slot, imgSelo, seloLogo, seloLogo2, seloTrio) {
   // Botton oficial em imagem (Dr. Elton): desenha e pronto. Maior que o selo
   // de texto, como na arte.
   if (imgSelo) {
-    const raio = 148
+    const raio = t.seloRaio ?? 148
     const cx = L - MARGEM - raio
-    const cy = Y0 + ALTURA_LINHA * 2.32
+    // No corpo (Dr. Elton) ou montado na quebra do cabecalho (Dulce): na
+    // imagem as linhas sao compactas e nao sobra bolso para um adesivo do
+    // tamanho da peca sem cair em cima do nome de algum candidato. O alto a
+    // direita e a unica area livre de texto — o titulo e as duas linhas do
+    // cabecalho sao alinhados a esquerda.
+    const cy = t.seloNoCorpo ? Y0 + ALTURA_LINHA * (t.seloLinha ?? 2.32) : (t.seloCy ?? 150)
     ctx.save()
-    ctx.shadowColor = 'rgba(14,31,58,.30)'
-    ctx.shadowBlur = 18
-    ctx.shadowOffsetY = 6
+    // So o botton do Dr. Elton tem sombra na arte; o adesivo da Dulce e chapado.
+    if (t.seloSombra) {
+      ctx.shadowColor = 'rgba(14,31,58,.30)'
+      ctx.shadowBlur = 18
+      ctx.shadowOffsetY = 6
+    }
     ctx.drawImage(imgSelo, cx - raio, cy - raio, raio * 2, raio * 2)
     ctx.restore()
     return
@@ -598,8 +606,9 @@ export async function desenhar(colinha, config) {
       ctx.fillStyle = t.txt
       const nome = cortar(ctx, slot.nome.toUpperCase(), L - MARGEM - cursor - 60)
       ctx.fillText(nome, cursor, y)
-      // Na peca o campo travado sai sem a sigla ("... | DR. ELTON", so).
-      if (slot.partido && !(slot.travado && t.peca)) {
+      // Na peca o campo ja preenchido sai sem a sigla ("... | DR. ELTON", so).
+      // Isso tambem tira o "UNIAO" de baixo do adesivo, no alto a direita.
+      if (slot.partido && !(slot.travado && display)) {
         cursor += ctx.measureText(nome).width + 12
         ctx.font = fonte(t, 700, COND, 24, { texto: true })
         ctx.fillStyle = t.rot

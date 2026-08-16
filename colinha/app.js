@@ -7,6 +7,13 @@ import { configurarBusca, abrirBusca } from './busca.js'
 
 const CHAVE = 'colinha-sp-2026'
 
+// Adesivo oficial de cada campanha, extraido do material em vetor. Campanha
+// sem arte cai no selo montado com texto (o do Tozi).
+const BADGE = {
+  elton: 'marca/selo-elton.png', // botton do manual ID 26 ELTON, pag. 14
+  dulce: 'marca/selo-dulce.png', // adesivo do santinho 7x10, ja com o 44400
+}
+
 const config = configPara(hostDeDev(location.hostname, location.search))
 let dados = {}
 let estado = criarEstado(config)
@@ -38,56 +45,16 @@ document.body.dataset.tema = config.tema
 {
   const travadoId = slotTravado(config)
   if (travadoId) {
-    if (config.tema === 'elton') {
-      // O selo do Dr. Elton e o botton oficial do manual (ID 26 ELTON, pag.
-      // 14), extraido como imagem — texto montado a mao nunca reproduz o
-      // lockup com os chevrons cruzando o T. Decorativo: a informacao ja
-      // esta no campo travado.
+    // Campanha com adesivo oficial: usa a arte, extraida do material em
+    // vetor. Texto montado a mao nunca reproduz o lockup — nem os chevrons
+    // cruzando o T do Dr. Elton, nem o Λ do RITΛ com o trio de pessoinhas
+    // encaixado. Decorativo: a informacao ja esta no campo travado.
+    if (BADGE[config.tema]) {
       const img = document.createElement('img')
-      img.src = 'marca/selo-elton.png'
+      img.src = BADGE[config.tema]
       img.alt = ''
       img.className = 'selo-badge'
       document.getElementById('selo').replaceChildren(img)
-    } else if (config.tema === 'dulce') {
-      // Selo da peca dela: wordmark oficial (o Λ final nao e fonte) + trio
-      // de pessoinhas mint. Cargo e numero seguem vindo da config.
-      const cargoInfo = CARGOS.find((c) => c.id === travadoId)
-      const cargo = document.createElement('span')
-      cargo.className = 'selo-cargo'
-      const barra = document.createElement('span')
-      barra.className = 'selo-barra'
-      barra.textContent = '//'
-      // Na peca o cargo sai em duas linhas ("DEPUTADA" / "ESTADUAL //"), com
-      // a barra lima fechando a segunda.
-      const partes = (config.rotulo ?? cargoInfo.rotulo).split(' ')
-      cargo.append(
-        partes.slice(0, -1).join(' '),
-        document.createElement('br'),
-        `${partes.at(-1)} `,
-        barra,
-      )
-      const lockup = document.createElement('span')
-      lockup.className = 'selo-lockup'
-      const l1 = document.createElement('img')
-      l1.src = 'marca/logo-dulce-l1.png'
-      l1.alt = ''
-      l1.className = 'selo-l1'
-      const linha2 = document.createElement('span')
-      linha2.className = 'selo-l2wrap'
-      const l2 = document.createElement('img')
-      l2.src = 'marca/logo-dulce-l2.png'
-      l2.alt = ''
-      l2.className = 'selo-l2'
-      const trio = document.createElement('img')
-      trio.src = 'marca/pessoinhas-trio.svg'
-      trio.alt = ''
-      trio.className = 'selo-trio'
-      linha2.append(l2, trio)
-      lockup.append(l1, linha2)
-      const num = document.createElement('span')
-      num.className = 'selo-numero'
-      num.textContent = config.numero
-      document.getElementById('selo').replaceChildren(cargo, lockup, num)
     } else {
       const cargoInfo = CARGOS.find((c) => c.id === travadoId)
       document.getElementById('selo-cargo').textContent = config.rotulo ?? cargoInfo.rotulo
