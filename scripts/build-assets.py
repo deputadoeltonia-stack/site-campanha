@@ -61,20 +61,12 @@ def main():
     src = os.path.join(ROOT, "assets-src/deputado-src.png")
     if os.path.exists(src):
         im = Image.open(src).convert("RGBA")
-        # Fechado em rosto+peito, 3:4, centrado na cabeca (cx 330 na fonte).
-        # As laterais cortam o paleto de proposito; o fade de alpha abaixo
-        # funde as bordas retas no fundo navy do hero (paleto navy = invisivel).
-        l, t, r, b = 83, 22, 577, 680
-        im = im.crop((l, t, r, b))
-        from PIL import ImageDraw, ImageChops
-        borda = Image.new("L", im.size, 255)
-        d = ImageDraw.Draw(borda)
-        N = 16
-        for x in range(N):
-            v = round(255 * x / N)
-            d.line([(x, 0), (x, im.height)], fill=v)
-            d.line([(im.width - 1 - x, 0), (im.width - 1 - x, im.height)], fill=v)
-        im.putalpha(ImageChops.multiply(im.getchannel("A"), borda))
+        # Corpo INTEIRO na largura (bracos nao cortam) e base no peito:
+        # 638x658, quase quadrado. No hero a foto e limitada pela ALTURA da
+        # coluna de texto; quanto menos torso no quadro, maior o rosto sai
+        # na tela. O CSS renderiza a proporcao natural (sem cover) — corte
+        # zero por construcao.
+        im = im.crop((25, 22, 663, 680))
         webp = os.path.join(ASSETS, "deputado.webp")
         png = os.path.join(ASSETS, "deputado.png")
         im.save(webp, "WEBP", quality=82, method=6)  # method 6 = melhor compressão
