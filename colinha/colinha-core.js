@@ -19,18 +19,18 @@ export const CANDIDATOS = {
   'colinha.dreltonai.com.br': {
     nome: 'DR. ELTON', cargo: 6, numero: '4412', partido: 'UNIÃO', tema: 'elton',
     foto: 'elton', // fotos/elton.jpg — foto oficial da campanha, nao vem do TSE
-    // A peca impressa ja traz o governador preenchido (Tarcisio, 10). Sugestao
-    // e diferente de travado: o campo comeca com o numero mas segue editavel,
-    // e o nome continua vindo do dataset TSE como em qualquer campo livre.
-    sugestao: { governador: '10' },
+    // A peca impressa dele ja traz o governador (Tarcisio, 10). Fixo, como na
+    // colinha da Dulce: o slot nao existe no estado, entao nao ha caminho de
+    // escrita por URL nem por localStorage. Nome e foto seguem do TSE.
+    fixos: { governador: '10' },
   },
   // Numero confirmado pelo santinho impresso 7x10 da campanha (15/08/2026).
   'colinhavirtual.dreltonai.com.br': {
     nome: 'PROFESSOR TOZI', cargo: 7, numero: '44447', partido: 'UNIÃO', tema: 'tozi',
     foto: 'tozi',
-    // Como na colinha da Dulce: Dr. Elton (peca conjunta) e o governador ja
-    // vem preenchidos. Sugestao = editavel; o nome resolve pelo dataset TSE.
-    sugestao: { federal: '4412', governador: '10' },
+    // A peca conjunta dele traz o Dr. Elton e o governador impressos, igual a
+    // da Dulce — e fixos pelo mesmo motivo: o eleitor nao muda nenhum dos dois.
+    fixos: { federal: '4412', governador: '10' },
   },
   // O site do Tozi embute a colinha em /colinha/ (site-tozi, deploy Vercel).
   // Sem estes aliases o hostname dele cairia no PADRAO e abriria a colinha

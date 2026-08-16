@@ -92,15 +92,6 @@ function linhaHTML(slot) {
     (_, i) => `<span class="digito" id="d-${slot.id}-${i}" aria-hidden="true"></span>`,
   ).join('')
 
-  // O tique da peca do Dr. Elton: o visto em contorno depois do 4412, no vao
-  // que o cargo de 4 digitos deixa na grade de 5. So no campo travado dele —
-  // as pecas do Tozi e da Dulce nao trazem o tique.
-  const tique = travado && config.tema === 'elton'
-    ? `<svg class="tique" viewBox="-4 -6 68 48" aria-hidden="true">
-         <path d="M2 15 L14 25 L58 4 L58 14 L14 36 L2 25 Z"/>
-       </svg>`
-    : ''
-
   // A foto e o botao que abre a busca por nome. No campo travado ela so
   // mostra a pessoa, nao clica — ninguem troca o federal por caminho nenhum.
   const foto = travado
@@ -116,7 +107,7 @@ function linhaHTML(slot) {
           <span>${slot.rotulo}</span><span class="nome" id="nome-${slot.id}" aria-live="polite"></span>
         </p>
         <div class="digitos">
-          ${caixas}${tique}
+          ${caixas}
           <input class="entrada" id="input-${slot.id}" name="${slot.id}"
                  type="text" inputmode="numeric" pattern="[0-9]*"
                  maxlength="${slot.digitos}"

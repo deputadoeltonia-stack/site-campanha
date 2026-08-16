@@ -25,10 +25,11 @@ export const TEMAS = {
     // ela falhar ao carregar, cai no circulo desenhado.
     selo: '#13284a', seloAnel: '#13284a', seloImagem: 'marca/selo-elton.png',
     seloSombra: true,
+    fotoSemDestaque: true, // campo pre-definido sem borda verde
     seloNoCorpo: true, // na arte ele flutua na faixa dos senadores
     digitoItalico: true, // Gunterz Bold Italic da peca; Geometos inclinada aqui
     // peca: true liga o que so a peca do Dr. Elton tem — pincel no titulo,
-    // fitas de chevron, tique depois do numero travado, faixa lima no pe.
+    // fitas de chevron e faixa lima no pe.
     peca: true,
     faixa: '#97c53f', faixaFita: '#a6cf45', faixaFita2: '#8dbd35',
     titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
@@ -687,36 +688,6 @@ export async function desenhar(colinha, config) {
       }
     }
 
-    // O tique em contorno da peca do Dr. Elton, no vao da 5a caixa que o
-    // numero travado de 4 digitos deixa livre.
-    if (slot.travado && t.peca && slot.digitos === 4) {
-      const x0 = colunaDe(t) + 4 * (CAIXA + GAP) + 10
-      const cyq = topo + CAIXA / 2
-      const k = (CAIXA * 1.02) / 60 // o path do visto vive num viewBox 60x36
-      ctx.save()
-      ctx.translate(x0, cyq - 18 * k)
-      ctx.rotate(-7 * Math.PI / 180)
-      ctx.scale(k, k)
-      ctx.beginPath()
-      ctx.moveTo(2, 15)
-      ctx.lineTo(14, 25)
-      ctx.lineTo(58, 4)
-      ctx.lineTo(58, 14)
-      ctx.lineTo(14, 36)
-      ctx.lineTo(2, 25)
-      ctx.closePath()
-      ctx.shadowColor = 'rgba(19,40,74,.22)'
-      ctx.shadowBlur = 5
-      ctx.shadowOffsetY = 2
-      ctx.fillStyle = '#fdfdf8'
-      ctx.fill()
-      ctx.shadowColor = 'transparent'
-      ctx.lineWidth = 3.4
-      ctx.lineJoin = 'round'
-      ctx.strokeStyle = t.lima ?? t.destaque
-      ctx.stroke()
-      ctx.restore()
-    }
 
     y += ALTURA_LINHA
   }

@@ -299,12 +299,10 @@ body:is([data-tema="tozi"], [data-tema="dulce"]) .faixa { display: none; }
   --cx: calc((100% - 4 * var(--gap-d)) / 5);
   display: flex; align-items: center; gap: .6rem;
 }
-/* O visto e um item flex depois da ultima caixa; num cargo de 5 digitos nao
-   sobra largura e ele sai da tela. Com o Dr. Elton isso so acontece enquanto
-   o eleitor digita o estadual, mas quando o cargo travado tem 5 digitos
-   (Tozi, Dulce — deputado estadual) o campo fica permanentemente sem o visto
-   e a pagina rola de lado. Ai a goteira do visto entra na conta das caixas,
-   igual para todos os cargos daquela pagina. */
+/* Goteira a direita nas paginas cujo cargo travado tem 5 digitos (Tozi,
+   Dulce). Nasceu para caber o visto depois do numero; o visto saiu, mas a
+   folga fica: sem ela as caixas de 5 digitos encostam nas duas bordas e a
+   linha perde o respiro que as de 4 e 3 digitos tem. */
 body:has(.campo.travado .digito:nth-child(5)) .campo {
   --cx: calc((100% - 2rem - 4 * var(--gap-d)) / 5);
 }
@@ -367,17 +365,6 @@ body[data-tema="elton"] .rotulo { font-family: var(--titulo); font-weight: 800; 
 .partido { color: var(--rot); font-size: .8em; font-weight: 700; }
 
 .digitos { position: relative; display: flex; gap: var(--gap-d); container-type: inline-size; }
-
-/* O visto em contorno da peca, depois do numero travado do Dr. Elton: ocupa
-   o vao da 5a caixa que o cargo de 4 digitos deixa livre. */
-.tique {
-  flex: none; align-self: center;
-  width: calc(var(--cx) * 1.04); height: auto;
-  margin-left: .1rem;
-  fill: #fdfdf8; stroke: var(--lima); stroke-width: 3.4; stroke-linejoin: round;
-  transform: rotate(-7deg);
-  filter: drop-shadow(0 1px 2px rgba(19, 40, 74, .2));
-}
 
 .digito {
   font-family: var(--titulo);
@@ -701,7 +688,9 @@ body[data-tema="dulce"] .acoes button.secundario { background: var(--bg); }
 body[data-tema="dulce"] .rodape { margin-top: auto; padding-bottom: env(safe-area-inset-bottom); }
 /* A foto do campo pre-definido nao leva destaque verde: fica com o mesmo fio
    fino dos campos livres. */
-body[data-tema="dulce"] .foto-travada { border-color: var(--linha); border-width: 1px; }
+body:is([data-tema="dulce"], [data-tema="elton"]) .foto-travada {
+  border-color: var(--linha); border-width: 1px;
+}
 /* Respiro garantido entre o ultimo botao e a faixa, mesmo com a pagina cheia
    (o margin-top: auto colapsa a zero quando o conteudo enche). */
 body[data-tema="dulce"] .acoes { margin-bottom: 1.4rem; }
