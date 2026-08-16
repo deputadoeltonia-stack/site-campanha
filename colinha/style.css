@@ -242,8 +242,6 @@ body:has(.campo.travado .digito:nth-child(5)) .campo {
 }
 button.foto:hover, button.foto:focus-visible { border-color: var(--marinho); outline: none; }
 .foto-travada { cursor: default; border-color: var(--cx-travado); border-width: 2px; }
-/* Rosto do candidato da casa em bem mais destaque que os thumbs dos livres. */
-.campo.travado .foto { width: 5rem; height: 6.3rem; border-width: 3px; border-radius: 9px; }
 
 /* Campo ainda vazio: tracejado reforca que ali se pode tocar para buscar. */
 button.foto:not(.tem-foto) { border-style: dashed; border-color: var(--marinho); }

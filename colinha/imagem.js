@@ -20,11 +20,6 @@ export const TEMAS = {
     // peca: true liga o que so a peca do Dr. Elton tem — pincel no titulo,
     // fitas de chevron, selo inclinado com nome empilhado, faixa lima no pe.
     peca: true,
-    // Rosto oficial em destaque no topo direito (recorte com alpha da foto
-    // do site, public/assets/deputado.png). O selo desce para a faixa dos
-    // senadores, como na peca impressa.
-    retrato: 'marca/elton-destaque.webp',
-    seloNoCorpo: true,
     titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
   },
@@ -402,9 +397,8 @@ export async function desenhar(colinha, config) {
   const fotos = await carregarFotos(colinha)
   // Simbolo e rosto do manual, quando o tema tem. Falha vira null e o desenho
   // cai no risco geometrico — a imagem sai sem a marca, nunca quebrada.
-  const [simbolo, rosto, padrao, retrato] = await Promise.all([
+  const [simbolo, rosto, padrao] = await Promise.all([
     carregarArquivo(t.simbolo), carregarArquivo(t.rosto), carregarArquivo(t.padrao),
-    carregarArquivo(t.retrato),
   ])
   // A peca do Dr. Elton fecha com a faixa lima de chevrons; a imagem dele
   // cresce essa faixa. Os temas com peca propria ficam na altura de sempre.
@@ -421,23 +415,6 @@ export async function desenhar(colinha, config) {
   ctx.fillRect(0, 0, L, A + FAIXA)
 
   desenharTopo(ctx, t, simbolo, padrao)
-
-  // Rosto oficial em destaque no canto direito, da faixa navy para o corpo
-  // claro, com a base dissolvendo antes da linha do deputado estadual.
-  if (retrato && t.peca) {
-    const larg = 312
-    const alt = larg * (retrato.height / retrato.width)
-    const x = L - larg - 24
-    ctx.drawImage(retrato, x, 0, larg, alt)
-    const fade = ctx.createLinearGradient(0, alt - 70, 0, alt)
-    fade.addColorStop(0, 'rgba(0,0,0,0)')
-    fade.addColorStop(1, 'rgba(0,0,0,1)')
-    ctx.save()
-    ctx.globalCompositeOperation = 'destination-out'
-    ctx.fillStyle = fade
-    ctx.fillRect(x, alt - 70, larg, 70)
-    ctx.restore()
-  }
 
   // Rosto em traco no canto de cima, invadindo o topo — a moldura da peca.
   if (rosto) {
