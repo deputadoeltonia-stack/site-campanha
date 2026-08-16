@@ -63,7 +63,9 @@
 
 [hidden] { display: none !important; }
 
-html { -webkit-text-size-adjust: 100%; }
+/* clip, nao hidden: a vinheta do rosto sangra da folha e nao pode virar
+   rolagem lateral; clip corta sem criar contexto de scroll novo */
+html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
 
 body {
   margin: 0;
@@ -465,7 +467,7 @@ body:is([data-tema="tozi"], [data-tema="dulce"]) .visto-marca { display: none; }
 /* Os passos da peça são numerados em azul, não no verde do Dr. Elton. O vão à
    direita é onde o rosto entra. */
 body[data-tema="tozi"] .passos {
-  flex: 1; min-width: 0; padding-right: 6rem; font-size: .8rem;
+  flex: 1; min-width: 0; padding-right: 4.2rem; font-size: .8rem;
 }
 body[data-tema="tozi"] .passos li::before {
   background: var(--acento); color: #fff;
@@ -476,13 +478,21 @@ body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .folha {
   position: relative;
   padding-top: 1.6rem;
 }
+/* O card do aviso ("Comecar de novo") e o primeiro elemento da folha — bem
+   onde o queixo da vinheta desce. Termina antes dela. */
+body[data-tema="tozi"] .aviso { margin-right: 3.8rem; }
+
+/* O rosto em traco invade do topo para o corpo, vinheta de canto com a cara
+   da peca. Sangra forte pela direita: o que ficaria por cima da tecla e das
+   caixas e cortado pela borda, entao nada util fica por baixo. */
 body[data-tema="tozi"] .folha::before {
   content: "";
   position: absolute; z-index: 1; pointer-events: none;
-  right: .3rem; top: -4.9rem;
+  right: -2rem; top: -4.9rem;
   width: 5.6rem; height: 8.8rem;
   background: url("marca/rosto.svg") center/contain no-repeat;
 }
+
 /* O selo (movido para cá pelo app.js) ocupa o vazio à direita dos senadores,
    que só têm 3 dígitos — o mesmo lugar que ele tem na peça. */
 /* O selo vive dentro do campo do senador (1º voto) e transborda sobre o de
@@ -519,33 +529,50 @@ body:is([data-tema="tozi"], [data-tema="dulce"]) .rodape {
 body[data-tema="tozi"] .rodape {
   background: var(--marinho) url("marca/ondas.svg") center/150% auto no-repeat;
 }
-/* Dulce Rita: paleta do site-dulcerita (identidade 2026) sobre o layout do
-   verso do santinho 7x10 dela. A peça é conjunta com o Dr. Elton: o campo
-   travado dela também sai verde, como os demais — a marca fica no petróleo
-   do topo, no selo navy com número mint e no padrão de pessoinhas. */
+/* Dulce Rita: cores medidas do verso do santinho 7x10 em curvas (16/08).
+   A peça é conjunta com o Dr. Elton: o campo travado dela também sai verde,
+   como os demais — a marca fica no petróleo do topo, no selo inclinado com o
+   wordmark oficial e número mint, e no padrão de pessoinhas Λ. */
 body[data-tema="dulce"] {
-  --marinho: #094b68; --marinho-2: #0a6089; --limao: #84bf41; --lima: #84bf41;
-  --limao-esc: #1f7a68; --bg: #e3e4e3; --bg-2: #d9e2df;
-  --txt: #10333f; --rot: #48626e; --mut: #48626e;
-  --linha: #c8cac8; --marca: #094b68; --acento: #0a6089;
-  --cx-travado: #84bf41; --cx-travado-txt: #10333f;
+  --marinho: #005474; --marinho-2: #005a78; --limao: #8dc73f; --lima: #8dc73f;
+  --limao-esc: #1f7a68; --bg: #eef0ee; --bg-2: #e2e7e4;
+  --txt: #062240; --rot: #48626e; --mut: #48626e;
+  --linha: #c8cac8; --marca: #005474; --acento: #0a6089;
+  --cx-travado: #8dc73f; --cx-travado-txt: #062240;
   --display: "Avenir LT Std", system-ui, -apple-system, "Segoe UI", sans-serif;
   --titulo: "Geometos Neue", "Geometos", var(--display);
 }
-/* O padrão de pessoinhas de mãos dadas, textura do topo e do rodapé. */
+/* O padrão de pessoinhas Λ da identidade, tom sobre tom no petróleo. */
 body[data-tema="dulce"] .topo {
-  background-image: url("marca/pessoinhas.svg");
-  background-size: 3.4rem auto;
+  background-image: url("marca/padrao-dulce-topo.svg");
+  background-size: 4.2rem auto;
   padding-bottom: 1.4rem;
 }
 body[data-tema="dulce"] .passos { flex: 1; min-width: 0; font-size: .8rem; }
-body[data-tema="dulce"] .passos li::before { background: #5ac2ad; color: #0f2d3d; }
-body[data-tema="dulce"] .tecla { background: #b9d13d; color: #0f2d3d; }
-/* Selo navy chapado com número mint, sem anel — como no santinho. */
-body[data-tema="dulce"] .selo { background: #174156; border-color: transparent; }
-body[data-tema="dulce"] .selo-numero { color: #5ac2ad; font-style: italic; }
+/* Passos em azul-claro com número navy, como na peça. */
+body[data-tema="dulce"] .passos li::before { background: #a4d2e6; color: #062240; }
+body[data-tema="dulce"] .tecla { background: #aecf3f; color: #062240; }
+/* Selo navy chapado, inclinado como na peça, sem anel. O conteúdo (wordmark
+   oficial + trio + número mint) é montado pelo app.js. */
+body[data-tema="dulce"] .selo { background: #0d3a52; border-color: transparent; transform: rotate(-8deg); }
+body[data-tema="dulce"] .selo-numero { color: #5ac2ad; font-style: italic; font-size: 1.25rem; }
+body[data-tema="dulce"] .selo-barra { color: #aecf3f; font-weight: 900; }
+/* Wordmark em duas linhas ("DULCE" / "RITΛ" + trio), como no selo da peça. */
+body[data-tema="dulce"] .selo-lockup { display: flex; flex-direction: column; align-items: center; gap: .12rem; }
+body[data-tema="dulce"] .selo-l1 { width: 4.3rem; display: block; }
+body[data-tema="dulce"] .selo-l2wrap { display: flex; align-items: flex-end; gap: .22rem; }
+body[data-tema="dulce"] .selo-l2 { width: 3.05rem; display: block; }
+body[data-tema="dulce"] .selo-trio { width: 1.25rem; display: block; }
+/* Pessoinhas mint na lateral direita do corpo, como na peça. */
+body[data-tema="dulce"] .folha::before {
+  content: ""; position: absolute; inset: 0 -.9rem 0 auto; width: 58%;
+  background: url("marca/padrao-dulce-corpo.svg") right top/4.6rem auto repeat;
+  opacity: .5; pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 45%);
+  mask-image: linear-gradient(90deg, transparent, #000 45%);
+}
 body[data-tema="dulce"] .rodape {
-  background: var(--marinho) url("marca/pessoinhas.svg") 0 0/3.4rem auto;
+  background: var(--marinho) url("marca/padrao-dulce-topo.svg") 0 0/4.2rem auto;
 }
 
 /* --- gaveta de busca por nome (bottom sheet) -------------------------- */

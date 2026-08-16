@@ -46,13 +46,19 @@ export const TEMAS = {
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
   },
   dulce: {
-    topo: '#094b68', topoRisco: '#0a6089', destaque: '#84bf41',
-    fundo: '#e3e4e3', fundo2: '#d9e2df', caixa: '#ffffff', linha: '#c8cac8',
-    txt: '#10333f', rot: '#48626e',
-    travadoTxt: '#10333f', // caixa travada segue verde; so o digito escurece
-    // Selo navy sem anel (anel na cor do fundo = invisivel), numero mint.
-    selo: '#174156', seloAnel: '#174156', seloNumero: '#5ac2ad',
-    padrao: 'marca/pessoinhas.svg', // textura de pessoinhas do topo/rodape
+    // Cores medidas do verso do santinho 7x10 em curvas (16/08).
+    topo: '#005474', topoRisco: '#005a78', destaque: '#8dc73f',
+    fundo: '#eef0ee', fundo2: '#e2e7e4', caixa: '#ffffff', linha: '#c8cac8',
+    txt: '#062240', rot: '#48626e',
+    travadoTxt: '#062240', // caixa travada segue verde; so o digito escurece
+    // Selo navy inclinado sem anel: wordmark oficial + trio + numero mint.
+    selo: '#0d3a52', seloAnel: '#0d3a52', seloNumero: '#5ac2ad',
+    seloTorto: true,
+    seloLogo: 'marca/logo-dulce-l1.png',
+    seloLogo2: 'marca/logo-dulce-l2.png',
+    seloTrio: 'marca/pessoinhas-trio.svg',
+    padrao: 'marca/padrao-dulce-topo.svg', // pessoinhas Λ tom sobre tom
+    corpoPadrao: 'marca/padrao-dulce-corpo.svg', // mint na direita do corpo
     titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
     seloNoCorpo: true,
@@ -316,7 +322,7 @@ function duasLinhas(ctx, texto, largura) {
 
 // O selo redondo do candidato, como na peca impressa: circulo na cor da marca
 // com anel de destaque, sobrepondo o topo e o corpo.
-function desenharSelo(ctx, t, slot, imgSelo) {
+function desenharSelo(ctx, t, slot, imgSelo, seloLogo, seloLogo2, seloTrio) {
   // Botton oficial em imagem (Dr. Elton): desenha e pronto. Maior que o selo
   // de texto, como na arte.
   if (imgSelo) {
@@ -347,11 +353,46 @@ function desenharSelo(ctx, t, slot, imgSelo) {
   ctx.strokeStyle = t.seloAnel ?? t.destaque
   ctx.stroke()
 
-  // Na peca do Dr. Elton o conteudo do selo sai levemente inclinado.
-  if (t.peca) {
+  // Nas pecas do Dr. Elton e da Dulce o conteudo do selo sai inclinado.
+  if (t.peca || t.seloTorto) {
     ctx.translate(cx, cy)
     ctx.rotate(-8 * Math.PI / 180)
     ctx.translate(-cx, -cy)
+  }
+
+  // Selo da Dulce: cargo, wordmark oficial + trio mint, numero mint — como
+  // no verso do santinho dela. O texto generico abaixo nao roda.
+  if (seloLogo) {
+    ctx.textAlign = 'center'
+    ctx.fillStyle = 'rgba(255,255,255,.9)'
+    ctx.font = fonte(t, 700, COND, 15, { texto: true })
+    const rotulo = `${slot.rotulo.toUpperCase()} //`
+    const linhas = duasLinhas(ctx, rotulo, raio * 1.5)
+    linhas.forEach((l, i) => ctx.fillText(l, cx, cy - 44 - (linhas.length - 1 - i) * 17))
+
+    // "DULCE" na primeira linha; "RITΛ" + trio mint na segunda, como na peca.
+    const l1L = 132
+    const l1A = l1L * (seloLogo.height / seloLogo.width)
+    ctx.drawImage(seloLogo, cx - l1L / 2, cy - 34, l1L, l1A)
+    if (seloLogo2) {
+      const l2L = 94
+      const l2A = l2L * (seloLogo2.height / seloLogo2.width)
+      const trioL = seloTrio ? 28 : 0
+      const x0 = cx - (l2L + (trioL ? trioL + 6 : 0)) / 2
+      const y2 = cy - 34 + l1A + 4
+      ctx.drawImage(seloLogo2, x0, y2, l2L, l2A)
+      if (seloTrio) {
+        const trioA = trioL * (seloTrio.height / seloTrio.width)
+        ctx.drawImage(seloTrio, x0 + l2L + 6, y2 + l2A - trioA, trioL, trioA)
+      }
+    }
+
+    ctx.fillStyle = t.seloNumero ?? t.destaque
+    ctx.font = fonte(t, 800, COND, 46, { italico: true })
+    ctx.fillText(slot.numero, cx, cy + 74)
+    ctx.restore()
+    ctx.textAlign = 'left'
+    return
   }
 
   ctx.textAlign = 'center'
@@ -430,9 +471,11 @@ export async function desenhar(colinha, config) {
   const fotos = await carregarFotos(colinha)
   // Simbolo, rosto e selo do manual, quando o tema tem. Falha vira null e o
   // desenho cai no risco geometrico — a imagem sai sem a marca, nunca quebrada.
-  const [simbolo, rosto, padrao, imgSelo] = await Promise.all([
+  const [simbolo, rosto, padrao, imgSelo, seloLogo, seloLogo2, seloTrio, corpoPadrao] = await Promise.all([
     carregarArquivo(t.simbolo), carregarArquivo(t.rosto), carregarArquivo(t.padrao),
     carregarArquivo(t.seloImagem),
+    carregarArquivo(t.seloLogo), carregarArquivo(t.seloLogo2),
+    carregarArquivo(t.seloTrio), carregarArquivo(t.corpoPadrao),
   ])
   // A peca do Dr. Elton fecha com a faixa lima de chevrons; a imagem dele
   // cresce essa faixa. Os temas com peca propria ficam na altura de sempre.
@@ -458,6 +501,26 @@ export async function desenhar(colinha, config) {
     ctx.fillRect(0, 0, L, A + FAIXA)
   }
 
+  // Pessoinhas mint na lateral direita do corpo, como na peca da Dulce.
+  if (corpoPadrao) {
+    ctx.save()
+    ctx.beginPath()
+    ctx.rect(L * 0.5, TOPO, L * 0.5, A - TOPO)
+    ctx.clip()
+    const grad = ctx.createLinearGradient(L * 0.5, 0, L * 0.78, 0)
+    grad.addColorStop(0, 'rgba(0,0,0,1)')
+    grad.addColorStop(1, 'rgba(0,0,0,0)')
+    ctx.globalAlpha = 0.55
+    ctx.fillStyle = ctx.createPattern(corpoPadrao, 'repeat')
+    ctx.fillRect(L * 0.5, TOPO, L * 0.5, A - TOPO)
+    ctx.globalAlpha = 1
+    ctx.globalCompositeOperation = 'destination-out'
+    ctx.fillStyle = grad
+    // apaga o padrao gradualmente na borda esquerda, como o esvaecer da peca
+    ctx.fillRect(L * 0.5, TOPO, L * 0.28, A - TOPO)
+    ctx.restore()
+  }
+
   desenharTopo(ctx, t, simbolo, padrao)
 
   // Rosto em traco no canto de cima, invadindo o topo — a moldura da peca.
@@ -470,7 +533,7 @@ export async function desenhar(colinha, config) {
   }
 
   const travado = colinha.find((s) => s.travado)
-  if (travado) desenharSelo(ctx, t, travado, imgSelo)
+  if (travado) desenharSelo(ctx, t, travado, imgSelo, seloLogo, seloLogo2, seloTrio)
 
   ctx.textAlign = 'left'
   let y = Y0

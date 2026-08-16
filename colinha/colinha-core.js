@@ -29,17 +29,35 @@ export const CANDIDATOS = {
     nome: 'PROFESSOR TOZI', cargo: 7, numero: '44447', partido: 'UNIÃO', tema: 'tozi',
     foto: 'tozi',
   },
+  // O site do Tozi embute a colinha em /colinha/ (site-tozi, deploy Vercel).
+  // Sem estes aliases o hostname dele cairia no PADRAO e abriria a colinha
+  // do Dr. Elton dentro do site do Tozi.
+  'tozisite.vercel.app': { alias: 'colinhavirtual.dreltonai.com.br' },
+  'tozisite-elton8.vercel.app': { alias: 'colinhavirtual.dreltonai.com.br' },
+  'tozisite-git-main-elton8.vercel.app': { alias: 'colinhavirtual.dreltonai.com.br' },
+  'proftozi.com.br': { alias: 'colinhavirtual.dreltonai.com.br' },
+  'www.proftozi.com.br': { alias: 'colinhavirtual.dreltonai.com.br' },
+  // Site da Dulce Rita (projeto Vercel "dulcesite") tambem embute /colinha/.
+  // Dominio de producao e sitedulce.vercel.app — um alias errado aqui abre a
+  // colinha do Dr. Elton dentro do site dela, em silencio.
+  'sitedulce.vercel.app': { alias: 'colinha2026.dreltonai.com.br' },
+  'dulcesite-elton8.vercel.app': { alias: 'colinha2026.dreltonai.com.br' },
+  'dulcesite-git-main-elton8.vercel.app': { alias: 'colinha2026.dreltonai.com.br' },
   // Numero confirmado pelo santinho impresso 7x10 da campanha (15/08/2026).
   'colinha2026.dreltonai.com.br': {
     nome: 'DULCE RITA', cargo: 7, numero: '44400', partido: 'UNIÃO', tema: 'dulce',
     foto: 'dulce', rotulo: 'Deputada estadual', // flexao do cargo, so no campo dela
+    // O verso do santinho dela ja vem com o federal (Dr. Elton, peca conjunta)
+    // e o governador preenchidos. Sugestao = editavel, como no tema do Elton.
+    sugestao: { federal: '4412', governador: '10' },
   },
 }
 
 const PADRAO = 'colinha.dreltonai.com.br'
 
 export function configPara(hostname) {
-  return CANDIDATOS[hostname] ?? CANDIDATOS[PADRAO]
+  const cfg = CANDIDATOS[hostname] ?? CANDIDATOS[PADRAO]
+  return cfg.alias ? CANDIDATOS[cfg.alias] : cfg
 }
 
 // Em localhost o hostname nao diz qual campanha e, entao ?campanha=tozi
