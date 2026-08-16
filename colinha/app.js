@@ -49,10 +49,6 @@ document.body.dataset.tema = config.tema
 
 // --- montagem da marcacao --------------------------------------------
 
-// O "visto" da marca, o mesmo tique que marca o campo ja decidido na peca.
-const VISTO = '<svg viewBox="0 0 60 34" aria-hidden="true">' +
-  '<path d="M3 13 L21 31 L57 3" fill="none" stroke="currentColor" stroke-width="6"/></svg>'
-
 // Silhueta neutra para campo vazio / candidato sem foto no acervo do TSE.
 const SILHUETA = '<svg viewBox="0 0 24 24" aria-hidden="true">' +
   '<path fill="currentColor" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4 0-9 2-9 6v2h18v-2c0-4-5-6-9-6Z"/></svg>'
@@ -100,7 +96,6 @@ function linhaHTML(slot) {
                  aria-label="${slot.rotulo}, ${slot.digitos} dígitos"
                  aria-describedby="nome-${slot.id} erro-${slot.id}"
                  ${travado ? 'readonly tabindex="-1"' : ''}>
-          ${travado ? `<span class="visto" aria-hidden="true">${VISTO}</span>` : ''}
         </div>
         <p class="erro" id="erro-${slot.id}" role="alert"></p>
       </div>

@@ -14,19 +14,20 @@ export const TEMAS = {
   elton: {
     topo: '#13253f', topoRisco: '#1c3357', destaque: '#a3ce3c',
     fundo: '#e6e7e5', fundo2: '#dbe4c4', caixa: '#ffffff', linha: '#c3c5c2',
-    txt: '#13253f', rot: '#63666a', visto: '#6f8f26',
+    txt: '#13253f', rot: '#63666a',
+    // Selo da peca: circulo navy liso, sem anel (anel na cor do fundo).
+    selo: '#13253f', seloAnel: '#13253f',
   },
   tozi: {
     topo: '#1a174e', topoRisco: '#001a6d', destaque: '#84bf41',
     fundo: '#e3e4e3', fundo2: '#d8dad8', caixa: '#ffffff', linha: '#c8cac8',
-    txt: '#1a174e', rot: '#5b5f6b', visto: '#1055bd',
+    txt: '#1a174e', rot: '#5b5f6b',
     travado: '#1055bd', travadoTxt: '#ffffff', // o campo dele sai azul na peca
     selo: '#1055bd', seloAnel: '#ffffff',
     // Simbolo e rosto em traco do manual, os mesmos arquivos da tela. Se o
     // navegador nao desenhar o SVG, cai nas listras retas de topoRisco.
     simbolo: 'marca/ondas.svg', rosto: 'marca/rosto.svg',
     seloNoCorpo: true, // o selo na faixa dos senadores, como na peca
-    semVisto: true,    // a peca dele nao traz o tique de conferido
     digitoItalico: true, // numerais inclinados da peca dele
     titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
@@ -34,14 +35,14 @@ export const TEMAS = {
   dulce: {
     topo: '#094b68', topoRisco: '#0a6089', destaque: '#84bf41',
     fundo: '#e3e4e3', fundo2: '#d9e2df', caixa: '#ffffff', linha: '#c8cac8',
-    txt: '#10333f', rot: '#48626e', visto: '#1f7a68',
+    txt: '#10333f', rot: '#48626e',
     travadoTxt: '#10333f', // caixa travada segue verde; so o digito escurece
     // Selo navy sem anel (anel na cor do fundo = invisivel), numero mint.
     selo: '#174156', seloAnel: '#174156', seloNumero: '#5ac2ad',
     padrao: 'marca/pessoinhas.svg', // textura de pessoinhas do topo/rodape
     titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
-    seloNoCorpo: true, semVisto: true,
+    seloNoCorpo: true,
   },
 }
 
@@ -194,12 +195,36 @@ function desenharFoto(ctx, t, slot, img, x, y) {
   }
 }
 
+// Fitas de chevron da peca: segmento cheio, corte reto, apontando para
+// baixo. As mesmas fitas do topo navy e da faixa lima do pe.
+function desenharFitas(ctx, cor, x0, y0, larg, alt, seg = 90, queda = 20, esp = 22, passo = 46) {
+  ctx.save()
+  ctx.beginPath()
+  ctx.rect(x0, y0, larg, alt)
+  ctx.clip()
+  ctx.fillStyle = cor
+  for (let y = y0 - queda; y < y0 + alt; y += passo) {
+    ctx.beginPath()
+    for (let x = x0 - seg; x < x0 + larg + seg; x += seg) {
+      ctx.moveTo(x, y)
+      ctx.lineTo(x + seg / 2, y + queda)
+      ctx.lineTo(x + seg, y)
+      ctx.lineTo(x + seg, y + esp)
+      ctx.lineTo(x + seg / 2, y + queda + esp)
+      ctx.lineTo(x, y + esp)
+      ctx.closePath()
+    }
+    ctx.fill()
+  }
+  ctx.restore()
+}
+
 function desenharTopo(ctx, t, simbolo, padrao) {
   ctx.fillStyle = t.topo
   ctx.fillRect(0, 0, L, TOPO)
 
-  // Chevrons discretos, o padrao da peca impressa. O tema que traz o simbolo
-  // proprio (Tozi) usa o SVG do manual no lugar, rebaixado a textura.
+  // Chevrons da peca impressa. O tema que traz o simbolo proprio (Tozi)
+  // usa o SVG do manual no lugar, rebaixado a textura.
   ctx.save()
   ctx.beginPath()
   ctx.rect(0, 0, L, TOPO)
@@ -215,14 +240,7 @@ function desenharTopo(ctx, t, simbolo, padrao) {
     ctx.fillStyle = 'rgba(26,23,78,.62)'
     ctx.fillRect(0, 0, L, TOPO)
   } else {
-    ctx.strokeStyle = t.topoRisco
-    ctx.lineWidth = 4
-    for (let x = -220; x < L + 220; x += 26) {
-      ctx.beginPath()
-      ctx.moveTo(x, TOPO)
-      ctx.lineTo(x + 110, 0)
-      ctx.stroke()
-    }
+    desenharFitas(ctx, t.topoRisco, 0, 0, L, TOPO)
   }
   ctx.restore()
 
@@ -231,17 +249,17 @@ function desenharTopo(ctx, t, simbolo, padrao) {
   ctx.font = fonte(t, 800, COND, 62)
   ctx.fillText('COMO VOTAR', MARGEM, 96)
 
-  // O tique ao lado do titulo e assinatura da peca do Dr. Elton; as pecas
-  // com identidade propria (fonte propria) nao o trazem.
+  // O pincel lima da peca do Dr. Elton corta por baixo do fim de "VOTAR";
+  // as pecas com identidade propria (fonte propria) nao o trazem.
   if (!t.titulo) {
     const largura = ctx.measureText('COMO VOTAR').width
     ctx.strokeStyle = t.destaque
-    ctx.lineWidth = 11
+    ctx.lineWidth = 13
     ctx.lineCap = 'square'
     ctx.beginPath()
-    ctx.moveTo(MARGEM + largura + 28, 68)
-    ctx.lineTo(MARGEM + largura + 54, 94)
-    ctx.lineTo(MARGEM + largura + 100, 46)
+    ctx.moveTo(MARGEM + largura - 148, 100)
+    ctx.lineTo(MARGEM + largura - 112, 116)
+    ctx.lineTo(MARGEM + largura - 26, 92)
     ctx.stroke()
   }
 
@@ -309,13 +327,39 @@ function desenharSelo(ctx, t, slot) {
   if (maior > largura) tam = Math.max(22, Math.floor((tam * largura) / maior))
 
   ctx.font = fonte(t, 800, COND, tam)
-  const linhas = duasLinhas(ctx, nome, largura)
+  // Na peca do Dr. Elton o nome sai empilhado ("DR." / "ELTON") mesmo
+  // cabendo em uma linha — e o vao da primeira linha recebe as fitas.
+  const quebra = nome.indexOf(' ')
+  const linhas = !t.titulo && quebra > 0
+    ? [nome.slice(0, quebra), cortar(ctx, nome.slice(quebra + 1), largura)]
+    : duasLinhas(ctx, nome, largura)
   const base = linhas.length === 2 ? cy - 14 : cy + 2
   linhas.forEach((l, i) => ctx.fillText(l, cx, base + i * (tam + 2)))
 
-  ctx.fillStyle = t.seloNumero ?? t.seloAnel ?? t.destaque
-  ctx.font = fonte(t, 800, COND, 44, { italico: true })
-  ctx.fillText(slot.numero, cx, cy + 64)
+  // Na peca do Dr. Elton, tres fitas de chevron lima preenchem o vao a
+  // direita da primeira linha curta ("DR." + fitas / "ELTON").
+  if (!t.titulo && linhas.length === 2 && linhas[0].length <= 4) {
+    const x0 = cx + ctx.measureText(linhas[0]).width / 2 + 12
+    ctx.fillStyle = t.destaque
+    for (let i = 0; i < 3; i++) {
+      const y = base - 26 + i * 11
+      ctx.beginPath()
+      ctx.moveTo(x0, y)
+      ctx.lineTo(x0 + 19, y + 6)
+      ctx.lineTo(x0 + 38, y)
+      ctx.lineTo(x0 + 38, y + 7)
+      ctx.lineTo(x0 + 19, y + 13)
+      ctx.lineTo(x0, y + 7)
+      ctx.closePath()
+      ctx.fill()
+    }
+  }
+
+  ctx.fillStyle = t.seloNumero ?? (t.titulo ? t.seloAnel : null) ?? t.destaque
+  // Na peca do Dr. Elton o numero domina o selo; nos outros temas segue menor.
+  const numTam = t.titulo ? 44 : 56
+  ctx.font = fonte(t, 800, COND, numTam, { italico: true })
+  ctx.fillText(slot.numero, cx, cy + (t.titulo ? 64 : 70))
   ctx.restore()
   ctx.textAlign = 'left'
 }
@@ -342,16 +386,19 @@ export async function desenhar(colinha, config) {
   const [simbolo, rosto, padrao] = await Promise.all([
     carregarArquivo(t.simbolo), carregarArquivo(t.rosto), carregarArquivo(t.padrao),
   ])
+  // A peca do Dr. Elton fecha com a faixa lima de chevrons; a imagem dele
+  // cresce essa faixa. Os temas com peca propria ficam na altura de sempre.
+  const FAIXA = t.titulo ? 0 : 72
   const cv = document.createElement('canvas')
   cv.width = L
-  cv.height = A
+  cv.height = A + FAIXA
   const ctx = cv.getContext('2d')
 
   const degrade = ctx.createLinearGradient(0, TOPO, L * 0.3, A)
   degrade.addColorStop(0, t.fundo)
   degrade.addColorStop(1, t.fundo2)
   ctx.fillStyle = degrade
-  ctx.fillRect(0, 0, L, A)
+  ctx.fillRect(0, 0, L, A + FAIXA)
 
   desenharTopo(ctx, t, simbolo, padrao)
 
@@ -424,21 +471,6 @@ export async function desenhar(colinha, config) {
       }
     }
 
-    // O tique da marca no campo ja decidido. A peca do Tozi nao tem: o campo
-    // dele ja vem preenchido de fabrica.
-    if (slot.travado && !t.semVisto) {
-      const x = colunaDe(t) + slot.digitos * (CAIXA + GAP) + 16
-      const meio = topo + CAIXA / 2
-      ctx.strokeStyle = t.visto
-      ctx.lineWidth = 9
-      ctx.lineCap = 'square'
-      ctx.beginPath()
-      ctx.moveTo(x, meio)
-      ctx.lineTo(x + 22, meio + 22)
-      ctx.lineTo(x + 64, meio - 26)
-      ctx.stroke()
-    }
-
     y += ALTURA_LINHA
   }
 
@@ -448,6 +480,12 @@ export async function desenhar(colinha, config) {
   ctx.fillText(location.hostname, L / 2, A - 50)
   ctx.font = fonte(t, 500, COND, 24, { texto: true })
   ctx.fillText('Confira sempre na urna.', L / 2, A - 18)
+
+  if (FAIXA) {
+    ctx.fillStyle = t.destaque
+    ctx.fillRect(0, A, L, FAIXA)
+    desenharFitas(ctx, 'rgba(111,143,38,.32)', 0, A, L, FAIXA, 64, 14, 16, 33)
+  }
 
   return new Promise((resolve) => cv.toBlob(resolve, 'image/png'))
 }

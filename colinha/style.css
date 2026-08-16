@@ -109,9 +109,9 @@ body {
   background: var(--marinho);
   color: #fff;
   padding: 1rem .9rem 1.05rem;
-  /* fileiras de chevrons, o padrao do topo da peca impressa */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cpath d='M0 7 L32 23 L64 7' fill='none' stroke='%231c3357' stroke-width='9'/%3E%3C/svg%3E");
-  background-size: 4rem auto;
+  /* fitas de chevron da peca: segmento cheio com corte reto, nao traco */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44'%3E%3Cpath d='M0 0 L32 14 L64 0 L64 18 L32 32 L0 18 Z' fill='%231c3357'/%3E%3C/svg%3E");
+  background-size: 3.6rem auto;
 }
 
 .topo-int {
@@ -130,7 +130,11 @@ body {
   font-stretch: 75%;
 }
 
-.visto-marca { width: 1.35rem; height: auto; color: var(--limao); flex: none; }
+/* O pincel lima da peca corta por baixo do fim de "VOTAR", nao ao lado. */
+.visto-marca {
+  width: 1.8rem; height: auto; color: var(--limao); flex: none;
+  align-self: flex-end; margin: 0 0 -.3rem -1.7rem; transform: rotate(-5deg);
+}
 
 .passos {
   margin: 0; padding: 0; list-style: none;
@@ -199,8 +203,8 @@ body {
 .faixa {
   flex: none; height: calc(2.3rem + env(safe-area-inset-bottom));
   background-color: var(--limao);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 32'%3E%3Cpath d='M0 7 L32 23 L64 7' fill='none' stroke='%236f8f26' stroke-width='9' stroke-opacity='.35'/%3E%3C/svg%3E");
-  background-size: 2.6rem auto;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44'%3E%3Cpath d='M0 0 L32 14 L64 0 L64 18 L32 32 L0 18 Z' fill='%236f8f26' fill-opacity='.32'/%3E%3C/svg%3E");
+  background-size: 2.4rem auto;
 }
 body:is([data-tema="tozi"], [data-tema="dulce"]) .faixa { display: none; }
 
@@ -333,15 +337,6 @@ button.foto:hover .foto-lupa, button.foto:focus-visible .foto-lupa { background:
 .entrada:focus { outline: none; }
 .campo.travado .entrada { cursor: default; }
 
-/* Item flex, nao posicionado: cai logo depois da ultima caixa daquele cargo.
-   Calcular a posicao pela largura da caixa estourava a tela nos cargos com
-   menos de 5 digitos. */
-.visto {
-  flex: none; align-self: center; margin-left: .5rem;
-  width: 1.5rem; color: var(--limao-esc); pointer-events: none;
-}
-.visto svg { width: 100%; height: auto; display: block; }
-
 .campo.tem-erro .digito { border-color: var(--erro); }
 .campo.tem-erro .digito.preenchido { background: var(--erro-bg); }
 .campo.tem-erro .nome { color: var(--erro); }
@@ -471,7 +466,6 @@ body:is([data-tema="tozi"], [data-tema="dulce"]) .campo:has(> .selo) .erro {
   padding-right: 7.4rem;
 }
 /* A peça não tem o tique de conferido: o campo dele já vem preenchido. */
-body:is([data-tema="tozi"], [data-tema="dulce"]) .visto { display: none; }
 body:is([data-tema="tozi"], [data-tema="dulce"]) .rotulo { font-size: .82rem; }
 
 /* A foto de cada cargo fica à esquerda, como no tema padrão: é ela que abre a
