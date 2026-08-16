@@ -2,22 +2,9 @@
    topo azul-marinho, corpo cinza com base esverdeada, e cada digito do numero
    dentro de um quadrado — verde quando preenchido, branco quando vazio. */
 
-/* Fonte da peca: condensada e pesada. Archivo variavel (OFL, fonts/OFL.txt),
-   hospedada aqui mesmo — nada de CDN. O eixo de largura 62%-125% e o que
-   permite o font-stretch condensado abaixo. */
-@font-face {
-  font-family: "Archivo";
-  src: url("fonts/archivo-var.woff2") format("woff2");
-  font-weight: 100 900;
-  font-stretch: 62% 125%;
-  font-display: swap;
-}
-
-/* Tipografia oficial do Prof. Tozi (manual TOZI ID): Geometos nos titulos e
-   numeros, Avenir no texto. Mesmos arquivos que o site-tozi serve, copiados
-   para ca — o app nao busca nada de fora. So o tema dele carrega: quem abre
-   a colinha do Dr. Elton nao baixa esses bytes, porque nenhum seletor do
-   tema padrao referencia as familias. */
+/* Fontes da peca (mesmas do manual da campanha, e as do manual TOZI ID):
+   Geometos nos titulos e numeros, Avenir no texto — auto-hospedadas, nada de
+   CDN. A Archivo condensada da primeira versao saiu quando o manual chegou. */
 @font-face {
   font-family: "Geometos";
   src: url("fonts/geometos.woff2") format("woff2");
@@ -42,7 +29,7 @@
 :root {
   --marinho: #13253f;
   --marinho-2: #1c3357;
-  --limao: #a3ce3c;
+  --limao: #8dc63f;
   --limao-esc: #6f8f26;
   --bg: #e6e7e5;
   --bg-2: #dbe4c4;
@@ -60,10 +47,9 @@
   --cx-travado-txt: var(--marinho);
   --erro: #a32d2d;
   --erro-bg: #fceaea;
-  --display: "Archivo", system-ui, -apple-system, "Segoe UI Variable", "Segoe UI", sans-serif;
-  /* Fonte dos numeros e titulos. Igual a --display no tema padrao; o Tozi
-     troca as duas pelas famílias do manual dele. */
-  --titulo: var(--display);
+  --display: "Avenir LT Std", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Fonte dos numeros e titulos, a display da campanha. */
+  --titulo: "Geometos Neue", "Geometos", var(--display);
   --raio: 8px;
   --gap-d: 6px;
 }
@@ -127,13 +113,12 @@ body {
   margin: 0 0 .5rem;
   font-size: 1.6rem; font-weight: 800; line-height: 1;
   letter-spacing: -.01em; text-transform: uppercase;
-  font-stretch: 75%;
 }
 
 /* O pincel lima da peca corta por baixo do fim de "VOTAR", nao ao lado. */
 .visto-marca {
   width: 1.8rem; height: auto; color: var(--limao); flex: none;
-  align-self: flex-end; margin: 0 0 -.3rem -1.7rem; transform: rotate(-5deg);
+  align-self: flex-end; margin: 0 0 -.55rem -1.9rem;
 }
 
 .passos {
@@ -152,7 +137,7 @@ body {
   display: grid; place-items: center;
   width: 1.15rem; height: 1.15rem; margin-top: .12rem;
   border-radius: 50%;
-  background: var(--limao); color: var(--marinho);
+  background: #b6d6ed; color: var(--marinho);
   font-size: .68rem; font-weight: 700; line-height: 1;
 }
 
@@ -160,38 +145,38 @@ body {
 .tecla {
   background: var(--limao); color: var(--marinho);
   padding: 0 .25rem; border-radius: 3px;
-  font-weight: 800; font-stretch: 85%;
-}
+  font-weight: 800;}
 
-/* Selo redondo do candidato, como na peca impressa: circulo na cor da marca
-   com anel no verde de destaque. Preenchido pelo app.js a partir da config —
-   so aparece quando ha campo travado (Tozi e Dulce ainda sem numero, nao tem). */
+/* Selo redondo do candidato, como na peca impressa: circulo navy liso, sem
+   anel, conteudo levemente inclinado. Preenchido pelo app.js a partir da
+   config — so aparece quando ha campo travado. A borda marinho-2 nao e anel:
+   so separa o circulo do padrao de chevrons do topo, que tem a mesma cor. */
 .selo {
   flex: none;
   width: 6.4rem; aspect-ratio: 1;
   border-radius: 50%;
   background: var(--marinho);
-  border: 3px solid var(--limao);
+  border: 2px solid var(--marinho-2);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   text-align: center; gap: .1rem;
   padding: .4rem;
+  transform: rotate(-8deg);
 }
 .selo-cargo {
   font-size: .5rem; font-weight: 700; letter-spacing: .14em;
   text-transform: uppercase; color: rgba(255, 255, 255, .85);
-  font-stretch: 80%;
 }
 .selo-nome {
   font-family: var(--titulo);
   font-size: .95rem; font-weight: 800; line-height: 1;
   text-transform: uppercase; color: #fff;
-  font-stretch: 75%; letter-spacing: -.01em;
+  letter-spacing: -.01em;
   overflow-wrap: anywhere;
 }
 .selo-numero {
   font-family: var(--titulo);
-  font-size: 1.15rem; font-weight: 800; line-height: 1;
+  font-size: 1.3rem; font-weight: 900; font-style: italic; line-height: 1;
   color: var(--limao); letter-spacing: .04em;
 }
 
@@ -276,8 +261,7 @@ button.foto:hover .foto-lupa, button.foto:focus-visible .foto-lupa { background:
 .foto-ph svg { width: 62%; height: 62%; opacity: .55; }
 .foto-ph.inicial {
   font-size: 1.7rem; font-weight: 800; color: var(--marca-txt);
-  background: var(--marinho); font-stretch: 80%;
-}
+  background: var(--marinho);}
 
 .rotulo {
   display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 .4rem;
@@ -285,8 +269,10 @@ button.foto:hover .foto-lupa, button.foto:focus-visible .foto-lupa { background:
   font-size: 1rem; font-weight: 800; line-height: 1.15;
   letter-spacing: 0; text-transform: uppercase;
   color: var(--rot);
-  font-stretch: 78%;
 }
+
+/* Na peca do Dr. Elton o rotulo do cargo sai na display da campanha. */
+body[data-tema="elton"] .rotulo { font-family: var(--titulo); font-weight: 800; }
 
 .nome { color: var(--marinho); overflow-wrap: anywhere; }
 .nome:empty { display: none; }
@@ -309,7 +295,6 @@ button.foto:hover .foto-lupa, button.foto:focus-visible .foto-lupa { background:
   border: 1px solid var(--linha);
   border-radius: 5px;
   font-size: 2.1rem; font-weight: 800; line-height: 1;
-  font-stretch: 85%;
   color: var(--marinho);
   transition: background-color .12s ease, border-color .12s ease;
 }
@@ -383,7 +368,9 @@ body[data-tema="tozi"] {
   --display: "Avenir LT Std", system-ui, -apple-system, "Segoe UI", sans-serif;
   --titulo: "Geometos Neue", "Geometos", var(--display);
 }
-/* Selo chapado no azul, sem o anel verde; e os numerais inclinados da peça. */
+/* Selo chapado no azul, sem o anel verde; e os numerais inclinados da peça.
+   A inclinação do selo é coisa da peça do Dr. Elton, não das outras. */
+body:is([data-tema="tozi"], [data-tema="dulce"]) .selo { transform: none; }
 body[data-tema="tozi"] .selo { background: var(--acento); border-color: #fff; }
 body[data-tema="tozi"] .selo-numero { color: #fff; }
 body[data-tema="tozi"] .selo-numero,
@@ -537,7 +524,7 @@ body.sem-rolagem { overflow: hidden; }
 }
 .busca-titulo {
   margin: 0; font-size: 1rem; font-weight: 800;
-  text-transform: uppercase; font-stretch: 78%; color: var(--rot);
+  text-transform: uppercase; color: var(--rot);
 }
 .busca-x {
   background: none; border: 0; font-size: 1.1rem; line-height: 1;
@@ -575,8 +562,7 @@ body.sem-rolagem { overflow: hidden; }
   border-radius: 6px; overflow: hidden;
   background: var(--marinho); color: var(--marca-txt);
   display: grid; place-items: center;
-  font-size: 1.3rem; font-weight: 800; font-stretch: 80%;
-}
+  font-size: 1.3rem; font-weight: 800;}
 .busca-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .busca-txt { min-width: 0; display: flex; flex-direction: column; gap: .1rem; }

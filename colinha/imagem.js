@@ -12,11 +12,16 @@ const A = 1350
 // arquivos precisam mudar juntos — tests/theme.test.js cobra isso.
 export const TEMAS = {
   elton: {
-    topo: '#13253f', topoRisco: '#1c3357', destaque: '#a3ce3c',
+    topo: '#13253f', topoRisco: '#1c3357', destaque: '#8dc63f',
     fundo: '#e6e7e5', fundo2: '#dbe4c4', caixa: '#ffffff', linha: '#c3c5c2',
     txt: '#13253f', rot: '#63666a',
     // Selo da peca: circulo navy liso, sem anel (anel na cor do fundo).
     selo: '#13253f', seloAnel: '#13253f',
+    // peca: true liga o que so a peca do Dr. Elton tem — pincel no titulo,
+    // fitas de chevron, selo inclinado com nome empilhado, faixa lima no pe.
+    peca: true,
+    titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
+    texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
   },
   tozi: {
     topo: '#1a174e', topoRisco: '#001a6d', destaque: '#84bf41',
@@ -249,18 +254,20 @@ function desenharTopo(ctx, t, simbolo, padrao) {
   ctx.font = fonte(t, 800, COND, 62)
   ctx.fillText('COMO VOTAR', MARGEM, 96)
 
-  // O pincel lima da peca do Dr. Elton corta por baixo do fim de "VOTAR";
-  // as pecas com identidade propria (fonte propria) nao o trazem.
-  if (!t.titulo) {
-    const largura = ctx.measureText('COMO VOTAR').width
-    ctx.strokeStyle = t.destaque
-    ctx.lineWidth = 13
-    ctx.lineCap = 'square'
+  // O pincel lima da peca do Dr. Elton: fita de chevron preenchida cortando
+  // por baixo do fim de "VOTAR". So a peca dele traz.
+  if (t.peca) {
+    const fim = MARGEM + ctx.measureText('COMO VOTAR').width
+    ctx.fillStyle = t.destaque
     ctx.beginPath()
-    ctx.moveTo(MARGEM + largura - 148, 100)
-    ctx.lineTo(MARGEM + largura - 112, 116)
-    ctx.lineTo(MARGEM + largura - 26, 92)
-    ctx.stroke()
+    ctx.moveTo(fim - 150, 104)
+    ctx.lineTo(fim - 118, 120)
+    ctx.lineTo(fim - 4, 86)
+    ctx.lineTo(fim - 4, 104)
+    ctx.lineTo(fim - 118, 138)
+    ctx.lineTo(fim - 150, 122)
+    ctx.closePath()
+    ctx.fill()
   }
 
   ctx.font = fonte(t, 500, COND, 29, { texto: true })
@@ -307,6 +314,13 @@ function desenharSelo(ctx, t, slot) {
   ctx.strokeStyle = t.seloAnel ?? t.destaque
   ctx.stroke()
 
+  // Na peca do Dr. Elton o conteudo do selo sai levemente inclinado.
+  if (t.peca) {
+    ctx.translate(cx, cy)
+    ctx.rotate(-8 * Math.PI / 180)
+    ctx.translate(-cx, -cy)
+  }
+
   ctx.textAlign = 'center'
   ctx.fillStyle = 'rgba(255,255,255,.85)'
   // "DEPUTADO ESTADUAL" nao cabe numa linha do selo na fonte do Tozi — e na
@@ -330,7 +344,7 @@ function desenharSelo(ctx, t, slot) {
   // Na peca do Dr. Elton o nome sai empilhado ("DR." / "ELTON") mesmo
   // cabendo em uma linha — e o vao da primeira linha recebe as fitas.
   const quebra = nome.indexOf(' ')
-  const linhas = !t.titulo && quebra > 0
+  const linhas = t.peca && quebra > 0
     ? [nome.slice(0, quebra), cortar(ctx, nome.slice(quebra + 1), largura)]
     : duasLinhas(ctx, nome, largura)
   const base = linhas.length === 2 ? cy - 14 : cy + 2
@@ -338,7 +352,7 @@ function desenharSelo(ctx, t, slot) {
 
   // Na peca do Dr. Elton, tres fitas de chevron lima preenchem o vao a
   // direita da primeira linha curta ("DR." + fitas / "ELTON").
-  if (!t.titulo && linhas.length === 2 && linhas[0].length <= 4) {
+  if (t.peca && linhas.length === 2 && linhas[0].length <= 4) {
     const x0 = cx + ctx.measureText(linhas[0]).width / 2 + 12
     ctx.fillStyle = t.destaque
     for (let i = 0; i < 3; i++) {
@@ -355,11 +369,11 @@ function desenharSelo(ctx, t, slot) {
     }
   }
 
-  ctx.fillStyle = t.seloNumero ?? (t.titulo ? t.seloAnel : null) ?? t.destaque
+  ctx.fillStyle = t.seloNumero ?? (t.peca ? t.destaque : t.seloAnel ?? t.destaque)
   // Na peca do Dr. Elton o numero domina o selo; nos outros temas segue menor.
-  const numTam = t.titulo ? 44 : 56
+  const numTam = t.peca ? 54 : 44
   ctx.font = fonte(t, 800, COND, numTam, { italico: true })
-  ctx.fillText(slot.numero, cx, cy + (t.titulo ? 64 : 70))
+  ctx.fillText(slot.numero, cx, cy + (t.peca ? 70 : 64))
   ctx.restore()
   ctx.textAlign = 'left'
 }
@@ -388,7 +402,7 @@ export async function desenhar(colinha, config) {
   ])
   // A peca do Dr. Elton fecha com a faixa lima de chevrons; a imagem dele
   // cresce essa faixa. Os temas com peca propria ficam na altura de sempre.
-  const FAIXA = t.titulo ? 0 : 72
+  const FAIXA = t.peca ? 72 : 0
   const cv = document.createElement('canvas')
   cv.width = L
   cv.height = A + FAIXA
@@ -418,8 +432,9 @@ export async function desenhar(colinha, config) {
   let y = Y0
 
   for (const slot of colinha) {
-    // Rotulo do cargo, e o nome resolvido logo depois da barra.
-    ctx.font = fonte(t, 800, COND, 32, { texto: true })
+    // Rotulo do cargo, e o nome resolvido logo depois da barra. Na peca do
+    // Dr. Elton o rotulo sai na display da campanha, nao na fonte de texto.
+    ctx.font = fonte(t, 800, COND, t.peca ? 30 : 32, { texto: !t.peca })
     ctx.fillStyle = t.rot
     const cargo = slot.rotulo.toUpperCase()
     const coluna = colunaDe(t)
@@ -462,7 +477,8 @@ export async function desenhar(colinha, config) {
 
       if (digito) {
         ctx.fillStyle = slot.travado ? (t.travadoTxt ?? t.txt) : t.txt
-        ctx.font = fonte(t, 800, SEMI, 66, { italico: !!t.digitoItalico })
+        // Na peca do Dr. Elton o digito quase preenche a caixa.
+        ctx.font = fonte(t, t.peca ? 900 : 800, SEMI, t.peca ? 78 : 66, { italico: !!t.digitoItalico })
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.fillText(digito, x + CAIXA / 2, topo + CAIXA / 2 + 3)
