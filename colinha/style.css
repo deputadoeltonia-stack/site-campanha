@@ -1,0 +1,564 @@
+/* Paleta e layout copiados do santinho impresso "COMO VOTAR" da campanha:
+   topo azul-marinho, corpo cinza com base esverdeada, e cada digito do numero
+   dentro de um quadrado — verde quando preenchido, branco quando vazio. */
+
+/* Fonte da peca: condensada e pesada. Archivo variavel (OFL, fonts/OFL.txt),
+   hospedada aqui mesmo — nada de CDN. O eixo de largura 62%-125% e o que
+   permite o font-stretch condensado abaixo. */
+@font-face {
+  font-family: "Archivo";
+  src: url("fonts/archivo-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+}
+
+/* Tipografia oficial do Prof. Tozi (manual TOZI ID): Geometos nos titulos e
+   numeros, Avenir no texto. Mesmos arquivos que o site-tozi serve, copiados
+   para ca — o app nao busca nada de fora. So o tema dele carrega: quem abre
+   a colinha do Dr. Elton nao baixa esses bytes, porque nenhum seletor do
+   tema padrao referencia as familias. */
+@font-face {
+  font-family: "Geometos";
+  src: url("fonts/geometos.woff2") format("woff2");
+  font-weight: 100 900; font-display: swap;
+}
+@font-face {
+  font-family: "Geometos Neue";
+  src: url("fonts/geometos-black.woff2") format("woff2");
+  font-weight: 900; font-display: swap;
+}
+@font-face {
+  font-family: "Avenir LT Std";
+  src: url("fonts/avenir-400.woff2") format("woff2");
+  font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: "Avenir LT Std";
+  src: url("fonts/avenir-500.woff2") format("woff2");
+  font-weight: 500 800; font-display: swap;
+}
+
+:root {
+  --marinho: #13253f;
+  --marinho-2: #1c3357;
+  --limao: #a3ce3c;
+  --limao-esc: #6f8f26;
+  --bg: #e6e7e5;
+  --bg-2: #dbe4c4;
+  --surface: #ffffff;
+  --txt: #13253f;
+  --rot: #63666a;
+  --mut: #5c6066;
+  --linha: #c3c5c2;
+  --marca: #13253f;
+  --marca-txt: #ffffff;
+  --acento: #13253f;
+  /* Caixa do campo travado: na peca do Dr. Elton ela e verde como as outras,
+     na do Tozi o campo dele sai azul para separar dos aliados. */
+  --cx-travado: var(--limao);
+  --cx-travado-txt: var(--marinho);
+  --erro: #a32d2d;
+  --erro-bg: #fceaea;
+  --display: "Archivo", system-ui, -apple-system, "Segoe UI Variable", "Segoe UI", sans-serif;
+  /* Fonte dos numeros e titulos. Igual a --display no tema padrao; o Tozi
+     troca as duas pelas famílias do manual dele. */
+  --titulo: var(--display);
+  --raio: 8px;
+  --gap-d: 6px;
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  padding: 0 0 calc(2rem + env(safe-area-inset-bottom));
+  background: var(--bg);
+  background-image: linear-gradient(170deg, var(--bg) 55%, var(--bg-2) 100%);
+  background-attachment: fixed;
+  color: var(--txt);
+  font-family: var(--display);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* --- topo -------------------------------------------------------------- */
+
+.topo {
+  background: var(--marinho);
+  color: #fff;
+  padding: 1rem .9rem 1.05rem;
+  /* chevrons discretos, o padrao da peca impressa */
+  background-image:
+    repeating-linear-gradient(115deg,
+      var(--marinho-2) 0 2px, transparent 2px 13px);
+}
+
+.topo-int {
+  max-width: 26rem; margin: 0 auto;
+  display: flex; align-items: center; gap: .9rem;
+}
+
+.topo-txt { flex: 1; min-width: 0; }
+
+.marca {
+  font-family: var(--titulo);
+  display: flex; align-items: center; gap: .4rem;
+  margin: 0 0 .5rem;
+  font-size: 1.6rem; font-weight: 800; line-height: 1;
+  letter-spacing: -.01em; text-transform: uppercase;
+  font-stretch: 75%;
+}
+
+.visto-marca { width: 1.35rem; height: auto; color: var(--limao); flex: none; }
+
+.passos {
+  margin: 0; padding: 0; list-style: none;
+  counter-reset: p;
+  display: grid; gap: .12rem;
+}
+.passos li {
+  counter-increment: p;
+  display: grid; grid-template-columns: 1.15rem 1fr; gap: .35rem;
+  font-size: .84rem; line-height: 1.35;
+  color: rgba(255, 255, 255, .93);
+}
+.passos li::before {
+  content: counter(p);
+  display: grid; place-items: center;
+  width: 1.15rem; height: 1.15rem; margin-top: .12rem;
+  border-radius: 50%;
+  background: var(--limao); color: var(--marinho);
+  font-size: .68rem; font-weight: 700; line-height: 1;
+}
+
+/* A tecla da urna, destacada como na peca impressa. */
+.tecla {
+  background: var(--limao); color: var(--marinho);
+  padding: 0 .25rem; border-radius: 3px;
+  font-weight: 800; font-stretch: 85%;
+}
+
+/* Selo redondo do candidato, como na peca impressa: circulo na cor da marca
+   com anel no verde de destaque. Preenchido pelo app.js a partir da config —
+   so aparece quando ha campo travado (Tozi e Dulce ainda sem numero, nao tem). */
+.selo {
+  flex: none;
+  width: 6.4rem; aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--marinho);
+  border: 3px solid var(--limao);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; gap: .1rem;
+  padding: .4rem;
+}
+.selo-cargo {
+  font-size: .5rem; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: rgba(255, 255, 255, .85);
+  font-stretch: 80%;
+}
+.selo-nome {
+  font-family: var(--titulo);
+  font-size: .95rem; font-weight: 800; line-height: 1;
+  text-transform: uppercase; color: #fff;
+  font-stretch: 75%; letter-spacing: -.01em;
+  overflow-wrap: anywhere;
+}
+.selo-numero {
+  font-family: var(--titulo);
+  font-size: 1.15rem; font-weight: 800; line-height: 1;
+  color: var(--limao); letter-spacing: .04em;
+}
+
+/* --- folha ------------------------------------------------------------- */
+
+.folha { max-width: 26rem; margin: 0 auto; padding: 1rem .9rem 0; }
+
+.aviso {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: .5rem; margin: 0 0 .85rem; padding: .5rem .7rem;
+  background: var(--surface); border: 1px solid var(--linha);
+  border-radius: var(--raio); font-size: .78rem; color: var(--mut);
+}
+
+.link {
+  background: none; border: 0; padding: 0; font: inherit;
+  color: var(--limao-esc); text-decoration: underline; cursor: pointer;
+  min-height: 44px; font-weight: 600;
+}
+
+.carregando { text-align: center; color: var(--mut); padding: 2rem 0; }
+
+.colinha { display: grid; gap: .75rem; }
+
+/* Foto a esquerda, corpo (rotulo + caixas) a direita.
+   Todas as caixas tem a mesma largura em todos os cargos, alinhadas a
+   esquerda — como na peca impressa. A conta usa o cargo mais largo (5),
+   com base na largura do corpo (100% aqui = largura de .campo-corpo). */
+.campo {
+  --cx: calc((100% - 4 * var(--gap-d)) / 5);
+  display: flex; align-items: center; gap: .6rem;
+}
+/* O visto e um item flex depois da ultima caixa; num cargo de 5 digitos nao
+   sobra largura e ele sai da tela. Com o Dr. Elton isso so acontece enquanto
+   o eleitor digita o estadual, mas quando o cargo travado tem 5 digitos
+   (Tozi, Dulce — deputado estadual) o campo fica permanentemente sem o visto
+   e a pagina rola de lado. Ai a goteira do visto entra na conta das caixas,
+   igual para todos os cargos daquela pagina. */
+body:has(.campo.travado .digito:nth-child(5)) .campo {
+  --cx: calc((100% - 2rem - 4 * var(--gap-d)) / 5);
+}
+.campo-corpo { flex: 1; min-width: 0; }
+
+.foto {
+  position: relative;
+  flex: none;
+  width: 3.4rem; height: 4.3rem;
+  padding: 0; margin: 0;
+  border: 1px solid var(--linha); border-radius: 7px;
+  background: var(--surface); overflow: hidden;
+  display: grid; place-items: center;
+  color: var(--rot); cursor: pointer;
+  transition: border-color .12s ease;
+}
+button.foto:hover, button.foto:focus-visible { border-color: var(--marinho); outline: none; }
+.foto-travada { cursor: default; border-color: var(--cx-travado); border-width: 2px; }
+
+/* Campo ainda vazio: tracejado reforca que ali se pode tocar para buscar. */
+button.foto:not(.tem-foto) { border-style: dashed; border-color: var(--marinho); }
+
+.foto-lupa {
+  position: absolute; right: -1px; bottom: -1px;
+  width: 1.35rem; height: 1.35rem;
+  display: grid; place-items: center;
+  background: var(--marinho); color: #fff;
+  border-radius: 7px 0 6px 0;
+}
+.foto-lupa svg { width: .82rem; height: .82rem; display: block; }
+button.foto:hover .foto-lupa, button.foto:focus-visible .foto-lupa { background: var(--limao-esc); }
+
+.foto-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.foto-ph { display: grid; place-items: center; width: 100%; height: 100%; }
+.foto-ph svg { width: 62%; height: 62%; opacity: .55; }
+.foto-ph.inicial {
+  font-size: 1.7rem; font-weight: 800; color: var(--marca-txt);
+  background: var(--marinho); font-stretch: 80%;
+}
+
+.rotulo {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 .4rem;
+  margin: 0 0 .3rem;
+  font-size: 1rem; font-weight: 800; line-height: 1.15;
+  letter-spacing: 0; text-transform: uppercase;
+  color: var(--rot);
+  font-stretch: 78%;
+}
+
+.nome { color: var(--marinho); overflow-wrap: anywhere; }
+.nome:empty { display: none; }
+/* Separador no fim do cargo, nao no inicio do nome: quando o nome e longo e
+   cai para a linha de baixo, a barra fica no fim da primeira linha em vez de
+   orfa no comeco da segunda. */
+.rotulo > span:first-child::after { content: " |"; color: var(--rot); }
+/* Sem nome resolvido ainda, nao ha o que separar. O span .nome existe sempre
+   no DOM (aria-live precisa dele estavel), entao a checagem e por :has(). */
+.rotulo:has(.nome:empty) > span:first-child::after { content: ""; }
+.partido { color: var(--rot); font-size: .8em; font-weight: 700; }
+
+.digitos { position: relative; display: flex; gap: var(--gap-d); }
+
+.digito {
+  font-family: var(--titulo);
+  width: var(--cx); aspect-ratio: 1; flex: none;
+  display: grid; place-items: center;
+  background: var(--surface);
+  border: 1px solid var(--linha);
+  border-radius: 5px;
+  font-size: 2.1rem; font-weight: 800; line-height: 1;
+  font-stretch: 85%;
+  color: var(--marinho);
+  transition: background-color .12s ease, border-color .12s ease;
+}
+.digito.preenchido { background: var(--limao); border-color: var(--limao); }
+.campo.travado .digito.preenchido {
+  background: var(--cx-travado); border-color: var(--cx-travado);
+  color: var(--cx-travado-txt);
+}
+/* So destaca a proxima caixa do campo em foco. A classe .atual existe em todo
+   campo vazio; sem o :focus-within os seis apareceriam marcados de uma vez. */
+.digitos:focus-within .digito.atual {
+  border-color: var(--marinho); border-width: 2px;
+}
+
+/* Input real, invisivel por cima das caixas: um so campo mantem colagem,
+   teclado numerico e leitor de tela funcionando. As caixas sao decorativas. */
+.entrada {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  margin: 0; padding: 0; border: 0;
+  opacity: 0;
+  font: inherit;
+  cursor: text;
+}
+.entrada:focus { outline: none; }
+.campo.travado .entrada { cursor: default; }
+
+/* Item flex, nao posicionado: cai logo depois da ultima caixa daquele cargo.
+   Calcular a posicao pela largura da caixa estourava a tela nos cargos com
+   menos de 5 digitos. */
+.visto {
+  flex: none; align-self: center; margin-left: .5rem;
+  width: 1.5rem; color: var(--limao-esc); pointer-events: none;
+}
+.visto svg { width: 100%; height: auto; display: block; }
+
+.campo.tem-erro .digito { border-color: var(--erro); }
+.campo.tem-erro .digito.preenchido { background: var(--erro-bg); }
+.campo.tem-erro .nome { color: var(--erro); }
+
+.erro { margin: .25rem 0 0; font-size: .74rem; font-weight: 600; color: var(--erro); }
+.erro-geral {
+  margin: .75rem 0 0; padding: .55rem .75rem; font-size: .8rem; font-weight: 600;
+  color: var(--erro); background: var(--erro-bg);
+  border: 1px solid var(--erro); border-radius: var(--raio);
+}
+
+/* Empilhados: "Compartilhe com amigos" nao cabe ao lado de "Salvar imagem"
+   em 375px sem quebrar no meio da palavra. */
+.acoes { display: grid; gap: .5rem; margin-top: 1.25rem; }
+.acoes button {
+  min-height: 48px; padding: .6rem .5rem;
+  font: inherit; font-size: .88rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .01em;
+  color: var(--marca-txt); background: var(--marca);
+  border: 2px solid var(--marca); border-radius: var(--raio);
+  cursor: pointer;
+}
+.acoes button.secundario { color: var(--marca); background: transparent; }
+.acoes button:active { transform: scale(.985); }
+.acoes button[disabled] { opacity: .45; cursor: default; }
+
+.rodape {
+  margin: 1.25rem 0 0; text-align: center;
+  font-size: .7rem; color: var(--mut);
+}
+
+/* temas por candidato — paletas copiadas dos sites de cada campanha */
+/* Tozi: cores digitais do manual TOZI ID — 274C #1a174e, 280C #001a6d e
+   2132C #1055bd. O impresso sai em Pantone/CMYK (por isso o santinho mede
+   #0f1b2c/#1e5898 no PDF); em tela o manual manda usar estes RGB.
+   O verde segue sendo a caixa preenchida dos outros cargos: a peça é conjunta
+   com o Dr. Elton. O campo do Tozi é o único azul. */
+body[data-tema="tozi"] {
+  --marinho: #1a174e; --marinho-2: #001a6d; --limao: #84bf41;
+  --limao-esc: #1055bd; --bg: #e3e4e3; --bg-2: #d8dad8;
+  --txt: #1a174e; --rot: #5b5f6b; --mut: #5b5f6b;
+  --linha: #c8cac8; --marca: #1055bd; --acento: #1055bd;
+  --cx-travado: #1055bd; --cx-travado-txt: #ffffff;
+  --display: "Avenir LT Std", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --titulo: "Geometos Neue", "Geometos", var(--display);
+}
+/* O símbolo da marca (linhas de pauta que se deformam num sol nascente) no
+   lugar dos chevrons do Elton. É o mesmo arquivo que o site-tozi usa. */
+body[data-tema="tozi"] .topo {
+  /* o véu por cima rebaixa o símbolo a textura: sem ele o azul 2132C cheio
+     briga com o texto branco do topo */
+  background-image:
+    linear-gradient(rgba(26, 23, 78, .74), rgba(26, 23, 78, .74)),
+    url("marca/ondas.svg");
+  background-repeat: no-repeat;
+  background-position: center, left bottom -30%;
+  background-size: cover, 125% auto;
+}
+/* Selo chapado no azul, sem o anel verde; e os numerais inclinados da peça. */
+body[data-tema="tozi"] .selo { background: var(--acento); border-color: #fff; }
+body[data-tema="tozi"] .selo-numero { color: #fff; }
+body[data-tema="tozi"] .selo-numero,
+body[data-tema="tozi"] .digito { font-style: italic; }
+/* Geometos não tem eixo de largura: o font-stretch do tema padrão viraria
+   síntese e engorda a letra. */
+body[data-tema="tozi"] .marca,
+body[data-tema="tozi"] .selo-nome,
+body[data-tema="tozi"] .selo-cargo,
+body[data-tema="tozi"] .digito { font-stretch: normal; }
+/* O nome inteiro não cabe no selo em Geometos, que é mais larga que a Archivo
+   condensada; e quebrar "PROFESSOR" no meio (overflow-wrap: anywhere) fica
+   pior que diminuir. */
+body[data-tema="tozi"] .selo-nome {
+  font-size: .78rem; overflow-wrap: normal; letter-spacing: 0;
+}
+
+/* --- layout da peça impressa (só o tema do Tozi) ----------------------- */
+
+/* Topo: título à esquerda e passos à direita, sobre o gradiente navy→azul da
+   peça, com o bloco de listras nas laterais. */
+body[data-tema="tozi"] .topo {
+  background-color: var(--marinho);
+  background-image:
+    linear-gradient(160deg, rgba(26, 23, 78, .92) 30%, rgba(16, 85, 189, .55)),
+    url("marca/ondas.svg"), url("marca/ondas.svg");
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-position: center, left -14% center, right -14% center;
+  background-size: cover, 42% auto, 42% auto;
+  padding-bottom: 1.4rem;
+}
+body[data-tema="tozi"] .topo-int { align-items: flex-start; }
+body[data-tema="tozi"] .marca {
+  flex: none; font-size: 1.25rem; line-height: 1; white-space: nowrap;
+}
+/* Título ao lado dos passos é o arranjo da peça, mas ela é bem mais larga em
+   proporção que um celular: abaixo disso a coluna dos passos fica com três
+   linhas por item e o topo engorda. Aí eles voltam a ficar um sob o outro. */
+@media (min-width: 26rem) {
+  body[data-tema="tozi"] .topo-txt {
+    display: flex; align-items: center; gap: .8rem;
+  }
+  body[data-tema="tozi"] .marca { font-size: 1.08rem; margin: 0; }
+}
+/* Na peça o "COMO VOTAR" vem sozinho — o tique é assinatura do Dr. Elton. */
+body[data-tema="tozi"] .visto-marca { display: none; }
+/* Os passos da peça são numerados em azul, não no verde do Dr. Elton. O vão à
+   direita é onde o rosto entra. */
+body[data-tema="tozi"] .passos {
+  flex: 1; min-width: 0; padding-right: 6rem; font-size: .8rem;
+}
+body[data-tema="tozi"] .passos li::before {
+  background: var(--acento); color: #fff;
+}
+
+/* O rosto em traço invade o corpo pelo canto direito, como na peça. */
+body[data-tema="tozi"] .folha {
+  position: relative;
+  padding-top: 1.6rem;
+}
+body[data-tema="tozi"] .folha::before {
+  content: "";
+  position: absolute; z-index: 1; pointer-events: none;
+  right: .3rem; top: -4.9rem;
+  width: 5.6rem; height: 8.8rem;
+  background: url("marca/rosto.svg") center/contain no-repeat;
+}
+/* O selo (movido para cá pelo app.js) ocupa o vazio à direita dos senadores,
+   que só têm 3 dígitos — o mesmo lugar que ele tem na peça. */
+body[data-tema="tozi"] .folha > .selo {
+  position: absolute; z-index: 1;
+  right: .4rem; top: 15.2rem;
+  width: 7rem;
+}
+/* A peça não tem o tique de conferido: o campo dele já vem preenchido. */
+body[data-tema="tozi"] .visto { display: none; }
+body[data-tema="tozi"] .rotulo { font-size: .82rem; }
+
+/* A foto de cada cargo fica à esquerda, como no tema padrão: é ela que abre a
+   busca por nome, e ver o rosto do candidato é metade do "confira o nome e a
+   foto". A peça impressa não tem essa coluna, mas ela é o app funcionando. */
+
+/* Rodapé com a faixa de listras da peça. */
+body[data-tema="tozi"] .rodape {
+  margin: 1.6rem -.9rem 0;
+  padding: 1rem .9rem calc(1rem + env(safe-area-inset-bottom));
+  background: var(--marinho) url("marca/ondas.svg") center/150% auto no-repeat;
+  color: rgba(255, 255, 255, .82);
+}
+body[data-tema="dulce"] {
+  --marinho: #6d1f3a; --marinho-2: #7d2a47; --limao: #e8a13d;
+  --limao-esc: #8a5a12; --bg: #faf3ef; --bg-2: #f2e3da;
+  --txt: #2b2126; --rot: #6e5f66; --mut: #6e5f66;
+  --linha: #ded0d5; --marca: #6d1f3a; --acento: #6d1f3a;
+}
+
+/* --- gaveta de busca por nome (bottom sheet) -------------------------- */
+
+body.sem-rolagem { overflow: hidden; }
+
+.busca {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(10, 16, 28, .55);
+  display: flex; align-items: flex-end; justify-content: center;
+}
+
+.busca-painel {
+  width: 100%; max-width: 30rem; max-height: 86vh;
+  display: flex; flex-direction: column;
+  background: var(--bg);
+  border-radius: 18px 18px 0 0;
+  padding: .8rem .9rem calc(.6rem + env(safe-area-inset-bottom));
+  animation: sobe .18s ease;
+}
+@keyframes sobe { from { transform: translateY(100%); } }
+
+.busca-topo {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: .6rem;
+}
+.busca-titulo {
+  margin: 0; font-size: 1rem; font-weight: 800;
+  text-transform: uppercase; font-stretch: 78%; color: var(--rot);
+}
+.busca-x {
+  background: none; border: 0; font-size: 1.1rem; line-height: 1;
+  color: var(--mut); cursor: pointer;
+  width: 2.2rem; height: 2.2rem; border-radius: 50%;
+}
+.busca-x:hover { background: var(--surface); }
+
+.busca-input {
+  width: 100%; box-sizing: border-box;
+  padding: .7rem .85rem; margin-bottom: .5rem;
+  font: inherit; font-size: 1rem;
+  border: 2px solid var(--linha); border-radius: 10px;
+  background: var(--surface); color: var(--txt);
+}
+.busca-input:focus { border-color: var(--marinho); outline: none; }
+
+.busca-lista {
+  list-style: none; margin: 0; padding: 0;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  flex: 1;
+}
+.busca-dica { padding: 1.2rem .3rem; color: var(--mut); font-size: .88rem; text-align: center; }
+
+.busca-item {
+  width: 100%; display: flex; align-items: center; gap: .7rem;
+  padding: .5rem .3rem; background: none; border: 0;
+  border-bottom: 1px solid var(--linha);
+  font: inherit; text-align: left; cursor: pointer;
+}
+.busca-item:active { background: var(--surface); }
+
+.busca-foto {
+  flex: none; width: 2.9rem; height: 3.6rem;
+  border-radius: 6px; overflow: hidden;
+  background: var(--marinho); color: var(--marca-txt);
+  display: grid; place-items: center;
+  font-size: 1.3rem; font-weight: 800; font-stretch: 80%;
+}
+.busca-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.busca-txt { min-width: 0; display: flex; flex-direction: column; gap: .1rem; }
+.busca-nome {
+  font-weight: 700; color: var(--txt); line-height: 1.2;
+  text-transform: uppercase; font-stretch: 82%; font-size: .95rem;
+}
+.busca-meta { font-size: .82rem; color: var(--rot); font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+  .busca-painel { animation: none; }
+}
+
+@media print {
+  body { background: #fff; padding: 0; font-size: 12pt; }
+  .topo { background: #fff; color: #000; }
+  .passos, .aviso, .acoes, .rodape, .carregando, .link { display: none !important; }
+  .marca { color: #000; }
+  .campo { break-inside: avoid; }
+  .digito { border: 1px solid #000; background: #fff; color: #000; }
+  .digito.preenchido { background: #ddd; }
+  .rotulo, .nome { color: #000 !important; }
+}

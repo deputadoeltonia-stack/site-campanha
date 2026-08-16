@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Minha colinha de voto</title>
+<meta name="description" content="Monte sua colinha de voto para 4 de outubro. Digite os números e confira os nomes antes de ir votar.">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-int">
+    <div class="topo-txt">
+      <h1 class="marca">
+        Como votar
+        <svg class="visto-marca" viewBox="0 0 60 34" aria-hidden="true">
+          <path d="M3 13 L21 31 L57 3" fill="none" stroke="currentColor" stroke-width="5"/>
+        </svg>
+      </h1>
+      <ol class="passos">
+        <li>Digite o número do seu candidato</li>
+        <li>Confira o nome e a foto</li>
+        <!-- o li e grid: o texto e a tecla precisam vir num item so, senao a
+             tecla vira um item de grade sozinha e cai na linha de baixo -->
+        <li><span>Aperte <span class="tecla">CONFIRMA</span></span></li>
+      </ol>
+    </div>
+    <div class="selo" id="selo" hidden>
+      <span class="selo-cargo" id="selo-cargo"></span>
+      <span class="selo-nome" id="selo-nome"></span>
+      <span class="selo-numero" id="selo-numero"></span>
+    </div>
+  </div>
+</header>
+
+<main class="folha">
+
+  <p id="aviso" class="aviso" hidden>
+    <span id="aviso-txt"></span>
+    <button type="button" id="btn-limpar" class="link">Começar de novo</button>
+  </p>
+
+  <p id="carregando" class="carregando" role="status">Carregando candidatos…</p>
+
+  <noscript>
+    <style>#carregando { display: none; }</style>
+    <p class="carregando">
+      Esta página precisa de JavaScript para buscar os candidatos pelo número.
+      Ative o JavaScript e recarregue.
+    </p>
+  </noscript>
+
+  <form id="colinha" class="colinha" hidden autocomplete="off"></form>
+
+  <p id="erro-geral" class="erro-geral" role="alert" hidden></p>
+
+  <div class="acoes" id="acoes" hidden>
+    <button type="button" id="btn-salvar">Salvar imagem</button>
+    <button type="button" id="btn-enviar" class="secundario">Compartilhe com amigos</button>
+  </div>
+
+  <p class="rodape">
+    Confira sempre na urna. Esta página não envia seus dados para lugar nenhum.
+  </p>
+
+</main>
+
+<div id="busca" class="busca" hidden role="dialog" aria-modal="true" aria-labelledby="busca-titulo">
+  <div class="busca-painel">
+    <div class="busca-topo">
+      <h2 class="busca-titulo" id="busca-titulo">Buscar candidato</h2>
+      <button type="button" id="busca-fechar" class="busca-x" aria-label="Fechar">✕</button>
+    </div>
+    <input type="search" id="busca-input" class="busca-input"
+           placeholder="Digite o nome do candidato" autocomplete="off"
+           enterkeyhint="search" aria-label="Nome do candidato">
+    <ul id="busca-lista" class="busca-lista"></ul>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
