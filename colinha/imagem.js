@@ -57,7 +57,7 @@ export const TEMAS = {
     seloLogo: 'marca/logo-dulce-l1.png',
     seloLogo2: 'marca/logo-dulce-l2.png',
     seloTrio: 'marca/pessoinhas-trio.svg',
-    padrao: 'marca/padrao-dulce-topo.svg', // pessoinhas Λ tom sobre tom
+    topoLiso: true, coracao: 'marca/coracao.svg', // topo limpo, so o coracao
     corpoPadrao: 'marca/padrao-dulce-corpo.svg', // mint na direita do corpo
     titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
@@ -260,7 +260,7 @@ function desenharTopo(ctx, t, simbolo, padrao) {
     ctx.drawImage(simbolo, -L * 0.1, TOPO - alt * 0.7, larg, alt)
     ctx.fillStyle = 'rgba(26,23,78,.62)'
     ctx.fillRect(0, 0, L, TOPO)
-  } else {
+  } else if (!t.topoLiso) {
     desenharFitas(ctx, t.topoRisco2 ?? t.topoRisco, t.topoRisco, 0, 0, L, TOPO)
   }
   // O brilho ciano diagonal que a arte tem entrando pela esquerda do topo.
@@ -471,11 +471,12 @@ export async function desenhar(colinha, config) {
   const fotos = await carregarFotos(colinha)
   // Simbolo, rosto e selo do manual, quando o tema tem. Falha vira null e o
   // desenho cai no risco geometrico — a imagem sai sem a marca, nunca quebrada.
-  const [simbolo, rosto, padrao, imgSelo, seloLogo, seloLogo2, seloTrio, corpoPadrao] = await Promise.all([
+  const [simbolo, rosto, padrao, imgSelo, seloLogo, seloLogo2, seloTrio, corpoPadrao, coracao] = await Promise.all([
     carregarArquivo(t.simbolo), carregarArquivo(t.rosto), carregarArquivo(t.padrao),
     carregarArquivo(t.seloImagem),
     carregarArquivo(t.seloLogo), carregarArquivo(t.seloLogo2),
     carregarArquivo(t.seloTrio), carregarArquivo(t.corpoPadrao),
+    carregarArquivo(t.coracao),
   ])
   // A peca do Dr. Elton fecha com a faixa lima de chevrons; a imagem dele
   // cresce essa faixa. Os temas com peca propria ficam na altura de sempre.
@@ -522,6 +523,13 @@ export async function desenhar(colinha, config) {
   }
 
   desenharTopo(ctx, t, simbolo, padrao)
+
+  // So o coracao da identidade na direita do topo, como na tela.
+  if (coracao) {
+    const alt = 88
+    const larg = alt * (coracao.width / coracao.height)
+    ctx.drawImage(coracao, L - larg - 48, (TOPO - alt) / 2, larg, alt)
+  }
 
   // Rosto em traco no canto de cima, invadindo o topo — a moldura da peca.
   if (rosto) {

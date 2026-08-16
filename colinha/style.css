@@ -542,13 +542,20 @@ body[data-tema="dulce"] {
   --display: "Avenir LT Std", system-ui, -apple-system, "Segoe UI", sans-serif;
   --titulo: "Geometos Neue", "Geometos", var(--display);
 }
-/* O padrão de pessoinhas Λ da identidade, tom sobre tom no petróleo. */
+/* Topo limpo: so o coracao da identidade, na direita. */
 body[data-tema="dulce"] .topo {
-  background-image: url("marca/padrao-dulce-topo.svg");
-  background-size: 4.2rem auto;
+  background-image: url("marca/coracao.svg");
+  background-repeat: no-repeat;
+  background-position: right 1rem top 1.2rem;
+  background-size: 2.6rem auto;
   padding-bottom: 1.4rem;
 }
-body[data-tema="dulce"] .passos { flex: 1; min-width: 0; font-size: .8rem; }
+body[data-tema="dulce"] .passos { flex: 1; min-width: 0; font-size: .8rem; padding-right: 3.4rem; }
+/* Com o titulo ao lado (>=26rem) o coracao fica alem dos passos: folga menor
+   evita quebrar "do seu candidato" em duas linhas a toa. */
+@media (min-width: 26rem) {
+  body[data-tema="dulce"] .passos { padding-right: 2.4rem; }
+}
 /* Passos em azul-claro com número navy, como na peça. */
 body[data-tema="dulce"] .passos li::before { background: #a4d2e6; color: #062240; }
 body[data-tema="dulce"] .tecla { background: #aecf3f; color: #062240; }
@@ -578,10 +585,17 @@ body[data-tema="dulce"] .folha::before {
 /* O botao de contorno e transparente: sobre o padrao, as pessoinhas vazavam
    para dentro do texto. Fundo da pagina no lugar de transparencia. */
 body[data-tema="dulce"] .acoes button.secundario { background: var(--bg); }
+/* Rodape como card: navy chapado, cantos generosos, flutuando com respiro —
+   nada de padrao nem faixa colada na borda. */
 body[data-tema="dulce"] .rodape {
-  background: var(--marinho) url("marca/padrao-dulce-topo.svg") 0 0/4.2rem auto;
-  margin-top: auto;
+  background: var(--marinho);
+  margin: 2rem 0 1rem; margin-top: auto;
+  padding: .95rem 1.2rem;
+  border-radius: 14px;
 }
+/* Respiro garantido entre o ultimo botao e o card, mesmo com a pagina cheia
+   (o margin-top: auto do card colapsa a zero quando o conteudo enche). */
+body[data-tema="dulce"] .acoes { margin-bottom: 1.4rem; }
 /* A folha tem flex: 1 e estica ate o pe da tela; sem isto o rodape parava no
    meio e sobrava um vao cinza com padrao solto embaixo. Coluna flex + auto
    no rodape fecham a pagina com a faixa navy, como a peca fecha. */
