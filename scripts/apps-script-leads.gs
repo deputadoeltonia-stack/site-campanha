@@ -23,18 +23,41 @@
  * qualquer um pode postar direto no endpoint.
  */
 
-var ABA = 'Leads';
+var ABA = 'Leads';   // destino padrão (site do Dr. Elton)
 var CABECALHO = ['Data', 'Nome', 'Telefone', 'Consentimento LGPD', 'Origem'];
 
+/**
+ * Uma planilha atende mais de um site: o campo `origem` do lead decide a aba.
+ * Origem desconhecida cai na aba padrão em vez de ser descartada — perder um
+ * lead por erro de digitação num site seria pior que uma linha fora de lugar.
+ */
+var ABA_POR_ORIGEM = {
+  'site-tozi': 'Pagina Tozi'
+};
+
 function setup() {
-  var sh = planilha_();
-  if (sh.getLastRow() === 0) sh.appendRow(CABECALHO);
-  sh.setFrozenRows(1);
+  var abas = [ABA];
+  for (var k in ABA_POR_ORIGEM) abas.push(ABA_POR_ORIGEM[k]);
+  for (var i = 0; i < abas.length; i++) {
+    var sh = planilhaPorNome_(abas[i]);
+    if (sh.getLastRow() === 0) sh.appendRow(CABECALHO);
+    sh.setFrozenRows(1);
+  }
 }
 
-function planilha_() {
+function planilhaPorNome_(nome) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  return ss.getSheetByName(ABA) || ss.insertSheet(ABA);
+  var sh = ss.getSheetByName(nome);
+  if (!sh) {
+    sh = ss.insertSheet(nome);
+    sh.appendRow(CABECALHO);
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+
+function planilha_(origem) {
+  return planilhaPorNome_(ABA_POR_ORIGEM[String(origem || '')] || ABA);
 }
 
 /**
@@ -83,9 +106,13 @@ function doPost(e) {
     var v = validar_(d);
     if (v.erros.length) return resposta_(false, 'invalido: ' + v.erros.join(','));
 
-    // anti duplicata: mesmo telefone em menos de 2 min é reenvio/bot
+    var origem = String(d.origem || 'site');
+
+    // anti duplicata: mesmo telefone em menos de 2 min é reenvio/bot.
+    // A chave inclui a origem: a mesma pessoa pode se cadastrar nos dois
+    // sites em seguida, e isso são dois leads legítimos, não repetição.
     var cache = CacheService.getScriptCache();
-    var chave = 'lead_' + v.telefone;
+    var chave = 'lead_' + origem + '_' + v.telefone;
     if (cache.get(chave)) return resposta_(true, 'duplicado ignorado');
     cache.put(chave, '1', 120);
 
@@ -93,12 +120,12 @@ function doPost(e) {
     var lock = LockService.getScriptLock();
     lock.waitLock(20000);
     try {
-      planilha_().appendRow([
+      planilha_(origem).appendRow([
         new Date(),
         seguro_(v.nome),
         "'" + v.telefone,   // apóstrofo: senão o Sheets come o zero do DDD
         'SIM',              // validar_ já rejeita quem não consentiu
-        seguro_(d.origem || 'site')
+        seguro_(origem)
       ]);
     } finally {
       lock.releaseLock();
