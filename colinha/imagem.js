@@ -69,7 +69,11 @@ export const TEMAS = {
     // perto do impresso. A Geometos Neue e Black de verdade (usWeightClass 900).
     rotuloDisplay: true,
     fotoSemDestaque: true, // campo pre-definido sem borda verde
-    topoLiso: true, // sem coracao: o adesivo ocupa o canto direito do topo
+    digitoAltura: 0.82, // tinta do digito / altura da caixa, medido na peca
+    // Borrao mint na esquerda do painel, como no impresso: sangra pela borda,
+    // centro a 26% da altura do corpo (medido na pagina 2 do santinho).
+    coracaoCorpo: 'marca/coracao.svg',
+    topoLiso: true, // sem coracao no topo: o adesivo ocupa o canto direito
     padrao: 'marca/padrao-dulce-topo.svg', // pessoinhas tom sobre tom no topo
     corpoPadrao: 'marca/padrao-dulce-corpo.svg', // mint na direita do corpo
     rodapeBanda: '#005474', // a faixa petroleo que fecha a peca
@@ -502,12 +506,12 @@ export async function desenhar(colinha, config) {
   const fotos = await carregarFotos(colinha)
   // Simbolo, rosto e selo do manual, quando o tema tem. Falha vira null e o
   // desenho cai no risco geometrico — a imagem sai sem a marca, nunca quebrada.
-  const [simbolo, rosto, padrao, imgSelo, seloLogo, seloLogo2, seloTrio, corpoPadrao, coracao] = await Promise.all([
+  const [simbolo, rosto, padrao, imgSelo, seloLogo, seloLogo2, seloTrio, corpoPadrao, coracao, coracaoCorpo] = await Promise.all([
     carregarArquivo(t.simbolo), carregarArquivo(t.rosto), carregarArquivo(t.padrao),
     carregarArquivo(t.seloImagem),
     carregarArquivo(t.seloLogo), carregarArquivo(t.seloLogo2),
     carregarArquivo(t.seloTrio), carregarArquivo(t.corpoPadrao),
-    carregarArquivo(t.coracao),
+    carregarArquivo(t.coracao), carregarArquivo(t.coracaoCorpo),
   ])
   // A peca do Dr. Elton fecha com a faixa lima de chevrons; a imagem dele
   // cresce essa faixa. Os temas com peca propria ficam na altura de sempre.
@@ -556,6 +560,25 @@ export async function desenhar(colinha, config) {
     ctx.globalAlpha = 1
   }
 
+  // Coracao mint desfocado na esquerda do painel, como na peca: sangra pela
+  // borda e o centro cai a 26% da altura do corpo. Proporcoes medidas no
+  // santinho (visivel 318x321 num painel de 1794, comecando na propria borda).
+  if (coracaoCorpo) {
+    const corpoA = A - TOPO
+    const larg = 0.193 * L // inclui o pedaco que fica fora da folha
+    const alt = larg * (coracaoCorpo.height / coracaoCorpo.width)
+    const x0 = -0.015 * L
+    const y0 = TOPO + 0.175 * corpoA
+    ctx.save()
+    // Sem suporte a filter (Safari antigo) o coracao sai nitido demais para
+    // passar por marca d'agua — ai entra com menos opacidade no lugar do blur.
+    const temBlur = typeof ctx.filter === 'string'
+    if (temBlur) ctx.filter = `blur(${Math.round(larg * 0.085)}px)`
+    ctx.globalAlpha = temBlur ? 0.5 : 0.22
+    ctx.drawImage(coracaoCorpo, x0, y0, larg, alt)
+    ctx.restore()
+  }
+
   desenharTopo(ctx, t, simbolo, padrao)
 
   // O coracao da identidade na direita do topo — desfocado, como o brilho
@@ -585,6 +608,20 @@ export async function desenhar(colinha, config) {
   // dela e o numero do Dr. Elton.
   const proprio = colinha.find((s) => s.id === slotTravado(config))
   if (proprio) desenharSelo(ctx, t, proprio, imgSelo, seloLogo, seloLogo2, seloTrio)
+
+  // Tamanho do algarismo tirado da peca: no santinho a tinta do digito mede
+  // 0,82 da altura da caixa (176px numa caixa de 215). Mede-se a tinta do "4"
+  // (de topo reto) num corpo de referencia e reescala — assim o "0" e o "2"
+  // mantem o transbordo optico proprio deles, como no impresso.
+  // So o tema que declara digitoAltura entra nessa conta; os outros seguem no
+  // corpo fixo de sempre, para nao mexer no PNG de campanha ja aprovada.
+  let tamDigito = t.peca ? 80 : 76
+  if (t.digitoAltura) {
+    ctx.font = fonte(t, t.peca ? 900 : 800, SEMI, 100, { italico: !!t.digitoItalico })
+    const ref = ctx.measureText('4')
+    const tintaRef = ref.actualBoundingBoxAscent + ref.actualBoundingBoxDescent
+    if (tintaRef > 0) tamDigito = Math.round((100 * CAIXA * t.digitoAltura) / tintaRef)
+  }
 
   ctx.textAlign = 'left'
   let y = Y0
@@ -638,13 +675,15 @@ export async function desenhar(colinha, config) {
 
       if (digito) {
         ctx.fillStyle = slot.travado ? (t.travadoTxt ?? t.txt) : t.txt
-        // Na peca do Dr. Elton o digito quase preenche a caixa.
-        ctx.font = fonte(t, t.peca ? 900 : 800, SEMI, t.peca ? 80 : 76, { italico: !!t.digitoItalico })
+        ctx.font = fonte(t, t.peca ? 900 : 800, SEMI, tamDigito, { italico: !!t.digitoItalico })
+        // Centra pela TINTA do algarismo, nao pelo textBaseline 'middle': o
+        // meio da caixa de linha fica entre ascent e descent da fonte, que sao
+        // assimetricos, e o digito sentava fora do centro da caixa.
+        const md = ctx.measureText(digito)
+        const meio = (md.actualBoundingBoxAscent - md.actualBoundingBoxDescent) / 2
         ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.fillText(digito, x + CAIXA / 2, topo + CAIXA / 2 + 3)
+        ctx.fillText(digito, x + CAIXA / 2, topo + CAIXA / 2 + meio)
         ctx.textAlign = 'left'
-        ctx.textBaseline = 'alphabetic'
       }
     }
 
