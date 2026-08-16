@@ -12,7 +12,10 @@
        - Google Apps Script Web App (/exec), ou
        - endpoint Supabase / qualquer POST que aceite JSON.
      ------------------------------------------------------- */
-  var LEAD_ENDPOINT = ""; // ex.: "https://script.google.com/macros/s/XXXX/exec"
+  // Apps Script -> planilha "Leads Dr. Elton". Vazio volta pro modo demo (localStorage).
+  // Se editar o .gs, tem que REIMPLANTAR (Gerenciar implantações > Versão: Nova),
+  // senão esta URL continua servindo o código velho.
+  var LEAD_ENDPOINT = "https://script.google.com/macros/s/AKfycbyBdY45weHbgTSWLBt0ymfRSHPmz4vHVGdEiu13T3o3yGejT36JiGPauMrxmv-vRz-j/exec";
 
   /* ---------- page-load orquestrado (dispara animações .load/.hero-photo) ---------- */
   var root = document.documentElement;

@@ -13,13 +13,25 @@ if [ -z "$URL" ]; then
 fi
 case "$URL" in *"/exec") ;; *) echo "AVISO: a URL deveria terminar em /exec" >&2 ;; esac
 
-TEL="119$(date +%H%M%S)"   # muda a cada segundo: não colide com o cache de dedupe
+# 11 dígitos, como o validador exige (celular BR com DDD). Muda a cada segundo,
+# então não colide com o cache de dedupe de 2 min entre uma rodada e outra.
+TEL=$(printf '119%08d' $(( $(date +%s) % 100000000 )))
 
+# O /exec responde 302 apontando pro googleusercontent, que só aceita GET.
+# Com `curl -L` o POST era reenviado pro destino e voltava 405 — parecia falha
+# do endpoint, mas o doPost já tinha rodado. Então: POSTa, pega o Location,
+# e busca o corpo com um GET separado.
 post() {
-  curl -sS -L -X POST "$URL" \
-    -H 'Content-Type: text/plain;charset=utf-8' \
-    --data "$1" \
-    -w '\n  [HTTP %{http_code}]\n'
+  local loc
+  loc=$(curl -sS -o /dev/null -D- -X POST "$URL" \
+          -H 'Content-Type: text/plain;charset=utf-8' \
+          --data "$1" --max-time 30 \
+        | tr -d '\r' | awk 'tolower($1)=="location:"{print $2}')
+  if [ -z "$loc" ]; then
+    echo "  SEM REDIRECT — o /exec não respondeu como app da web" >&2
+    return 1
+  fi
+  curl -sS "$loc" --max-time 30 -w '\n  [HTTP %{http_code}]\n'
 }
 
 echo "== 1. lead válido (esperado: ok:true) =="
