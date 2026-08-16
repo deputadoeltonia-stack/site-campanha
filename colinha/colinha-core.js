@@ -28,6 +28,9 @@ export const CANDIDATOS = {
   'colinhavirtual.dreltonai.com.br': {
     nome: 'PROFESSOR TOZI', cargo: 7, numero: '44447', partido: 'UNIÃO', tema: 'tozi',
     foto: 'tozi',
+    // Como na colinha da Dulce: Dr. Elton (peca conjunta) e o governador ja
+    // vem preenchidos. Sugestao = editavel; o nome resolve pelo dataset TSE.
+    sugestao: { federal: '4412', governador: '10' },
   },
   // O site do Tozi embute a colinha em /colinha/ (site-tozi, deploy Vercel).
   // Sem estes aliases o hostname dele cairia no PADRAO e abriria a colinha
