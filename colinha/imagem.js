@@ -594,7 +594,7 @@ export async function desenhar(colinha, config) {
       if (digito) {
         ctx.fillStyle = slot.travado ? (t.travadoTxt ?? t.txt) : t.txt
         // Na peca do Dr. Elton o digito quase preenche a caixa.
-        ctx.font = fonte(t, t.peca ? 900 : 800, SEMI, t.peca ? 80 : 66, { italico: !!t.digitoItalico })
+        ctx.font = fonte(t, t.peca ? 900 : 800, SEMI, t.peca ? 80 : 76, { italico: !!t.digitoItalico })
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.fillText(digito, x + CAIXA / 2, topo + CAIXA / 2 + 3)

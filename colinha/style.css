@@ -156,14 +156,16 @@ body[data-tema="elton"] {
   width: 1.15rem; height: 1.15rem; margin-top: .12rem;
   border-radius: 50%;
   background: #b6d6ed; color: var(--marinho);
-  font-size: .68rem; font-weight: 700; line-height: 1;
+  font-size: .68rem; font-weight: 700; line-height: 0; /* so o glifo conta no centro */
 }
 
 /* A tecla da urna, destacada como na peca impressa. */
 .tecla {
+  display: inline-block;
   background: var(--lima); color: var(--marinho);
-  padding: 0 .25rem; border-radius: 3px;
-  font-weight: 800;}
+  padding: .12em .45em .16em; border-radius: .3em;
+  line-height: 1.05; font-weight: 800;
+}
 
 /* Selo redondo do candidato, como na peca impressa: circulo navy liso, sem
    anel, conteudo levemente inclinado. Preenchido pelo app.js a partir da
@@ -312,7 +314,7 @@ body[data-tema="elton"] .rotulo { font-family: var(--titulo); font-weight: 800; 
 .rotulo:has(.nome:empty) > span:first-child::after { content: ""; }
 .partido { color: var(--rot); font-size: .8em; font-weight: 700; }
 
-.digitos { position: relative; display: flex; gap: var(--gap-d); }
+.digitos { position: relative; display: flex; gap: var(--gap-d); container-type: inline-size; }
 
 /* O visto em contorno da peca, depois do numero travado do Dr. Elton: ocupa
    o vao da 5a caixa que o cargo de 4 digitos deixa livre. */
@@ -329,11 +331,12 @@ body[data-tema="elton"] .rotulo { font-family: var(--titulo); font-weight: 800; 
   font-family: var(--titulo);
   width: var(--cx); aspect-ratio: 1; flex: none;
   display: grid; place-items: center;
+  padding-top: .07em; /* otico: o digito da Geometos senta alto na caixa */
   background: var(--surface);
   border: 1px solid var(--linha);
   border-radius: 7px;
   box-shadow: 0 1px 2px rgba(19, 40, 74, .06);
-  font-size: 2.35rem; font-weight: 900; line-height: 1;
+  font-size: 15.5cqw; font-weight: 900; line-height: 1;
   color: var(--marinho);
   transition: background-color .12s ease, border-color .12s ease;
 }
@@ -542,12 +545,13 @@ body[data-tema="dulce"] {
   --display: "Avenir LT Std", system-ui, -apple-system, "Segoe UI", sans-serif;
   --titulo: "Geometos Neue", "Geometos", var(--display);
 }
-/* Topo limpo: so o coracao da identidade, na direita. */
+/* Topo da peca: pessoinhas tom sobre tom + o coracao da identidade na
+   direita (na peca ele aparece suave, ao lado do CONFIRMA). */
 body[data-tema="dulce"] .topo {
-  background-image: url("marca/coracao.svg");
-  background-repeat: no-repeat;
-  background-position: right 1rem top 1.2rem;
-  background-size: 2.6rem auto;
+  background-image: url("marca/coracao.svg"), url("marca/padrao-dulce-topo.svg");
+  background-repeat: no-repeat, repeat;
+  background-position: right 1rem top 1.2rem, 0 0;
+  background-size: 2.6rem auto, 4.2rem auto;
   padding-bottom: 1.4rem;
 }
 body[data-tema="dulce"] .passos { flex: 1; min-width: 0; font-size: .8rem; padding-right: 3.4rem; }
