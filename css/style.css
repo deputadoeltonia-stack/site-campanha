@@ -350,6 +350,25 @@ p { margin: 0 0 1rem; }
 .video-block:last-child { margin-bottom: 0; }
 .video-block-title { font-size: var(--step-1); margin-bottom: 1.1rem; }
 .video-empty { color: var(--ink-mut); font-family: var(--prose); }
+
+/* ---------- materiais ----------
+   Card navy: a lima da placa/CTA só funciona em fundo escuro (regra da paleta). */
+.material-card {
+  display: grid; gap: clamp(1.5rem, 4vw, 3rem); align-items: center;
+  background: var(--ink); color: var(--surface);
+  border-radius: var(--radius); padding: clamp(1.75rem, 4vw, 3rem);
+  text-decoration: none;
+  transition: transform .18s var(--ease), box-shadow .25s var(--ease);
+}
+.material-card:hover { transform: translateY(-3px); box-shadow: 0 22px 44px -20px rgba(14,20,36,.6); }
+.material-card h3 { font-family: var(--display); font-size: var(--step-2); margin: 0 0 .6rem; }
+.material-card .prose { color: var(--paper-txt); max-width: 46ch; margin-bottom: 1.4rem; }
+.material-ballot { display: flex; flex-direction: column; gap: .5rem; align-items: flex-start; margin: 0; }
+.material-ballot .ballot-plate { font-size: clamp(2.2rem, 6vw, 3.4rem); }
+@media (min-width: 720px) {
+  .material-card { grid-template-columns: 1.2fr auto; }
+  .material-ballot { align-items: flex-end; }
+}
 .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
 .video-card { margin: 0; border-radius: 14px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
 .video-card video { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: var(--ink); }
