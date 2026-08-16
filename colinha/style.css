@@ -159,15 +159,20 @@ body[data-tema="elton"] {
   font-size: .68rem; font-weight: 700; line-height: 0; /* so o glifo conta no centro */
 }
 
-/* A tecla da urna, destacada como na peca impressa. Alinhada pelo meio da
-   linha (baseline + padding assimetrico deixavam a caixa ~1px alta em
-   relacao ao texto "Aperte"). */
+/* A tecla da urna, como na peca impressa: na arte a folga e igual nos quatro
+   lados (0,30 da altura das maiusculas) e a caixa mede 1,63 vez essa altura.
+   O padding NAO pode ser simetrico para chegar la: a Avenir reserva 0,223em
+   de descida abaixo da baseline e "CONFIRMA" nao tem descendente, entao essa
+   sobra vira folga so embaixo. Compensacao: o topo leva 0,18em a mais que a
+   base, que e a diferenca exata (desc 0,223 - asc acima do cap 0,018).
+   Medido na peca 7x10 (16/08) e nas metricas da fonte — nao mexer sem
+   remedir os dois. */
 .tecla {
   display: inline-block;
   vertical-align: middle;
   background: var(--lima); color: var(--marinho);
-  padding: .13em .45em; border-radius: .3em;
-  line-height: 1.05; font-weight: 800;
+  padding: .27em .22em .09em; border-radius: .2em;
+  line-height: .85; font-weight: 800;
 }
 
 /* Selo redondo do candidato, como na peca impressa: circulo navy liso, sem
@@ -579,9 +584,12 @@ body[data-tema="dulce"] .passos { flex: 1; min-width: 0; font-size: .8rem; paddi
 }
 /* Passos da peça: bolinha navy com número branco. */
 body[data-tema="dulce"] .passos li::before { background: var(--txt); color: #fff; }
-/* A tecla CONFIRMA sai no lima vivo da peça (mais claro que o verde das
-   caixas), com o texto navy. */
-body[data-tema="dulce"] .tecla { background: var(--lima); color: var(--txt); }
+/* A tecla CONFIRMA da peça não é chapada: desce do lima vivo para o verde
+   das caixas (cores medidas no topo e na base da caixa impressa). */
+body[data-tema="dulce"] .tecla {
+  background: linear-gradient(180deg, #bfd736, #68bd46);
+  color: var(--txt);
+}
 /* Selo petróleo-escuro chapado, inclinado como na peça, sem anel. O conteúdo
    (cargo em duas linhas + wordmark + trio + número mint) vem do app.js. */
 body[data-tema="dulce"] .selo { background: #0a4b69; border-color: transparent; transform: rotate(-8deg); }
