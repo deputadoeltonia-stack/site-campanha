@@ -91,18 +91,34 @@ body[data-tema="elton"] {
 
 /* --- topo -------------------------------------------------------------- */
 
-/* link de volta — pill discreto no topo, so quando embutida num site */
-.topo-volta { max-width: 26rem; margin: 0 auto .7rem; }
+/* Volta para o site — canto de cima a esquerda, onde todo mundo procura
+   "voltar". E chrome do app, nao conteudo da peca: fica no fio da margem,
+   discreto, sem disputar com o "COMO VOTAR". */
+.topo-volta { max-width: 26rem; margin: 0 auto; }
 .volta {
   display: inline-flex; align-items: center; gap: .45rem;
-  background: rgba(255, 255, 255, .14); color: #fff;
+  /* Alvo de 44px SEM engordar o cabecalho: o padding cresce para dentro e as
+     margens negativas devolvem o espaco ao layout. A da esquerda ainda anula
+     o recuo do proprio pill, alinhando a seta com o "C" de COMO VOTAR — sem
+     isso ela nasce 11px a direita da coluna de texto e o topo fica torto. */
+  min-height: 44px; padding: .5rem .85rem .5rem .7rem;
+  margin: -.3rem 0 .1rem -.7rem;
+  /* Sem preenchimento parado: com fundo visivel, o pill sangrava para fora da
+     margem (a seta so alinha com o titulo se a caixa recuar) e parecia
+     cortado na borda da tela. Fantasma resolve os dois — a seta alinha, nada
+     vaza — e o fundo entra no toque, confirmando que e clicavel. */
+  background: transparent; color: #fff;
   font-weight: 600; font-size: .78rem; letter-spacing: .02em;
-  padding: .38rem .9rem .38rem .7rem; border-radius: 999px;
+  border-radius: 999px;
   text-decoration: none;
   transition: background .18s cubic-bezier(.25, 1, .5, 1), color .18s cubic-bezier(.25, 1, .5, 1);
 }
 .volta svg { width: .5rem; height: auto; flex: none; }
-.volta:hover, .volta:focus-visible { background: var(--limao); color: var(--marinho); }
+/* Fantasma parado, fundo discreto no toque: o lima cheio era do pill antigo e
+   agora gritaria mais que o "COMO VOTAR" logo abaixo. */
+.volta:hover, .volta:focus-visible { background: rgba(255, 255, 255, .18); }
+/* No celular ninguem passa o mouse: o retorno que importa e o do toque. */
+.volta:active { background: rgba(255, 255, 255, .3); }
 @media (prefers-reduced-motion: reduce) { .volta { transition: none; } }
 
 .topo {
