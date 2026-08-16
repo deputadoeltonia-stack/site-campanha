@@ -432,6 +432,10 @@ body[data-tema="elton"] .digito { font-style: italic; }
 .rodape {
   margin: 1.25rem 0 0; text-align: center;
   font-size: .7rem; color: var(--mut);
+  /* Em 375px a frase nao cabe numa linha so e sobrava "lugar nenhum." sozinho
+     embaixo. O balance reparte as linhas por igual em vez de encher a
+     primeira; onde nao existe (navegador antigo), quebra como antes. */
+  text-wrap: balance;
 }
 
 /* temas por candidato — paletas copiadas dos sites de cada campanha */
