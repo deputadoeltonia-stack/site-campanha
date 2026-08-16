@@ -46,19 +46,23 @@ export const TEMAS = {
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
   },
   dulce: {
-    // Cores medidas do verso do santinho 7x10 em curvas (16/08).
-    topo: '#005474', topoRisco: '#005a78', destaque: '#8dc73f',
-    fundo: '#eef0ee', fundo2: '#e2e7e4', caixa: '#ffffff', linha: '#c8cac8',
-    txt: '#062240', rot: '#48626e',
+    // Verso do santinho 7x10 em curvas (16/08), reproduzido a risca: painel
+    // cinza chapado, rotulo cinza + nome/digito navy, selo petroleo-escuro,
+    // tecla CONFIRMA num lima mais vivo que o verde das caixas.
+    topo: '#005474', topoRisco: '#005b79', destaque: '#8dc73f', lima: '#bfd736',
+    fundo: '#e7e8e8', fundo2: '#e7e8e8', caixa: '#ffffff', linha: '#d3d4d4',
+    txt: '#062240', rot: '#6d6f71',
     travadoTxt: '#062240', // caixa travada segue verde; so o digito escurece
-    // Selo navy inclinado sem anel: wordmark oficial + trio + numero mint.
-    selo: '#0d3a52', seloAnel: '#0d3a52', seloNumero: '#5ac2ad',
+    // Selo petroleo-escuro inclinado sem anel: wordmark + trio + numero mint.
+    selo: '#0a4b69', seloAnel: '#0a4b69', seloNumero: '#5bc2ad',
     seloTorto: true,
     seloLogo: 'marca/logo-dulce-l1.png',
     seloLogo2: 'marca/logo-dulce-l2.png',
     seloTrio: 'marca/pessoinhas-trio.svg',
-    topoLiso: true, coracao: 'marca/coracao.svg', // topo limpo, so o coracao
+    topoLiso: true, coracao: 'marca/coracao.svg', // coracao suave a direita
+    padrao: 'marca/padrao-dulce-topo.svg', // pessoinhas tom sobre tom no topo
     corpoPadrao: 'marca/padrao-dulce-corpo.svg', // mint na direita do corpo
+    rodapeBanda: '#005474', // a faixa petroleo que fecha a peca
     titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
     seloNoCorpo: true,
@@ -503,32 +507,40 @@ export async function desenhar(colinha, config) {
   }
 
   // Pessoinhas mint na lateral direita do corpo, como na peca da Dulce.
+  // O esvaecer e feito num canvas separado: destination-out direto no canvas
+  // principal apagava tambem o fundo ja pintado e o PNG saia com uma banda
+  // transparente (escura em qualquer visualizador de fundo escuro).
   if (corpoPadrao) {
-    ctx.save()
-    ctx.beginPath()
-    ctx.rect(L * 0.5, TOPO, L * 0.5, A - TOPO)
-    ctx.clip()
-    const grad = ctx.createLinearGradient(L * 0.5, 0, L * 0.78, 0)
+    const off = document.createElement('canvas')
+    off.width = L
+    off.height = A - TOPO
+    const octx = off.getContext('2d')
+    octx.fillStyle = octx.createPattern(corpoPadrao, 'repeat')
+    octx.fillRect(L * 0.5, 0, L * 0.5, A - TOPO)
+    const grad = octx.createLinearGradient(L * 0.5, 0, L * 0.78, 0)
     grad.addColorStop(0, 'rgba(0,0,0,1)')
     grad.addColorStop(1, 'rgba(0,0,0,0)')
-    ctx.globalAlpha = 0.55
-    ctx.fillStyle = ctx.createPattern(corpoPadrao, 'repeat')
-    ctx.fillRect(L * 0.5, TOPO, L * 0.5, A - TOPO)
-    ctx.globalAlpha = 1
-    ctx.globalCompositeOperation = 'destination-out'
-    ctx.fillStyle = grad
+    octx.globalCompositeOperation = 'destination-out'
+    octx.fillStyle = grad
     // apaga o padrao gradualmente na borda esquerda, como o esvaecer da peca
-    ctx.fillRect(L * 0.5, TOPO, L * 0.28, A - TOPO)
-    ctx.restore()
+    octx.fillRect(L * 0.5, 0, L * 0.28, A - TOPO)
+    ctx.globalAlpha = 0.85
+    ctx.drawImage(off, 0, TOPO)
+    ctx.globalAlpha = 1
   }
 
   desenharTopo(ctx, t, simbolo, padrao)
 
-  // So o coracao da identidade na direita do topo, como na tela.
+  // O coracao da identidade na direita do topo — desfocado, como o brilho
+  // suave da peca. Navegador sem ctx.filter (Safari velho) desenha nitido.
   if (coracao) {
-    const alt = 88
+    const alt = 92
     const larg = alt * (coracao.width / coracao.height)
+    ctx.save()
+    ctx.filter = 'blur(9px)'
+    ctx.globalAlpha = 0.8
     ctx.drawImage(coracao, L - larg - 48, (TOPO - alt) / 2, larg, alt)
+    ctx.restore()
   }
 
   // Rosto em traco no canto de cima, invadindo o topo — a moldura da peca.
@@ -637,8 +649,14 @@ export async function desenhar(colinha, config) {
     y += ALTURA_LINHA
   }
 
+  // A peca da Dulce fecha com a faixa petroleo colada na borda de baixo; o
+  // rodape entra nela em branco. Sem banda, segue o cinza discreto de sempre.
+  if (t.rodapeBanda) {
+    ctx.fillStyle = t.rodapeBanda
+    ctx.fillRect(0, A - 92, L, 92)
+  }
   ctx.textAlign = 'center'
-  ctx.fillStyle = t.rot
+  ctx.fillStyle = t.rodapeBanda ? 'rgba(255,255,255,.88)' : t.rot
   ctx.font = fonte(t, 700, COND, 26, { texto: true })
   ctx.fillText(location.hostname, L / 2, A - 50)
   ctx.font = fonte(t, 500, COND, 24, { texto: true })

@@ -532,27 +532,41 @@ body:is([data-tema="tozi"], [data-tema="dulce"]) .rodape {
 body[data-tema="tozi"] .rodape {
   background: var(--marinho) url("marca/ondas.svg") center/150% auto no-repeat;
 }
-/* Dulce Rita: cores medidas do verso do santinho 7x10 em curvas (16/08).
-   A peça é conjunta com o Dr. Elton: o campo travado dela também sai verde,
-   como os demais — a marca fica no petróleo do topo, no selo inclinado com o
-   wordmark oficial e número mint, e no padrão de pessoinhas Λ. */
+/* Dulce Rita: verso do santinho 7x10 em curvas (16/08) reproduzido à risca.
+   Painel cinza-claro chapado dentro da moldura petróleo, rótulo do cargo em
+   cinza com o nome em navy, dígito navy na caixa verde, selo circular
+   petróleo-escuro e pattern de pessoinhas mint — cores medidas da peça.
+   A peça é conjunta com o Dr. Elton: o campo travado dela também sai verde. */
 body[data-tema="dulce"] {
-  --marinho: #005474; --marinho-2: #005a78; --limao: #8dc73f; --lima: #8dc73f;
-  --limao-esc: #1f7a68; --bg: #eef0ee; --bg-2: #e2e7e4;
-  --txt: #062240; --rot: #48626e; --mut: #48626e;
-  --linha: #c8cac8; --marca: #005474; --acento: #0a6089;
+  --marinho: #005474; --marinho-2: #005b79; --limao: #8dc73f; --lima: #bfd736;
+  --limao-esc: #1f7a68; --bg: #e7e8e8; --bg-2: #e7e8e8;
+  --txt: #062240; --rot: #6d6f71; --mut: #5c6a72;
+  --linha: #d3d4d4; --marca: #005474; --acento: #0a4b69;
   --cx-travado: #8dc73f; --cx-travado-txt: #062240;
   --display: "Avenir LT Std", system-ui, -apple-system, "Segoe UI", sans-serif;
   --titulo: "Geometos Neue", "Geometos", var(--display);
 }
-/* Topo da peca: pessoinhas tom sobre tom + o coracao da identidade na
-   direita (na peca ele aparece suave, ao lado do CONFIRMA). */
+/* Na peça o cargo é cinza e o NOME (e os dígitos) saem no navy mais escuro,
+   não no petróleo do topo. */
+body[data-tema="dulce"] .nome,
+body[data-tema="dulce"] .digito { color: var(--txt); }
+/* Topo da peca: pessoinhas tom sobre tom. O coracao mint aparece DESFOCADO à
+   direita do CONFIRMA, um brilho suave — por isso pseudo com blur, nao
+   background (filter nao pega numa camada só do background). */
 body[data-tema="dulce"] .topo {
-  background-image: url("marca/coracao.svg"), url("marca/padrao-dulce-topo.svg");
-  background-repeat: no-repeat, repeat;
-  background-position: right 1rem top 1.2rem, 0 0;
-  background-size: 2.6rem auto, 4.2rem auto;
+  position: relative;
+  background-image: url("marca/padrao-dulce-topo.svg");
+  background-repeat: repeat;
+  background-size: 4.2rem auto;
   padding-bottom: 1.4rem;
+}
+body[data-tema="dulce"] .topo::after {
+  content: ""; position: absolute;
+  right: .7rem; top: 50%; transform: translateY(-50%);
+  width: 3.4rem; height: 3.2rem;
+  background: url("marca/coracao.svg") center/contain no-repeat;
+  filter: blur(7px); opacity: .8;
+  pointer-events: none;
 }
 body[data-tema="dulce"] .passos { flex: 1; min-width: 0; font-size: .8rem; padding-right: 3.4rem; }
 /* Com o titulo ao lado (>=26rem) o coracao fica alem dos passos: folga menor
@@ -560,14 +574,17 @@ body[data-tema="dulce"] .passos { flex: 1; min-width: 0; font-size: .8rem; paddi
 @media (min-width: 26rem) {
   body[data-tema="dulce"] .passos { padding-right: 2.4rem; }
 }
-/* Passos em azul-claro com número navy, como na peça. */
-body[data-tema="dulce"] .passos li::before { background: #a4d2e6; color: #062240; }
-body[data-tema="dulce"] .tecla { background: #aecf3f; color: #062240; }
-/* Selo navy chapado, inclinado como na peça, sem anel. O conteúdo (wordmark
-   oficial + trio + número mint) é montado pelo app.js. */
-body[data-tema="dulce"] .selo { background: #0d3a52; border-color: transparent; transform: rotate(-8deg); }
-body[data-tema="dulce"] .selo-numero { color: #5ac2ad; font-style: italic; font-size: 1.25rem; }
-body[data-tema="dulce"] .selo-barra { color: #aecf3f; font-weight: 900; }
+/* Passos da peça: bolinha navy com número branco. */
+body[data-tema="dulce"] .passos li::before { background: var(--txt); color: #fff; }
+/* A tecla CONFIRMA sai no lima vivo da peça (mais claro que o verde das
+   caixas), com o texto navy. */
+body[data-tema="dulce"] .tecla { background: var(--lima); color: var(--txt); }
+/* Selo petróleo-escuro chapado, inclinado como na peça, sem anel. O conteúdo
+   (cargo em duas linhas + wordmark + trio + número mint) vem do app.js. */
+body[data-tema="dulce"] .selo { background: #0a4b69; border-color: transparent; transform: rotate(-8deg); }
+body[data-tema="dulce"] .selo-cargo { font-size: .52rem; letter-spacing: .1em; line-height: 1.3; }
+body[data-tema="dulce"] .selo-numero { color: #5bc2ad; font-style: italic; font-size: 1.35rem; }
+body[data-tema="dulce"] .selo-barra { color: var(--limao); font-weight: 900; }
 /* Wordmark em duas linhas ("DULCE" / "RITΛ" + trio), como no selo da peça. */
 body[data-tema="dulce"] .selo-lockup { display: flex; flex-direction: column; align-items: center; gap: .12rem; }
 body[data-tema="dulce"] .selo-l1 { width: 4.3rem; display: block; }
@@ -582,23 +599,29 @@ body[data-tema="dulce"] .folha::before {
   content: ""; position: absolute; inset: 0 -.9rem 0 auto; width: 58%;
   z-index: -1;
   background: url("marca/padrao-dulce-corpo.svg") right top/4.6rem auto repeat;
-  opacity: .5; pointer-events: none;
+  opacity: .85; pointer-events: none;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 45%);
   mask-image: linear-gradient(90deg, transparent, #000 45%);
+}
+/* Os corações mint desfocados que a peça espalha pelo painel — um grande à
+   esquerda na altura do governador, um menor à direita entre os senadores. */
+body[data-tema="dulce"] .folha::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  pointer-events: none;
+  background:
+    url("marca/coracao.svg") left 8% top 64% / 6.5rem auto no-repeat,
+    url("marca/coracao.svg") right 24% top 26% / 3.5rem auto no-repeat;
+  filter: blur(9px); opacity: .3;
 }
 /* O botao de contorno e transparente: sobre o padrao, as pessoinhas vazavam
    para dentro do texto. Fundo da pagina no lugar de transparencia. */
 body[data-tema="dulce"] .acoes button.secundario { background: var(--bg); }
-/* Rodape como card: navy chapado, cantos generosos, flutuando com respiro —
-   nada de padrao nem faixa colada na borda. */
-body[data-tema="dulce"] .rodape {
-  background: var(--marinho);
-  margin: 2rem 0 1rem; margin-top: auto;
-  padding: .95rem 1.2rem;
-  border-radius: 14px;
-}
-/* Respiro garantido entre o ultimo botao e o card, mesmo com a pagina cheia
-   (o margin-top: auto do card colapsa a zero quando o conteudo enche). */
+/* A peça fecha com a faixa petróleo colada na borda de baixo: o rodapé é a
+   faixa (full-bleed, herdado da regra tozi/dulce acima), empurrado para o pé
+   pelo margin-top: auto. */
+body[data-tema="dulce"] .rodape { margin-top: auto; }
+/* Respiro garantido entre o ultimo botao e a faixa, mesmo com a pagina cheia
+   (o margin-top: auto colapsa a zero quando o conteudo enche). */
 body[data-tema="dulce"] .acoes { margin-bottom: 1.4rem; }
 /* A folha tem flex: 1 e estica ate o pe da tela; sem isto o rodape parava no
    meio e sobrava um vao cinza com padrao solto embaixo. Coluna flex + auto

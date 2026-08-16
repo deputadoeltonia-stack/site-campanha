@@ -54,11 +54,18 @@ document.body.dataset.tema = config.tema
       const cargoInfo = CARGOS.find((c) => c.id === travadoId)
       const cargo = document.createElement('span')
       cargo.className = 'selo-cargo'
-      cargo.textContent = `${config.rotulo ?? cargoInfo.rotulo} `
       const barra = document.createElement('span')
       barra.className = 'selo-barra'
       barra.textContent = '//'
-      cargo.append(barra)
+      // Na peca o cargo sai em duas linhas ("DEPUTADA" / "ESTADUAL //"), com
+      // a barra lima fechando a segunda.
+      const partes = (config.rotulo ?? cargoInfo.rotulo).split(' ')
+      cargo.append(
+        partes.slice(0, -1).join(' '),
+        document.createElement('br'),
+        `${partes.at(-1)} `,
+        barra,
+      )
       const lockup = document.createElement('span')
       lockup.className = 'selo-lockup'
       const l1 = document.createElement('img')
