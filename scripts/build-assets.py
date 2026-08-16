@@ -57,15 +57,24 @@ def main():
         print(f"  {src:28} {sz_in//1024:>4}K -> {dst:22} {sz_out//1024:>3}K")
     print(f"  TOTAL fontes: {total_in//1024}K -> {total_out//1024}K")
 
-    print("== hero -> webp ==")
-    png = os.path.join(ASSETS, "deputado.png")
-    if os.path.exists(png):
-        im = Image.open(png).convert("RGBA")
+    print("== hero -> busto 3:4 (webp + png fallback) ==")
+    src = os.path.join(ROOT, "assets-src/deputado-src.png")
+    if os.path.exists(src):
+        im = Image.open(src).convert("RGBA")
+        # Busto: trim das margens transparentes (bbox alpha do meio-corpo) e
+        # base no peito, 3:4 exato — nada do corpo e cortado pelo cover do CSS
+        # e o rosto passa a ocupar ~1/3 da altura do quadro.
+        l, t, r = 25, 22, 663
+        b = t + round((r - l) * 4 / 3)
+        im = im.crop((l, t, r, b))
         webp = os.path.join(ASSETS, "deputado.webp")
+        png = os.path.join(ASSETS, "deputado.png")
         im.save(webp, "WEBP", quality=82, method=6)  # method 6 = melhor compressão
-        print(f"  deputado.png {os.path.getsize(png)//1024}K -> deputado.webp {os.path.getsize(webp)//1024}K")
+        im.save(png, "PNG", optimize=True)
+        print(f"  deputado-src.png -> busto {im.width}x{im.height}: "
+              f"webp {os.path.getsize(webp)//1024}K, png {os.path.getsize(png)//1024}K")
     else:
-        print("  faltando deputado.png")
+        print("  faltando assets-src/deputado-src.png")
 
     print("== galeria -> webp ==")
     if os.path.isdir(GALLERY_SRC):

@@ -2,16 +2,22 @@
  * Destino dos leads do site de campanha -> Google Sheets.
  *
  * COMO LIGAR (5 min):
- *  1. Crie uma planilha nova no Google Sheets.
- *  2. Extensões > Apps Script. Apague o conteúdo e cole ESTE arquivo.
- *  3. Rode a função `setup` uma vez (cria o cabeçalho e pede autorização).
- *  4. Implantar > Nova implantação > tipo "App da Web".
+ *  1. sheets.new  ->  dá um nome à planilha (ex.: "Leads Dr. Elton 4412").
+ *  2. Extensões > Apps Script. Apague o conteúdo e cole ESTE arquivo. Salve.
+ *  3. Rode a função `setup` uma vez. Vai pedir autorização: Revisar permissões
+ *     > sua conta > "Isso não é seguro" (é seu próprio script) > Permitir.
+ *     Confira que nasceu a aba "Leads" com cabeçalho.
+ *  4. Implantar > Nova implantação > engrenagem > "App da Web".
  *       Executar como: Eu
- *       Quem tem acesso: Qualquer pessoa
+ *       Quem tem acesso: QUALQUER PESSOA   <- sem isso o site leva 401
  *  5. Copie a URL que termina em /exec.
- *  6. Em js/main.js, linha ~15:
+ *  6. Cole em js/main.js, linha ~15:
  *       var LEAD_ENDPOINT = "https://script.google.com/macros/s/XXXX/exec";
- *  7. Envie um lead de teste pelo site e confira se caiu na planilha.
+ *  7. Teste sem abrir o navegador:  bash scripts/testar-endpoint.sh <URL>
+ *
+ * REIMPLANTAR: toda vez que editar este arquivo, Implantar > Gerenciar
+ * implantações > lápis > Versão: Nova > Implantar. Sem isso a URL continua
+ * servindo o código velho — é a pegadinha nº 1 do Apps Script.
  *
  * IMPORTANTE: a validação do navegador é só UX. Ela é refeita aqui porque
  * qualquer um pode postar direto no endpoint.
@@ -90,8 +96,8 @@ function doPost(e) {
       planilha_().appendRow([
         new Date(),
         seguro_(v.nome),
-        seguro_(v.telefone),
-        v.consentimento_lgpd === false ? 'NAO' : 'SIM',
+        "'" + v.telefone,   // apóstrofo: senão o Sheets come o zero do DDD
+        'SIM',              // validar_ já rejeita quem não consentiu
         seguro_(d.origem || 'site')
       ]);
     } finally {

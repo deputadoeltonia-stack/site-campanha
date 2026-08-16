@@ -238,7 +238,20 @@
       headers: { "Content-Type": "text/plain;charset=utf-8" }, // evita preflight no Apps Script
       body: JSON.stringify(payload)
     })
-      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r; })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        // O Apps Script responde 200 mesmo recusando o lead ({ok:false}).
+        // Sem ler o corpo, um lead rejeitado virava "sucesso" na tela.
+        return r.text().then(function (t) {
+          try {
+            var j = JSON.parse(t);
+            if (j && j.ok === false) throw new Error(j.msg || "recusado");
+          } catch (e) {
+            if (e instanceof SyntaxError) return; // corpo opaco/CORS: 200 já basta
+            throw e;
+          }
+        });
+      })
       .then(function () { ok(payload.nome); })
       .catch(function () { fail(); });
   }
