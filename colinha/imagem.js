@@ -25,6 +25,8 @@ export const TEMAS = {
     // ela falhar ao carregar, cai no circulo desenhado.
     selo: '#13284a', seloAnel: '#13284a', seloImagem: 'marca/selo-elton.png',
     seloSombra: true,
+    seloLinha: 5.05, // ultima linha (presidente), como na tela — nos senadores
+                     // ele caia em cima do nome assim que o eleitor digitava
     fotoSemDestaque: true, // campo pre-definido sem borda verde
     seloNoCorpo: true, // na arte ele flutua na faixa dos senadores
     digitoItalico: true, // Gunterz Bold Italic da peca; Geometos inclinada aqui
@@ -627,7 +629,15 @@ export async function desenhar(colinha, config) {
   ctx.textAlign = 'left'
   let y = Y0
 
-  for (const slot of colinha) {
+  for (const [idx, slot] of colinha.entries()) {
+    // Linha que hospeda o selo (Dulce e Dr. Elton: a ultima): o rotulo para
+    // na borda esquerda do adesivo, senao o fim do nome (ou a sigla) some
+    // por baixo dele.
+    const linhaDoSelo = imgSelo && t.seloNoCorpo
+      && Math.round(t.seloLinha ?? 2.32) === idx
+    const bordaDireita = linhaDoSelo
+      ? L - MARGEM - 2 * (t.seloRaio ?? 148) - 30
+      : L - MARGEM - 60
     // Rotulo do cargo, e o nome resolvido logo depois da barra. Na peca do
     // Dr. Elton o rotulo sai na display da campanha, nao na fonte de texto.
     const display = t.peca || t.rotuloDisplay
@@ -642,15 +652,26 @@ export async function desenhar(colinha, config) {
       ctx.fillText(' |', cursor, y)
       cursor += ctx.measureText(' | ').width
       ctx.fillStyle = t.txt
-      const nome = cortar(ctx, slot.nome.toUpperCase(), L - MARGEM - cursor - 60)
+      // Nome nao se trunca numa peca de conferencia: encolhe ate caber
+      // (24px ainda le bem) e so corta se nem assim couber.
+      const cheio = slot.nome.toUpperCase()
+      let corpo = display ? 30 : 32
+      while (corpo > 24 && ctx.measureText(cheio).width > bordaDireita - cursor) {
+        corpo -= 2
+        ctx.font = fonte(t, 800, COND, corpo, { texto: !display })
+      }
+      const nome = cortar(ctx, cheio, bordaDireita - cursor)
       ctx.fillText(nome, cursor, y)
       // Na peca o campo ja preenchido sai sem a sigla ("... | DR. ELTON", so).
       // Isso tambem tira o "UNIAO" de baixo do adesivo, no alto a direita.
       if (slot.partido && !(slot.travado && display)) {
         cursor += ctx.measureText(nome).width + 12
         ctx.font = fonte(t, 700, COND, 24, { texto: true })
-        ctx.fillStyle = t.rot
-        ctx.fillText(slot.partido, cursor, y)
+        // A sigla so entra se couber antes da borda (do selo, na linha dele).
+        if (cursor + ctx.measureText(slot.partido).width <= bordaDireita) {
+          ctx.fillStyle = t.rot
+          ctx.fillText(slot.partido, cursor, y)
+        }
       }
     }
 

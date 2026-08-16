@@ -558,8 +558,15 @@ body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo > .
   right: 0; top: -.3rem;
   width: 7rem;
 }
-/* Na arte do Dr. Elton o botton e maior e desce um pouco mais na faixa. */
-body[data-tema="elton"] .campo > .selo { width: 7.5rem; top: -.1rem; }
+/* No Dr. Elton o adesivo tambem desce para o ultimo campo (ver app.js), na
+   faixa das caixas — o rotulo em cima fica livre para o nome do presidente.
+   Um tico menor que os 7.5rem de antes: no pe da folha ele nao disputa com
+   o topo e nao precisa gritar. */
+body[data-tema="elton"] .campo > .selo { width: 7.2rem; top: 1.3rem; }
+/* O adesivo transborda do campo de 2 digitos; o respiro antes dos botoes
+   absorve o transbordo (mesma solucao da Dulce, folga um pouco maior porque
+   o botton dele e maior). */
+body[data-tema="elton"] .acoes { margin-top: 4rem; }
 /* Na Dulce o selo vive no ULTIMO campo (ver app.js) e comeca na altura das
    CAIXAS, nao do rotulo: o rotulo cresce quando o nome do candidato resolve,
    e era ali que o selo cobria os senadores. Abaixo dele o vao de um cargo de
