@@ -38,12 +38,23 @@ document.body.dataset.tema = config.tema
 {
   const travadoId = slotTravado(config)
   if (travadoId) {
-    const cargoInfo = CARGOS.find((c) => c.id === travadoId)
-    document.getElementById('selo-cargo').textContent = config.rotulo ?? cargoInfo.rotulo
-    document.getElementById('selo-nome').textContent = config.nome
-    document.getElementById('selo-numero').textContent = config.numero
+    if (config.tema === 'elton') {
+      // O selo do Dr. Elton e o botton oficial do manual (ID 26 ELTON, pag.
+      // 14), extraido como imagem — texto montado a mao nunca reproduz o
+      // lockup com os chevrons cruzando o T. Decorativo: a informacao ja
+      // esta no campo travado.
+      const img = document.createElement('img')
+      img.src = 'marca/selo-elton.png'
+      img.alt = ''
+      img.className = 'selo-badge'
+      document.getElementById('selo').replaceChildren(img)
+    } else {
+      const cargoInfo = CARGOS.find((c) => c.id === travadoId)
+      document.getElementById('selo-cargo').textContent = config.rotulo ?? cargoInfo.rotulo
+      document.getElementById('selo-nome').textContent = config.nome
+      document.getElementById('selo-numero').textContent = config.numero
+    }
     document.getElementById('selo').hidden = false
-
   }
 }
 
@@ -74,6 +85,15 @@ function linhaHTML(slot) {
     (_, i) => `<span class="digito" id="d-${slot.id}-${i}" aria-hidden="true"></span>`,
   ).join('')
 
+  // O tique da peca do Dr. Elton: o visto em contorno depois do 4412, no vao
+  // que o cargo de 4 digitos deixa na grade de 5. So no campo travado dele —
+  // as pecas do Tozi e da Dulce nao trazem o tique.
+  const tique = travado && config.tema === 'elton'
+    ? `<svg class="tique" viewBox="-4 -6 68 48" aria-hidden="true">
+         <path d="M2 15 L14 25 L58 4 L58 14 L14 36 L2 25 Z"/>
+       </svg>`
+    : ''
+
   // A foto e o botao que abre a busca por nome. No campo travado ela so
   // mostra a pessoa, nao clica — ninguem troca o federal por caminho nenhum.
   const foto = travado
@@ -89,7 +109,7 @@ function linhaHTML(slot) {
           <span>${slot.rotulo}</span><span class="nome" id="nome-${slot.id}" aria-live="polite"></span>
         </p>
         <div class="digitos">
-          ${caixas}
+          ${caixas}${tique}
           <input class="entrada" id="input-${slot.id}" name="${slot.id}"
                  type="text" inputmode="numeric" pattern="[0-9]*"
                  maxlength="${slot.digitos}"
@@ -466,12 +486,12 @@ async function iniciar() {
 
   montarMarcacao()
 
-  // Na peça do Tozi e da Dulce o selo não fica no topo: ele flutua à direita
-  // dos senadores, no vazio que 3 dígitos deixam. Ancorado no próprio campo
-  // (e não em top fixo na folha) ele acompanha o layout — quando o aviso de
-  // "Começar de novo" aparece e empurra tudo para baixo, o selo desce junto
-  // em vez de cair por cima dos números.
-  if (config.tema !== 'elton' && slotTravado(config)) {
+  // Na peça — nas três campanhas — o selo não fica no topo: ele flutua à
+  // direita dos senadores, no vazio que 3 dígitos deixam. Ancorado no próprio
+  // campo (e não em top fixo na folha) ele acompanha o layout — quando o
+  // aviso de "Começar de novo" aparece e empurra tudo para baixo, o selo
+  // desce junto em vez de cair por cima dos números.
+  if (slotTravado(config)) {
     document.getElementById('campo-senador1')
       .appendChild(document.getElementById('selo'))
   }

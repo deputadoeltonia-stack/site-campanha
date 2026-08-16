@@ -27,20 +27,25 @@
 }
 
 :root {
-  --marinho: #13253f;
-  --marinho-2: #1c3357;
-  --limao: #8dc63f;
+  /* Cores medidas na arte final da colinha (peca 15/08) — nao no manual
+     digital, que traz o lima neon de tela. A peca tem DOIS verdes: o verde
+     das caixas (--limao) e o lima vivo dos acentos (--lima: pincel, tecla
+     CONFIRMA, tique, faixa do pe). */
+  --marinho: #13284a;
+  --marinho-2: #0e1f3a;
+  --limao: #84bf41;
+  --lima: #a9cf35;
   --limao-esc: #6f8f26;
-  --bg: #e6e7e5;
-  --bg-2: #dbe4c4;
+  --bg: #e9e9e6;
+  --bg-2: #dfe0d8;
   --surface: #ffffff;
-  --txt: #13253f;
+  --txt: #13284a;
   --rot: #63666a;
   --mut: #5c6066;
-  --linha: #c3c5c2;
-  --marca: #13253f;
+  --linha: #cfceca;
+  --marca: #13284a;
   --marca-txt: #ffffff;
-  --acento: #13253f;
+  --acento: #13284a;
   /* Caixa do campo travado: na peca do Dr. Elton ela e verde como as outras,
      na do Tozi o campo dele sai azul para separar dos aliados. */
   --cx-travado: var(--limao);
@@ -75,6 +80,13 @@ body {
   line-height: 1.5;
 }
 
+/* Fundo da peca do Dr. Elton: prata com brilho lima no canto de baixo. */
+body[data-tema="elton"] {
+  background-image:
+    radial-gradient(46rem 34rem at 100% 94%, rgba(169, 207, 53, .32), transparent 62%),
+    linear-gradient(168deg, #dfe0d8 0%, #e9e9e6 48%, #e6e6e3 100%);
+}
+
 /* --- topo -------------------------------------------------------------- */
 
 /* link de volta — pill discreto no topo, so quando embutida num site */
@@ -95,9 +107,13 @@ body {
   background: var(--marinho);
   color: #fff;
   padding: 1rem .9rem 1.05rem;
-  /* fitas de chevron da peca: segmento cheio com corte reto, nao traco */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44'%3E%3Cpath d='M0 0 L32 14 L64 0 L64 18 L32 32 L0 18 Z' fill='%231c3357'/%3E%3C/svg%3E");
-  background-size: 3.6rem auto;
+  /* Fitas de chevron do pattern do manual (ID 26 ELTON, pag. 21): filas
+     coladas alternando um tom mais claro e um mais escuro que o fundo, e um
+     brilho ciano diagonal entrando pela esquerda, como na arte da peca. */
+  background-image:
+    linear-gradient(104deg, rgba(64, 170, 214, .38), rgba(64, 170, 214, 0) 38%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 36'%3E%3Crect width='64' height='36' fill='%2313284a'/%3E%3Cpath d='M0 0 L32 15 L64 0 L64 18 L32 33 L0 18 Z' fill='%2317335f'/%3E%3Cpath d='M0 18 L32 33 L64 18 L64 36 L32 51 L0 36 Z M0 -18 L32 -3 L64 -18 L64 0 L32 15 L0 0 Z' fill='%230e1f3a'/%3E%3C/svg%3E");
+  background-size: auto, 2.7rem auto;
 }
 
 .topo-int {
@@ -117,7 +133,7 @@ body {
 
 /* O pincel lima da peca corta por baixo do fim de "VOTAR", nao ao lado. */
 .visto-marca {
-  width: 1.8rem; height: auto; color: var(--limao); flex: none;
+  width: 1.8rem; height: auto; color: var(--lima); flex: none;
   align-self: flex-end; margin: 0 0 -.55rem -1.9rem;
 }
 
@@ -143,7 +159,7 @@ body {
 
 /* A tecla da urna, destacada como na peca impressa. */
 .tecla {
-  background: var(--limao); color: var(--marinho);
+  background: var(--lima); color: var(--marinho);
   padding: 0 .25rem; border-radius: 3px;
   font-weight: 800;}
 
@@ -180,15 +196,24 @@ body {
   color: var(--limao); letter-spacing: .04em;
 }
 
+/* No Dr. Elton o selo e o botton oficial do manual, uma imagem: o circulo,
+   os chevrons e o Gunterz inclinado do 4412 ja vem prontos de la. */
+body[data-tema="elton"] .selo {
+  background: none; border: 0; padding: 0; transform: none;
+  filter: drop-shadow(0 3px 7px rgba(14, 31, 58, .28));
+}
+.selo-badge { display: block; width: 100%; height: auto; }
+
 /* --- folha ------------------------------------------------------------- */
 
 .folha { width: 100%; max-width: 26rem; margin: 0 auto; padding: 1rem .9rem 2rem; flex: 1 0 auto; }
 
-/* faixa lima de chevrons que fecha a peca impressa */
+/* faixa lima de chevrons que fecha a peca impressa — mesmo pattern do topo,
+   nos verdes medidos na arte */
 .faixa {
-  flex: none; height: calc(2.3rem + env(safe-area-inset-bottom));
-  background-color: var(--limao);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44'%3E%3Cpath d='M0 0 L32 14 L64 0 L64 18 L32 32 L0 18 Z' fill='%236f8f26' fill-opacity='.32'/%3E%3C/svg%3E");
+  flex: none; height: calc(2.5rem + env(safe-area-inset-bottom));
+  background-color: #97c53f;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 36'%3E%3Crect width='64' height='36' fill='%2397c53f'/%3E%3Cpath d='M0 0 L32 15 L64 0 L64 18 L32 33 L0 18 Z' fill='%23a6cf45'/%3E%3Cpath d='M0 18 L32 33 L64 18 L64 36 L32 51 L0 36 Z M0 -18 L32 -3 L64 -18 L64 0 L32 15 L0 0 Z' fill='%238dbd35'/%3E%3C/svg%3E");
   background-size: 2.4rem auto;
 }
 body:is([data-tema="tozi"], [data-tema="dulce"]) .faixa { display: none; }
@@ -287,18 +312,33 @@ body[data-tema="elton"] .rotulo { font-family: var(--titulo); font-weight: 800; 
 
 .digitos { position: relative; display: flex; gap: var(--gap-d); }
 
+/* O visto em contorno da peca, depois do numero travado do Dr. Elton: ocupa
+   o vao da 5a caixa que o cargo de 4 digitos deixa livre. */
+.tique {
+  flex: none; align-self: center;
+  width: calc(var(--cx) * 1.04); height: auto;
+  margin-left: .1rem;
+  fill: #fdfdf8; stroke: var(--lima); stroke-width: 3.4; stroke-linejoin: round;
+  transform: rotate(-7deg);
+  filter: drop-shadow(0 1px 2px rgba(19, 40, 74, .2));
+}
+
 .digito {
   font-family: var(--titulo);
   width: var(--cx); aspect-ratio: 1; flex: none;
   display: grid; place-items: center;
   background: var(--surface);
   border: 1px solid var(--linha);
-  border-radius: 5px;
-  font-size: 2.1rem; font-weight: 800; line-height: 1;
+  border-radius: 7px;
+  box-shadow: 0 1px 2px rgba(19, 40, 74, .06);
+  font-size: 2.35rem; font-weight: 900; line-height: 1;
   color: var(--marinho);
   transition: background-color .12s ease, border-color .12s ease;
 }
-.digito.preenchido { background: var(--limao); border-color: var(--limao); }
+/* Os numerais da peca do Dr. Elton sao o Gunterz Bold Italic do manual —
+   inclinados. Sem o arquivo da fonte, a Geometos itálica e o mais perto. */
+body[data-tema="elton"] .digito { font-style: italic; }
+.digito.preenchido { background: var(--limao); border-color: var(--limao); box-shadow: none; }
 .campo.travado .digito.preenchido {
   background: var(--cx-travado); border-color: var(--cx-travado);
   color: var(--cx-travado-txt);
@@ -360,7 +400,7 @@ body[data-tema="elton"] .rotulo { font-family: var(--titulo); font-weight: 800; 
    O verde segue sendo a caixa preenchida dos outros cargos: a peça é conjunta
    com o Dr. Elton. O campo do Tozi é o único azul. */
 body[data-tema="tozi"] {
-  --marinho: #1a174e; --marinho-2: #001a6d; --limao: #84bf41;
+  --marinho: #1a174e; --marinho-2: #001a6d; --limao: #84bf41; --lima: #84bf41;
   --limao-esc: #1055bd; --bg: #e3e4e3; --bg-2: #d8dad8;
   --txt: #1a174e; --rot: #5b5f6b; --mut: #5b5f6b;
   --linha: #c8cac8; --marca: #1055bd; --acento: #1055bd;
@@ -402,19 +442,24 @@ body[data-tema="tozi"] .topo {
   background-size: cover, 42% auto, 42% auto;
   padding-bottom: 1.4rem;
 }
-body:is([data-tema="tozi"], [data-tema="dulce"]) .topo-int { align-items: flex-start; }
-body:is([data-tema="tozi"], [data-tema="dulce"]) .marca {
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .topo-int { align-items: flex-start; }
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .marca {
   flex: none; font-size: 1.25rem; line-height: 1; white-space: nowrap;
 }
 /* Título ao lado dos passos é o arranjo da peça, mas ela é bem mais larga em
    proporção que um celular: abaixo disso a coluna dos passos fica com três
    linhas por item e o topo engorda. Aí eles voltam a ficar um sob o outro. */
 @media (min-width: 26rem) {
-  body:is([data-tema="tozi"], [data-tema="dulce"]) .topo-txt {
+  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .topo-txt {
     display: flex; align-items: center; gap: .8rem;
   }
-  body:is([data-tema="tozi"], [data-tema="dulce"]) .marca { font-size: 1.08rem; margin: 0; }
+  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .marca { font-size: 1.08rem; margin: 0; }
+  /* Na arte o COMO VOTAR e maior que nos aliados; o pincel encolhe junto. */
+  body[data-tema="elton"] .marca { font-size: 1.3rem; }
 }
+body[data-tema="elton"] .visto-marca { width: 1.5rem; margin-left: -1.55rem; }
+/* A faixa navy da arte respira mais que o topo compacto dos aliados. */
+body[data-tema="elton"] .topo { padding-top: 1.25rem; padding-bottom: 1.45rem; }
 /* Na peça o "COMO VOTAR" vem sozinho — o tique é assinatura do Dr. Elton. */
 body:is([data-tema="tozi"], [data-tema="dulce"]) .visto-marca { display: none; }
 /* Os passos da peça são numerados em azul, não no verde do Dr. Elton. O vão à
@@ -427,7 +472,7 @@ body[data-tema="tozi"] .passos li::before {
 }
 
 /* O rosto em traço invade o corpo pelo canto direito, como na peça. */
-body:is([data-tema="tozi"], [data-tema="dulce"]) .folha {
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .folha {
   position: relative;
   padding-top: 1.6rem;
 }
@@ -442,18 +487,23 @@ body[data-tema="tozi"] .folha::before {
    que só têm 3 dígitos — o mesmo lugar que ele tem na peça. */
 /* O selo vive dentro do campo do senador (1º voto) e transborda sobre o de
    baixo — ancorado ali, desce junto quando um aviso empurra o formulário. */
-body:is([data-tema="tozi"], [data-tema="dulce"]) .campo { position: relative; }
-body:is([data-tema="tozi"], [data-tema="dulce"]) .campo > .selo {
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo { position: relative; }
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo > .selo {
   position: absolute; z-index: 1;
   right: 0; top: -.3rem;
   width: 7rem;
 }
+/* Na arte do Dr. Elton o botton e maior e desce um pouco mais na faixa. */
+body[data-tema="elton"] .campo > .selo { width: 7.5rem; top: -.1rem; }
 /* A mensagem de erro do campo que hospeda o selo quebraria por baixo dele. */
-body:is([data-tema="tozi"], [data-tema="dulce"]) .campo:has(> .selo) .erro {
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo:has(> .selo) .erro {
   padding-right: 7.4rem;
 }
 /* A peça não tem o tique de conferido: o campo dele já vem preenchido. */
-body:is([data-tema="tozi"], [data-tema="dulce"]) .rotulo { font-size: .82rem; }
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .rotulo { font-size: .82rem; }
+/* Na peca o campo travado sai sem a sigla do partido ("DEPUTADO FEDERAL |
+   DR. ELTON", nada de UNIÃO) — e sem ela o rotulo cabe numa linha so. */
+body[data-tema="elton"] .campo.travado .partido { display: none; }
 
 /* A foto de cada cargo fica à esquerda, como no tema padrão: é ela que abre a
    busca por nome, e ver o rosto do candidato é metade do "confira o nome e a
@@ -474,7 +524,7 @@ body[data-tema="tozi"] .rodape {
    travado dela também sai verde, como os demais — a marca fica no petróleo
    do topo, no selo navy com número mint e no padrão de pessoinhas. */
 body[data-tema="dulce"] {
-  --marinho: #094b68; --marinho-2: #0a6089; --limao: #84bf41;
+  --marinho: #094b68; --marinho-2: #0a6089; --limao: #84bf41; --lima: #84bf41;
   --limao-esc: #1f7a68; --bg: #e3e4e3; --bg-2: #d9e2df;
   --txt: #10333f; --rot: #48626e; --mut: #48626e;
   --linha: #c8cac8; --marca: #094b68; --acento: #0a6089;

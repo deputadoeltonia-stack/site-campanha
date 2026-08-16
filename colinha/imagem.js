@@ -12,14 +12,22 @@ const A = 1350
 // arquivos precisam mudar juntos — tests/theme.test.js cobra isso.
 export const TEMAS = {
   elton: {
-    topo: '#13253f', topoRisco: '#1c3357', destaque: '#8dc63f',
-    fundo: '#e6e7e5', fundo2: '#dbe4c4', caixa: '#ffffff', linha: '#c3c5c2',
-    txt: '#13253f', rot: '#63666a',
-    // Selo da peca: circulo navy liso, sem anel (anel na cor do fundo).
-    selo: '#13253f', seloAnel: '#13253f',
+    // Cores medidas na arte final da peca (15/08): navy mais azulado, verde
+    // de caixa #84bf41 e um segundo verde — o lima vivo dos acentos.
+    topo: '#13284a', topoRisco: '#0e1f3a', topoRisco2: '#17335f',
+    ciano: 'rgba(64,170,214,.38)',
+    destaque: '#84bf41', lima: '#a9cf35',
+    fundo: '#e9e9e6', fundo2: '#dfe0d8', caixa: '#ffffff', linha: '#cfceca',
+    txt: '#13284a', rot: '#63666a',
+    // O selo e o botton oficial do manual (ID 26 ELTON p.14), em imagem; se
+    // ela falhar ao carregar, cai no circulo desenhado.
+    selo: '#13284a', seloAnel: '#13284a', seloImagem: 'marca/selo-elton.png',
+    seloNoCorpo: true, // na arte ele flutua na faixa dos senadores
+    digitoItalico: true, // Gunterz Bold Italic da peca; Geometos inclinada aqui
     // peca: true liga o que so a peca do Dr. Elton tem — pincel no titulo,
-    // fitas de chevron, selo inclinado com nome empilhado, faixa lima no pe.
+    // fitas de chevron, tique depois do numero travado, faixa lima no pe.
     peca: true,
+    faixa: '#97c53f', faixaFita: '#a6cf45', faixaFita2: '#8dbd35',
     titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
   },
@@ -200,15 +208,17 @@ function desenharFoto(ctx, t, slot, img, x, y) {
   }
 }
 
-// Fitas de chevron da peca: segmento cheio, corte reto, apontando para
-// baixo. As mesmas fitas do topo navy e da faixa lima do pe.
-function desenharFitas(ctx, cor, x0, y0, larg, alt, seg = 90, queda = 20, esp = 22, passo = 46) {
+// Fitas de chevron da peca, como no pattern do manual (ID 26 ELTON p.21):
+// filas coladas (passo = espessura) alternando duas cores. Passar a mesma
+// cor duas vezes reproduz o desenho antigo de uma cor so.
+function desenharFitas(ctx, corA, corB, x0, y0, larg, alt, seg = 68, queda = 16, esp = 19) {
   ctx.save()
   ctx.beginPath()
   ctx.rect(x0, y0, larg, alt)
   ctx.clip()
-  ctx.fillStyle = cor
-  for (let y = y0 - queda; y < y0 + alt; y += passo) {
+  let fila = 0
+  for (let y = y0 - queda - esp; y < y0 + alt; y += esp, fila++) {
+    ctx.fillStyle = fila % 2 ? corB : corA
     ctx.beginPath()
     for (let x = x0 - seg; x < x0 + larg + seg; x += seg) {
       ctx.moveTo(x, y)
@@ -245,7 +255,15 @@ function desenharTopo(ctx, t, simbolo, padrao) {
     ctx.fillStyle = 'rgba(26,23,78,.62)'
     ctx.fillRect(0, 0, L, TOPO)
   } else {
-    desenharFitas(ctx, t.topoRisco, 0, 0, L, TOPO)
+    desenharFitas(ctx, t.topoRisco2 ?? t.topoRisco, t.topoRisco, 0, 0, L, TOPO)
+  }
+  // O brilho ciano diagonal que a arte tem entrando pela esquerda do topo.
+  if (t.ciano) {
+    const luz = ctx.createLinearGradient(0, TOPO, L * 0.55, 0)
+    luz.addColorStop(0, t.ciano)
+    luz.addColorStop(1, 'rgba(64,170,214,0)')
+    ctx.fillStyle = luz
+    ctx.fillRect(0, 0, L, TOPO)
   }
   ctx.restore()
 
@@ -258,7 +276,7 @@ function desenharTopo(ctx, t, simbolo, padrao) {
   // por baixo do fim de "VOTAR". So a peca dele traz.
   if (t.peca) {
     const fim = MARGEM + ctx.measureText('COMO VOTAR').width
-    ctx.fillStyle = t.destaque
+    ctx.fillStyle = t.lima ?? t.destaque
     ctx.beginPath()
     ctx.moveTo(fim - 150, 104)
     ctx.lineTo(fim - 118, 120)
@@ -298,11 +316,26 @@ function duasLinhas(ctx, texto, largura) {
 
 // O selo redondo do candidato, como na peca impressa: circulo na cor da marca
 // com anel de destaque, sobrepondo o topo e o corpo.
-function desenharSelo(ctx, t, slot) {
+function desenharSelo(ctx, t, slot, imgSelo) {
+  // Botton oficial em imagem (Dr. Elton): desenha e pronto. Maior que o selo
+  // de texto, como na arte.
+  if (imgSelo) {
+    const raio = 148
+    const cx = L - MARGEM - raio
+    const cy = Y0 + ALTURA_LINHA * 2.32
+    ctx.save()
+    ctx.shadowColor = 'rgba(14,31,58,.30)'
+    ctx.shadowBlur = 18
+    ctx.shadowOffsetY = 6
+    ctx.drawImage(imgSelo, cx - raio, cy - raio, raio * 2, raio * 2)
+    ctx.restore()
+    return
+  }
+
   const raio = 96
   const cx = L - MARGEM - raio
-  // Na peca do Tozi o selo desce para a faixa dos senadores, que so tem 3
-  // digitos e deixa a direita vazia; na do Elton ele fica no topo.
+  // Na peca o selo desce para a faixa dos senadores, que so tem 3 digitos e
+  // deixa a direita vazia.
   const cy = t.seloNoCorpo ? Y0 + ALTURA_LINHA * 2.32 : 150
 
   ctx.save()
@@ -395,24 +428,35 @@ export async function desenhar(colinha, config) {
   // Fotos antes de qualquer traco: drawImage e sincrono, entao elas precisam
   // ja estar decodificadas quando o laco chegar em cada linha.
   const fotos = await carregarFotos(colinha)
-  // Simbolo e rosto do manual, quando o tema tem. Falha vira null e o desenho
-  // cai no risco geometrico — a imagem sai sem a marca, nunca quebrada.
-  const [simbolo, rosto, padrao] = await Promise.all([
+  // Simbolo, rosto e selo do manual, quando o tema tem. Falha vira null e o
+  // desenho cai no risco geometrico — a imagem sai sem a marca, nunca quebrada.
+  const [simbolo, rosto, padrao, imgSelo] = await Promise.all([
     carregarArquivo(t.simbolo), carregarArquivo(t.rosto), carregarArquivo(t.padrao),
+    carregarArquivo(t.seloImagem),
   ])
   // A peca do Dr. Elton fecha com a faixa lima de chevrons; a imagem dele
   // cresce essa faixa. Os temas com peca propria ficam na altura de sempre.
-  const FAIXA = t.peca ? 72 : 0
+  const FAIXA = t.peca ? 84 : 0
   const cv = document.createElement('canvas')
   cv.width = L
   cv.height = A + FAIXA
   const ctx = cv.getContext('2d')
 
   const degrade = ctx.createLinearGradient(0, TOPO, L * 0.3, A)
-  degrade.addColorStop(0, t.fundo)
-  degrade.addColorStop(1, t.fundo2)
+  degrade.addColorStop(0, t.fundo2)
+  degrade.addColorStop(0.45, t.fundo)
+  degrade.addColorStop(1, t.fundo)
   ctx.fillStyle = degrade
   ctx.fillRect(0, 0, L, A + FAIXA)
+
+  // O brilho lima do canto de baixo da arte.
+  if (t.peca) {
+    const brilho = ctx.createRadialGradient(L * 0.98, A * 0.92, 0, L * 0.98, A * 0.92, L * 0.55)
+    brilho.addColorStop(0, 'rgba(169,207,53,.32)')
+    brilho.addColorStop(1, 'rgba(169,207,53,0)')
+    ctx.fillStyle = brilho
+    ctx.fillRect(0, 0, L, A + FAIXA)
+  }
 
   desenharTopo(ctx, t, simbolo, padrao)
 
@@ -426,7 +470,7 @@ export async function desenhar(colinha, config) {
   }
 
   const travado = colinha.find((s) => s.travado)
-  if (travado) desenharSelo(ctx, t, travado)
+  if (travado) desenharSelo(ctx, t, travado, imgSelo)
 
   ctx.textAlign = 'left'
   let y = Y0
@@ -447,7 +491,8 @@ export async function desenhar(colinha, config) {
       ctx.fillStyle = t.txt
       const nome = cortar(ctx, slot.nome.toUpperCase(), L - MARGEM - cursor - 60)
       ctx.fillText(nome, cursor, y)
-      if (slot.partido) {
+      // Na peca o campo travado sai sem a sigla ("... | DR. ELTON", so).
+      if (slot.partido && !(slot.travado && t.peca)) {
         cursor += ctx.measureText(nome).width + 12
         ctx.font = fonte(t, 700, COND, 24, { texto: true })
         ctx.fillStyle = t.rot
@@ -478,13 +523,44 @@ export async function desenhar(colinha, config) {
       if (digito) {
         ctx.fillStyle = slot.travado ? (t.travadoTxt ?? t.txt) : t.txt
         // Na peca do Dr. Elton o digito quase preenche a caixa.
-        ctx.font = fonte(t, t.peca ? 900 : 800, SEMI, t.peca ? 78 : 66, { italico: !!t.digitoItalico })
+        ctx.font = fonte(t, t.peca ? 900 : 800, SEMI, t.peca ? 80 : 66, { italico: !!t.digitoItalico })
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.fillText(digito, x + CAIXA / 2, topo + CAIXA / 2 + 3)
         ctx.textAlign = 'left'
         ctx.textBaseline = 'alphabetic'
       }
+    }
+
+    // O tique em contorno da peca do Dr. Elton, no vao da 5a caixa que o
+    // numero travado de 4 digitos deixa livre.
+    if (slot.travado && t.peca && slot.digitos === 4) {
+      const x0 = colunaDe(t) + 4 * (CAIXA + GAP) + 10
+      const cyq = topo + CAIXA / 2
+      const k = (CAIXA * 1.02) / 60 // o path do visto vive num viewBox 60x36
+      ctx.save()
+      ctx.translate(x0, cyq - 18 * k)
+      ctx.rotate(-7 * Math.PI / 180)
+      ctx.scale(k, k)
+      ctx.beginPath()
+      ctx.moveTo(2, 15)
+      ctx.lineTo(14, 25)
+      ctx.lineTo(58, 4)
+      ctx.lineTo(58, 14)
+      ctx.lineTo(14, 36)
+      ctx.lineTo(2, 25)
+      ctx.closePath()
+      ctx.shadowColor = 'rgba(19,40,74,.22)'
+      ctx.shadowBlur = 5
+      ctx.shadowOffsetY = 2
+      ctx.fillStyle = '#fdfdf8'
+      ctx.fill()
+      ctx.shadowColor = 'transparent'
+      ctx.lineWidth = 3.4
+      ctx.lineJoin = 'round'
+      ctx.strokeStyle = t.lima ?? t.destaque
+      ctx.stroke()
+      ctx.restore()
     }
 
     y += ALTURA_LINHA
@@ -498,9 +574,13 @@ export async function desenhar(colinha, config) {
   ctx.fillText('Confira sempre na urna.', L / 2, A - 18)
 
   if (FAIXA) {
-    ctx.fillStyle = t.destaque
+    ctx.fillStyle = t.faixa ?? t.destaque
     ctx.fillRect(0, A, L, FAIXA)
-    desenharFitas(ctx, 'rgba(111,143,38,.32)', 0, A, L, FAIXA, 64, 14, 16, 33)
+    desenharFitas(
+      ctx,
+      t.faixaFita ?? 'rgba(111,143,38,.32)', t.faixaFita2 ?? t.faixaFita ?? 'rgba(111,143,38,.32)',
+      0, A, L, FAIXA, 56, 13, 16,
+    )
   }
 
   return new Promise((resolve) => cv.toBlob(resolve, 'image/png'))

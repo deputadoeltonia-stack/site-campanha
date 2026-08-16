@@ -19,6 +19,10 @@ export const CANDIDATOS = {
   'colinha.dreltonai.com.br': {
     nome: 'DR. ELTON', cargo: 6, numero: '4412', partido: 'UNIÃO', tema: 'elton',
     foto: 'elton', // fotos/elton.jpg — foto oficial da campanha, nao vem do TSE
+    // A peca impressa ja traz o governador preenchido (Tarcisio, 10). Sugestao
+    // e diferente de travado: o campo comeca com o numero mas segue editavel,
+    // e o nome continua vindo do dataset TSE como em qualquer campo livre.
+    sugestao: { governador: '10' },
   },
   // Numero confirmado pelo santinho impresso 7x10 da campanha (15/08/2026).
   'colinhavirtual.dreltonai.com.br': {
@@ -77,7 +81,12 @@ export function slotTravado(config) {
 export function criarEstado(config) {
   const travado = slotTravado(config)
   const livres = CARGOS.filter((c) => c.id !== travado)
-  return Object.fromEntries(livres.map((c) => [c.id, '']))
+  // Sugestao da config preenche o valor inicial de um campo livre (na peca do
+  // Dr. Elton, o governador). lerURL/lerSalvo sobrescrevem depois: o que o
+  // eleitor apagou de proposito continua apagado ao restaurar.
+  return Object.fromEntries(
+    livres.map((c) => [c.id, limpar(config?.sugestao?.[c.id], c.digitos)]),
+  )
 }
 
 export function limpar(valor, digitos) {
