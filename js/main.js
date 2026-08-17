@@ -70,6 +70,48 @@
     }
   });
 
+  /* ---------- títulos fatiados p/ o efeito de subir letra a letra ----------
+     Só o corte do texto mora aqui; quem anima é o CSS (view-timeline).
+     O h2 ganha aria-label com o texto inteiro e as letras somem do leitor
+     de tela — senão o VoiceOver soletraria o título. */
+  document.querySelectorAll(".titulo-float").forEach(function (titulo) {
+    if (titulo.dataset.fatiado) return;
+    var indice = 0;
+
+    var fatiar = function (no) {
+      var saida = document.createDocumentFragment();
+      Array.prototype.slice.call(no.childNodes).forEach(function (filho) {
+        if (filho.nodeType === 3) {
+          filho.nodeValue.split(/(\s+)/).forEach(function (pedaco) {
+            if (!pedaco) return;
+            var palavra = document.createElement("span");
+            palavra.className = "word";
+            pedaco.split("").forEach(function (letra) {
+              var span = document.createElement("span");
+              span.className = "char";
+              span.style.setProperty("--i", indice++);
+              span.textContent = letra;
+              palavra.appendChild(span);
+            });
+            saida.appendChild(palavra);
+          });
+        } else if (filho.nodeType === 1) {
+          var clone = filho.cloneNode(false);        // <br>, <em>… preservados
+          clone.appendChild(fatiar(filho));
+          saida.appendChild(clone);
+        }
+      });
+      return saida;
+    };
+
+    titulo.setAttribute("aria-label", titulo.textContent.replace(/\s+/g, " ").trim());
+    var fatiado = fatiar(titulo);
+    titulo.textContent = "";
+    titulo.appendChild(fatiado);
+    Array.prototype.forEach.call(titulo.children, function (n) { n.setAttribute("aria-hidden", "true"); });
+    titulo.dataset.fatiado = "1";
+  });
+
   /* ---------- seção atual marcada no cabeçalho ----------
      Sem observer por seção: uma passada no scroll decide qual âncora está
      acima da linha do header. Barato e não erra em seção mais alta que a tela. */
