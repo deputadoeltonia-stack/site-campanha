@@ -149,10 +149,17 @@ body[data-tema="elton"] {
   letter-spacing: -.01em; text-transform: uppercase;
 }
 
-/* O pincel lima da peca corta por baixo do fim de "VOTAR", nao ao lado. */
+/* O pincel lima da peca passa POR BAIXO das letras "OTA" de VOTAR — nao e um
+   tique solto depois do "R". Medidas em em, ancoradas na propria caixa do
+   titulo: "COMO V" termina em 4,43em e "COMO VOTA" em 6,52em (Geometos), e a
+   altura da maiuscula e 0,743em. z-index -1 com isolation no h1 poe o traco
+   atras do texto sem cair atras da faixa do cabecalho. */
+.marca { position: relative; isolation: isolate; }
 .visto-marca {
-  width: 1.8rem; height: auto; color: var(--lima); flex: none;
-  align-self: flex-end; margin: 0 0 -.55rem -1.9rem;
+  position: absolute; z-index: -1;
+  left: 4.24em; width: 2.5em;
+  bottom: -.02em; height: .6em;
+  color: var(--lima);
 }
 
 .passos {
@@ -514,7 +521,8 @@ body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .marca {
   /* Na arte o COMO VOTAR e maior que nos aliados; o pincel encolhe junto. */
   body[data-tema="elton"] .marca { font-size: 1.3rem; }
 }
-body[data-tema="elton"] .visto-marca { width: 1.5rem; margin-left: -1.55rem; }
+/* (o tamanho e a posicao do pincel saem da regra base, em em: eles seguem o
+   corpo do titulo sozinhos, sem override por tema) */
 /* A faixa navy da arte respira mais que o topo compacto dos aliados. */
 body[data-tema="elton"] .topo { padding-top: 1.25rem; padding-bottom: 1.45rem; }
 /* Na peça o "COMO VOTAR" vem sozinho — o tique é assinatura do Dr. Elton. */

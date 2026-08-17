@@ -304,23 +304,31 @@ function desenharTopo(ctx, t, simbolo, padrao) {
   ctx.textAlign = 'left'
   ctx.fillStyle = '#ffffff'
   ctx.font = fonte(t, 800, COND, 62)
-  ctx.fillText('COMO VOTAR', MARGEM, 96)
-
-  // O pincel lima da peca do Dr. Elton: fita de chevron preenchida cortando
-  // por baixo do fim de "VOTAR". So a peca dele traz.
+  // O pincel lima da peca do Dr. Elton passa POR BAIXO das letras "OTA" de
+  // VOTAR — por isso vem ANTES do fillText do titulo (no canvas quem desenha
+  // depois fica por cima). Mesmas proporcoes da tela, em em do corpo do
+  // titulo: comeca em 4,24em, mede 2,5em x 0,6em e desce 0,02em da linha de
+  // base. O path vive num viewBox 56x32, esticado sem manter proporcao.
   if (t.peca) {
-    const fim = MARGEM + ctx.measureText('COMO VOTAR').width
+    const corpo = 62 // o mesmo px do fillText abaixo
+    const x0 = MARGEM + 4.24 * corpo
+    const larg = 2.5 * corpo
+    const alt = 0.6 * corpo
+    const base = 96 + 0.02 * corpo // 96 = linha de base do titulo
+    const px = (x, y) => [x0 + (x / 56) * larg, base - alt + (y / 32) * alt]
     ctx.fillStyle = t.lima ?? t.destaque
     ctx.beginPath()
-    ctx.moveTo(fim - 150, 104)
-    ctx.lineTo(fim - 118, 120)
-    ctx.lineTo(fim - 4, 86)
-    ctx.lineTo(fim - 4, 104)
-    ctx.lineTo(fim - 118, 138)
-    ctx.lineTo(fim - 150, 122)
+    const pts = [[0, 11], [12, 21], [56, 0], [56, 10], [12, 32], [0, 21]]
+    pts.forEach(([x, y], i) => {
+      const [cx, cy] = px(x, y)
+      i ? ctx.lineTo(cx, cy) : ctx.moveTo(cx, cy)
+    })
     ctx.closePath()
     ctx.fill()
+    ctx.fillStyle = '#ffffff'
   }
+
+  ctx.fillText('COMO VOTAR', MARGEM, 96)
 
   ctx.font = fonte(t, 500, COND, 29, { texto: true })
   ctx.fillStyle = 'rgba(255,255,255,.93)'
