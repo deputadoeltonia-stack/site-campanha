@@ -153,17 +153,17 @@ body[data-tema="elton"] {
   letter-spacing: -.01em; text-transform: uppercase;
 }
 
-/* O pincel lima da peca passa POR BAIXO das letras "OTA" de VOTAR — nao e um
-   tique solto depois do "R". Medidas em em, ancoradas na propria caixa do
-   titulo: "COMO V" termina em 4,43em e "COMO VOTA" em 6,52em (Geometos), e a
-   altura da maiuscula e 0,743em. z-index -1 com isolation no h1 poe o traco
-   atras do texto sem cair atras da faixa do cabecalho. */
-.marca { position: relative; isolation: isolate; }
+/* O risco lima da identidade cruza POR CIMA da base do "OTA" de VOTAR, como
+   na foto da peca (e como ele sublinha "medico"/"compromisso" no manual).
+   Medidas em em, ancoradas na caixa do titulo: "COMO V" termina em 4,43em e
+   "COMO VOTA" em 6,52em (Geometos). */
+.marca { position: relative; }
 .visto-marca {
-  position: absolute; z-index: -1;
+  position: absolute; z-index: 1;
   left: 4.1em; width: 2.42em;
   bottom: -.18em; height: .58em;
   color: var(--lima);
+  pointer-events: none;
 }
 
 .passos {

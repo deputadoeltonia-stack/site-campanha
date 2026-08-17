@@ -339,21 +339,24 @@ function desenharTopo(ctx, t, simbolo, padrao) {
   ctx.textAlign = 'left'
   ctx.fillStyle = '#ffffff'
   ctx.font = fonte(t, 800, COND, 62)
-  // O pincel lima da peca do Dr. Elton passa POR BAIXO das letras "OTA" de
-  // VOTAR — por isso vem ANTES do fillText do titulo (no canvas quem desenha
-  // depois fica por cima). Mesmas proporcoes da tela, em em do corpo do
-  // titulo: comeca em 4,24em, mede 2,5em x 0,6em e desce 0,02em da linha de
-  // base. O path vive num viewBox 56x32, esticado sem manter proporcao.
+  ctx.fillText('COMO VOTAR', MARGEM, 96)
+
+  // O risco lima da identidade cruza POR CIMA da base do "OTA" de VOTAR —
+  // por isso vem DEPOIS do fillText (no canvas quem desenha depois fica por
+  // cima). Path = modulo OFICIAL do sublinhado (ID 26 ELTON p.11, o risco de
+  // "medico"/"compromisso"), viewBox 85.7x39.8 esticado sem manter proporcao.
+  // Mesmas medidas da tela, em em do corpo do titulo.
   if (t.peca) {
-    const corpo = 62 // o mesmo px do fillText abaixo
+    const corpo = 62 // o mesmo px do fillText acima
     const x0 = MARGEM + 4.1 * corpo
     const larg = 2.42 * corpo
     const alt = 0.58 * corpo
     const base = 96 + 0.18 * corpo // 96 = linha de base do titulo
-    const px = (x, y) => [x0 + (x / 56) * larg, base - alt + (y / 32) * alt]
+    const px = (x, y) => [x0 + (x / 85.7) * larg, base - alt + (y / 39.8) * alt]
     ctx.fillStyle = t.lima ?? t.destaque
     ctx.beginPath()
-    const pts = [[0, 11], [12, 21], [56, 0], [56, 10], [12, 32], [0, 21]]
+    const pts = [[85.7, 0], [46.8, 12.5], [23.4, 20.1], [0, 12.6], [0, 32.3],
+      [3, 33.2], [23.4, 39.8], [77.6, 22.3], [85.7, 19.7]]
     pts.forEach(([x, y], i) => {
       const [cx, cy] = px(x, y)
       i ? ctx.lineTo(cx, cy) : ctx.moveTo(cx, cy)
@@ -362,8 +365,6 @@ function desenharTopo(ctx, t, simbolo, padrao) {
     ctx.fill()
     ctx.fillStyle = '#ffffff'
   }
-
-  ctx.fillText('COMO VOTAR', MARGEM, 96)
 
   ctx.font = fonte(t, 500, COND, 29, { texto: true })
   ctx.fillStyle = 'rgba(255,255,255,.93)'
