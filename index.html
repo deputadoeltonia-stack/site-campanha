@@ -29,7 +29,7 @@
   <link rel="preload" href="public/fonts/avenir-400.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="public/assets/deputado.webp" as="image" type="image/webp" fetchpriority="high" />
 
-  <link rel="stylesheet" href="css/style.css?v=54" />
+  <link rel="stylesheet" href="css/style.css?v=56" />
   <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
@@ -93,7 +93,7 @@
         <div class="hero-photo" id="hero-photo">
           <picture>
             <source srcset="public/assets/deputado.webp" type="image/webp" />
-            <img src="public/assets/deputado.png" width="638" height="658" fetchpriority="high" decoding="async"
+            <img src="public/assets/deputado.png" width="664" height="658" fetchpriority="high" decoding="async"
                  alt="Dr. Elton de terno azul-marinho e camisa branca, sorrindo, em close do busto"
                  onerror="this.closest('.hero-photo').classList.add('no-photo'); this.remove();" />
           </picture>
@@ -335,6 +335,15 @@
           <h3 class="video-block-title">Dr. Elton na minha casa</h3>
           <div class="video-grid">
             <figure class="video-card reveal">
+              <video controls preload="none" poster="public/assets/videos/casa-adelson.webp?v=2" playsinline>
+                <source src="public/assets/videos/casa-adelson.mp4?v=2" type="video/mp4" />
+              </video>
+              <figcaption>
+                <strong>Casa do Adelson</strong>
+                <p class="prose">O café da tarde com bolo e pão de queijo foi na casa do Adelson, um casal feito por um goiano e uma mineira. E no bate papo, eu não poderia deixar de lembrar de uma das minhas frutas preferidas: pequi. Estar perto de vocês me lembra diariamente do meu propósito.</p>
+              </figcaption>
+            </figure>
+            <figure class="video-card reveal">
               <video controls preload="none" poster="public/assets/videos/casa-william-padaria.webp?v=2" playsinline>
                 <source src="public/assets/videos/casa-william-padaria.mp4?v=2" type="video/mp4" />
               </video>
@@ -540,6 +549,6 @@
 
   <a href="#participar" class="sticky-cta" aria-label="Quero participar">Quero participar</a>
 
-  <script src="js/main.js?v=11" defer></script>
+  <script src="js/main.js?v=13" defer></script>
 </body>
 </html>

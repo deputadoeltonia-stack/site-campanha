@@ -152,6 +152,12 @@ p { margin: 0 0 1rem; }
 .nav a { position: relative; text-decoration: none; font-weight: 600; font-size: var(--step--1); color: var(--ink-txt); padding: .3rem 0; }
 .nav a::after { content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 2px; background: var(--blue); transition: right .28s var(--ease); }
 .nav a:hover::after { right: 0; }
+/* seção em que o leitor está: mesmo traço do hover, mais discreto, e o rótulo
+   escurece. Indicador, não botão selecionado — o hover continua sendo o forte. */
+.nav a.is-active { color: var(--ink); }
+.nav a.is-active::after { right: 0; opacity: .45; }
+.nav a.is-active:hover::after { opacity: 1; }
+.mobile-menu a.is-active { color: var(--blue); }
 .header-cta { display: none; }
 
 .menu-toggle { display: inline-flex; flex-direction: column; justify-content: center; gap: 5px; width: 46px; height: 46px; padding: 0 11px; background: none; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; }
@@ -162,6 +168,19 @@ p { margin: 0 0 1rem; }
 
 .mobile-menu { display: flex; flex-direction: column; gap: .25rem; padding: .5rem var(--gutter) 1.25rem; border-bottom: 1px solid var(--line); }
 .mobile-menu[hidden] { display: none; }
+/* abertura: a aba desce e os itens entram em cascata. Como fechar é display:none
+   (o [hidden]), só a entrada anima — sem estado intermediário pra destravar. */
+.mobile-menu:not([hidden]) { animation: menuIn .3s var(--ease); transform-origin: top; }
+.mobile-menu:not([hidden]) a { animation: menuItemIn .34s var(--ease) backwards; }
+.mobile-menu:not([hidden]) a:nth-child(1) { animation-delay: .04s; }
+.mobile-menu:not([hidden]) a:nth-child(2) { animation-delay: .08s; }
+.mobile-menu:not([hidden]) a:nth-child(3) { animation-delay: .12s; }
+.mobile-menu:not([hidden]) a:nth-child(4) { animation-delay: .16s; }
+.mobile-menu:not([hidden]) a:nth-child(5) { animation-delay: .20s; }
+.mobile-menu:not([hidden]) a:nth-child(6) { animation-delay: .24s; }
+.mobile-menu:not([hidden]) a:nth-child(7) { animation-delay: .28s; }
+@keyframes menuIn { from { opacity: 0; transform: translateY(-8px) scaleY(.97); } to { opacity: 1; transform: none; } }
+@keyframes menuItemIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
 .mobile-menu a { text-decoration: none; font-weight: 600; color: var(--ink); padding: .8rem 0; border-bottom: 1px solid var(--line); }
 .mobile-menu a:last-child { border: none; margin-top: .7rem; color: #241703; }
 
@@ -189,8 +208,11 @@ p { margin: 0 0 1rem; }
      resetar pra stretch, a foto encolhe e vai pra direita. */
   .hero-grid { flex: 1; display: flex; flex-direction: column; align-items: stretch; }
   .hero-photo { margin-top: auto; align-self: stretch; }
-  /* a foto sangra os gutters: ele maior, de borda a borda da tela */
-  .hero-photo img { width: calc(100% + 2 * var(--gutter)); max-width: none; margin-inline: calc(-1 * var(--gutter)); }
+  /* a foto sangra os gutters: ele maior, de borda a borda da tela.
+     `.hero` na frente é obrigatório: a regra base de .hero-photo img mora
+     DEPOIS deste bloco no arquivo e, com a mesma especificidade, vencia —
+     sobrava só a margem negativa e a foto puxava pra esquerda. */
+  .hero .hero-photo img { width: calc(100% + 2 * var(--gutter)); max-width: none; margin-inline: calc(-1 * var(--gutter)); }
 }
 .hero-copy { padding-bottom: clamp(1.25rem, 3vw, 2.25rem); padding-top: clamp(1.5rem, 4vw, 2.5rem); }
 /* LOCKUP: a marca oficial é o h1. É o que o eleitor precisa gravar —
@@ -222,7 +244,8 @@ p { margin: 0 0 1rem; }
   background: radial-gradient(58% 52% at 50% 42%, rgba(150,182,225,.20), transparent 72%);
   pointer-events: none;
 }
-/* rosto+peito com o corpo inteiro (asset já vem recortado no build, 638x658):
+/* rosto+peito com o corpo inteiro (asset já vem recortado no build, 664x658 —
+   inclui a faixa transparente que põe o eixo do busto no meio do arquivo):
    proporção natural, sem cover — nada do corpo é cortado pelo CSS; a base
    encosta no fim do hero (corte reto, intencional) */
 .hero-photo img { align-self: end; width: 100%; max-width: min(760px, 100%); height: auto; filter: drop-shadow(0 28px 40px rgba(0,0,0,.55)) drop-shadow(0 0 2px rgba(204, 255, 0,.35)); }
@@ -458,6 +481,45 @@ p { margin: 0 0 1rem; }
 .footer-bottom { display: flex; flex-wrap: wrap; gap: .4rem 1.5rem; justify-content: space-between; padding-block: 1.5rem; border-top: 1px solid var(--line-lt); font-size: .8rem; }
 .footer-bottom p { margin: 0; }
 .footer-legal { opacity: .6; }
+
+/* ---------- indicador de rolagem (troca a barra nativa) ----------
+   Só entra onde existe barra de verdade (mouse/trackpad): no toque o
+   navegador não desenha nada e o indicador seria enfeite no caminho do dedo.
+   A nativa só some depois que o JS confirma que o custom subiu — sem JS,
+   a barra do navegador continua lá. */
+.tem-indicador { scrollbar-width: none; }
+.tem-indicador::-webkit-scrollbar { width: 0; height: 0; }
+
+.scroll-rail {
+  position: fixed; top: 0; right: 7px; bottom: 0; width: 10px;
+  z-index: var(--z-cta); pointer-events: none;
+  opacity: 0; transition: opacity .45s var(--ease);
+}
+.scroll-rail.visivel { opacity: 1; }
+
+.scroll-thumb {
+  position: absolute; top: 0; left: 0; width: 100%;
+  border-radius: 99px; pointer-events: auto; cursor: grab;
+  /* vidro: o fundo atravessa desfocado e a luz bate na aresta de cima */
+  background: linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,.13));
+  -webkit-backdrop-filter: blur(12px) saturate(1.8);
+  backdrop-filter: blur(12px) saturate(1.8);
+  border: 1px solid rgba(255,255,255,.34);
+  box-shadow: 0 8px 22px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.55), inset 0 -6px 12px rgba(255,255,255,.08);
+  transition: background .22s var(--ease), box-shadow .22s var(--ease);
+  will-change: transform;
+}
+.scroll-rail:hover .scroll-thumb, .scroll-thumb.arrastando {
+  background: linear-gradient(180deg, rgba(204,255,0,.42), rgba(204,255,0,.20));
+  border-color: rgba(204,255,0,.55);
+  box-shadow: 0 8px 26px rgba(0,0,0,.34), 0 0 18px rgba(204,255,0,.28), inset 0 1px 0 rgba(255,255,255,.6);
+}
+.scroll-thumb.arrastando { cursor: grabbing; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-rail { transition: none; }
+  .scroll-thumb { transition: none; }
+}
 
 /* ---------- CTA fixo (mobile) ---------- */
 .sticky-cta { position: fixed; left: max(1rem, env(safe-area-inset-left)); right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); z-index: var(--z-cta); display: flex; align-items: center; justify-content: center; padding: 1rem; border-radius: 14px; background: var(--gold); color: #241703; font-family: var(--body); font-weight: 500; text-decoration: none; box-shadow: 0 14px 34px -10px rgba(204, 255, 0,.75); transform: translateY(150%); transition: transform .4s var(--ease); }

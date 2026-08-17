@@ -70,6 +70,39 @@
     }
   });
 
+  /* ---------- seção atual marcada no cabeçalho ----------
+     Sem observer por seção: uma passada no scroll decide qual âncora está
+     acima da linha do header. Barato e não erra em seção mais alta que a tela. */
+  var navLinks = Array.prototype.slice.call(
+    document.querySelectorAll('.nav a[href^="#"], .mobile-menu a[href^="#"]')
+  ).filter(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
+
+  if (navLinks.length) {
+    var marcarAtiva = function () {
+      var linha = (header ? header.offsetHeight : 0) + 24;
+      var atual = "";
+      navLinks.forEach(function (a) {
+        var alvo = document.getElementById(a.getAttribute("href").slice(1));
+        if (alvo.getBoundingClientRect().top <= linha) atual = a.getAttribute("href");
+      });
+      // fim da página: a última seção nunca chega ao topo, então assume ela
+      if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 2) {
+        atual = navLinks[navLinks.length - 1].getAttribute("href");
+      }
+      navLinks.forEach(function (a) {
+        a.classList.toggle("is-active", a.getAttribute("href") === atual);
+      });
+    };
+    var agendada = false;
+    window.addEventListener("scroll", function () {
+      if (agendada) return;
+      agendada = true;
+      requestAnimationFrame(function () { agendada = false; marcarAtiva(); });
+    }, { passive: true });
+    window.addEventListener("resize", marcarAtiva);
+    marcarAtiva();
+  }
+
   /* ---------- reveal on scroll ---------- */
   var reveals = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window && reveals.length) {
@@ -105,6 +138,103 @@
         atForm = es[0].isIntersecting; update();
       }, { threshold: 0.1 }).observe(form);
     }
+  }
+
+  /* ---------- indicador de rolagem (troca a barra nativa) ----------
+     Só com ponteiro fino: no toque não há barra pra substituir.
+     A classe que esconde a nativa só entra depois que o custom existe —
+     se algo aqui falhar, o usuário nunca fica sem barra nenhuma. */
+  if (window.matchMedia("(pointer: fine)").matches) {
+    var trilho = document.createElement("div");
+    trilho.className = "scroll-rail";
+    trilho.setAttribute("aria-hidden", "true"); // roda/teclado já rolam a página
+    var polegar = document.createElement("div");
+    polegar.className = "scroll-thumb";
+    trilho.appendChild(polegar);
+    document.body.appendChild(trilho);
+    root.classList.add("tem-indicador");
+
+    var MARGEM = 12;      // respiro nas pontas: o polegar não encosta na quina
+    var MIN_ALTURA = 48;  // página longa não vira um risco de 4px
+    var sumir = null, arrastando = false, pegouEm = 0, alturaAtual = 0;
+
+    function medir() {
+      var doc = document.documentElement;
+      var vis = window.innerHeight;
+      var pista = vis - MARGEM * 2;
+      var total = Math.max(doc.scrollHeight, document.body.scrollHeight);
+      return {
+        pista: pista,
+        rolavel: total - vis,
+        altura: Math.max(MIN_ALTURA, Math.round(pista * (vis / total)))
+      };
+    }
+
+    function pintar() {
+      var m = medir();
+      if (m.rolavel <= 4) { trilho.classList.remove("visivel"); return; }
+      var p = Math.min(1, Math.max(0, window.scrollY / m.rolavel));
+      var y = MARGEM + p * (m.pista - m.altura);
+      // encaixe na ponta: chegando ao fim do curso o polegar comprime contra a
+      // borda, como se ela fosse arredondada e ele estivesse se acomodando nela.
+      var encaixe = p < 0.02 ? 1 - (0.02 - p) * 6
+                  : p > 0.98 ? 1 - (p - 0.98) * 6
+                  : 1;
+      if (m.altura !== alturaAtual) { polegar.style.height = m.altura + "px"; alturaAtual = m.altura; }
+      polegar.style.transformOrigin = p > 0.5 ? "center bottom" : "center top";
+      polegar.style.transform = "translate3d(0," + y + "px,0) scaleY(" + encaixe + ")";
+    }
+
+    function acender() {
+      trilho.classList.add("visivel");
+      clearTimeout(sumir);
+      if (!arrastando) sumir = setTimeout(function () { trilho.classList.remove("visivel"); }, 1100);
+    }
+
+    var pendente = false;
+    function aoRolar() {
+      if (!pendente) {
+        pendente = true;
+        requestAnimationFrame(function () { pendente = false; pintar(); });
+      }
+      acender();
+    }
+    window.addEventListener("scroll", aoRolar, { passive: true });
+    window.addEventListener("resize", function () { alturaAtual = 0; pintar(); });
+    trilho.addEventListener("mouseenter", acender);
+
+    // arrastar o polegar: sem isso, esconder a barra nativa tiraria um jeito
+    // legítimo de navegar que parte das pessoas usa.
+    polegar.addEventListener("pointerdown", function (e) {
+      arrastando = true;
+      pegouEm = e.clientY - polegar.getBoundingClientRect().top;
+      polegar.classList.add("arrastando");
+      polegar.setPointerCapture(e.pointerId);
+      acender();
+      e.preventDefault();
+    });
+    polegar.addEventListener("pointermove", function (e) {
+      if (!arrastando) return;
+      var m = medir();
+      var curso = m.pista - m.altura;
+      if (curso <= 0) return;
+      var p = (e.clientY - pegouEm - MARGEM) / curso;
+      window.scrollTo(0, Math.min(1, Math.max(0, p)) * m.rolavel);
+    });
+    function soltar(e) {
+      if (!arrastando) return;
+      arrastando = false;
+      polegar.classList.remove("arrastando");
+      if (e && e.pointerId != null && polegar.hasPointerCapture(e.pointerId)) {
+        polegar.releasePointerCapture(e.pointerId);
+      }
+      acender();
+    }
+    polegar.addEventListener("pointerup", soltar);
+    polegar.addEventListener("pointercancel", soltar);
+
+    pintar();
+    acender();
   }
 
   /* ---------- máscara de telefone BR ---------- */

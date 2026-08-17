@@ -44,6 +44,32 @@ def subset_font(src, dst):
     return os.path.getsize(os.path.join(FONTS, dst))
 
 
+def center_subject(im):
+    """Faixa transparente de um lado so ate o eixo do busto cair no meio.
+
+    Eixo = centro de massa do alpha na METADE DE CIMA (cabeca e ombros), que e
+    onde o olho ancora; a metade de baixo puxa o resultado pro lado do braco
+    mais aberto. Recalculado a cada build: troca de foto nao quebra o ajuste.
+    """
+    w, h = im.size
+    alpha = im.split()[3].load()
+    soma = qtd = 0
+    for y in range(0, h // 2, 2):
+        for x in range(0, w, 2):
+            if alpha[x, y] > 40:
+                soma += x
+                qtd += 1
+    if not qtd:
+        return im
+    eixo = soma / qtd
+    pad = int(round(abs(w - 2 * eixo)))
+    if pad < 2:
+        return im
+    out = Image.new("RGBA", (w + pad, h), (0, 0, 0, 0))
+    out.paste(im, (pad if eixo < w / 2 else 0, 0))
+    return out
+
+
 def main():
     print("== fontes -> woff2 (subset) ==")
     total_in = total_out = 0
@@ -67,6 +93,11 @@ def main():
         # na tela. O CSS renderiza a proporcao natural (sem cover) — corte
         # zero por construcao.
         im = im.crop((25, 22, 663, 680))
+        # O recorte abraca o corpo de ponta a ponta, mas o ombro direito e mais
+        # largo: o EIXO do busto cai ~2% a esquerda do meio do arquivo. No
+        # celular, onde a foto ocupa a largura inteira da tela, isso le como
+        # "foto torta". Fecha a conta com faixa transparente do lado que falta.
+        im = center_subject(im)
         webp = os.path.join(ASSETS, "deputado.webp")
         png = os.path.join(ASSETS, "deputado.png")
         im.save(webp, "WEBP", quality=82, method=6)  # method 6 = melhor compressão
