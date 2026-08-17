@@ -160,8 +160,8 @@ body[data-tema="elton"] {
 .marca { position: relative; }
 .visto-marca {
   position: absolute; z-index: 1;
-  left: 4.1em; width: 2.42em;
-  bottom: -.18em; height: .58em;
+  left: 4.15em; width: 2.1em;
+  bottom: -.18em; height: .36em;
   color: var(--lima);
   pointer-events: none;
 }

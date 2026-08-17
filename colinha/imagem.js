@@ -348,9 +348,9 @@ function desenharTopo(ctx, t, simbolo, padrao) {
   // Mesmas medidas da tela, em em do corpo do titulo.
   if (t.peca) {
     const corpo = 62 // o mesmo px do fillText acima
-    const x0 = MARGEM + 4.1 * corpo
-    const larg = 2.42 * corpo
-    const alt = 0.58 * corpo
+    const x0 = MARGEM + 4.15 * corpo
+    const larg = 2.1 * corpo
+    const alt = 0.36 * corpo
     const base = 96 + 0.18 * corpo // 96 = linha de base do titulo
     const px = (x, y) => [x0 + (x / 85.7) * larg, base - alt + (y / 39.8) * alt]
     ctx.fillStyle = t.lima ?? t.destaque
