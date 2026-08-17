@@ -122,16 +122,18 @@ body[data-tema="elton"] {
 @media (prefers-reduced-motion: reduce) { .volta { transition: none; } }
 
 .topo {
-  background: var(--marinho);
+  background: #061e4c;
   color: #fff;
   padding: 1rem .9rem 1.05rem;
-  /* Fitas de chevron do pattern do manual (ID 26 ELTON, pag. 21): filas
-     coladas alternando um tom mais claro e um mais escuro que o fundo, e um
-     brilho ciano diagonal entrando pela esquerda, como na arte da peca. */
+  /* Pattern OFICIAL do manual (ID 26 ELTON, pag. 21), extraido do vetor:
+     colunas de 135,6 x periodo 71, fita clara #0a3983 de 35,8 de espessura
+     sobre o escuro #061e4c — 50/50, sem terceiro tom. O path e o poligono
+     exato da peca (vale assimetrico em x=37). Por cima, o brilho ciano que a
+     arte tem entrando pelo canto de baixo a esquerda. */
   background-image:
-    linear-gradient(104deg, rgba(64, 170, 214, .38), rgba(64, 170, 214, 0) 38%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 36'%3E%3Crect width='64' height='36' fill='%2313284a'/%3E%3Cpath d='M0 0 L32 15 L64 0 L64 18 L32 33 L0 18 Z' fill='%2317335f'/%3E%3Cpath d='M0 18 L32 33 L64 18 L64 36 L32 51 L0 36 Z M0 -18 L32 -3 L64 -18 L64 0 L32 15 L0 0 Z' fill='%230e1f3a'/%3E%3C/svg%3E");
-  background-size: auto, 2.7rem auto;
+    radial-gradient(34rem 20rem at 0% 100%, rgba(64, 170, 214, .42), rgba(64, 170, 214, 0) 62%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 135.6 71'%3E%3Crect width='135.6' height='71' fill='%23061e4c'/%3E%3Cpath d='M135.6 0 L135.6 35.8 L111.7 43.5 L92.3 49.8 L71.4 56.5 L37 67.7 L23.9 63.4 L0 55.7 L0 19.9 L37 31.9 Z' fill='%230a3983'/%3E%3C/svg%3E");
+  background-size: auto, 8.5rem auto;
 }
 
 .topo-int {

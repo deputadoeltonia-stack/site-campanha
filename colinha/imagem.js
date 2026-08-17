@@ -16,7 +16,9 @@ export const TEMAS = {
   elton: {
     // Cores medidas na arte final da peca (15/08): navy mais azulado, verde
     // de caixa #84bf41 e um segundo verde — o lima vivo dos acentos.
-    topo: '#13284a', topoRisco: '#0e1f3a', topoRisco2: '#17335f',
+    // Cabecalho no pattern oficial do manual (p.21): fundo escuro #061e4c com
+    // a fita clara #0a3983 — cores digitais do proprio vetor.
+    topo: '#061e4c', chevClaro: '#0a3983',
     ciano: 'rgba(64,170,214,.38)',
     destaque: '#84bf41', lima: '#a9cf35',
     fundo: '#e9e9e6', fundo2: '#dfe0d8', caixa: '#ffffff', linha: '#cfceca',
@@ -288,6 +290,28 @@ function desenharTopo(ctx, t, simbolo, padrao) {
     ctx.drawImage(simbolo, -L * 0.1, TOPO - alt * 0.7, larg, alt)
     ctx.fillStyle = 'rgba(26,23,78,.62)'
     ctx.fillRect(0, 0, L, TOPO)
+  } else if (t.chevClaro) {
+    // Pattern oficial do manual (ID 26 ELTON, p.21), poligono exato do vetor:
+    // colunas de 135,6 x periodo 71, fita clara de 35,8 sobre o fundo escuro.
+    // Escala pela altura do cabecalho (~3,2 periodos), como na arte.
+    const P = [[135.6, 0], [135.6, 35.8], [111.7, 43.5], [92.3, 49.8],
+      [71.4, 56.5], [37, 67.7], [23.9, 63.4], [0, 55.7], [0, 19.9], [37, 31.9]]
+    const k = (TOPO / 3.2) / 71
+    const col = 135.6 * k
+    const per = 71 * k
+    ctx.fillStyle = t.chevClaro
+    for (let x = 0; x < L; x += col) {
+      for (let y = -per; y < TOPO + per; y += per) {
+        ctx.beginPath()
+        P.forEach(([px, py], i) => {
+          const cx = x + px * k
+          const cy = y + py * k
+          i ? ctx.lineTo(cx, cy) : ctx.moveTo(cx, cy)
+        })
+        ctx.closePath()
+        ctx.fill()
+      }
+    }
   } else if (!t.topoLiso) {
     desenharFitas(ctx, t.topoRisco2 ?? t.topoRisco, t.topoRisco, 0, 0, L, TOPO)
   }
