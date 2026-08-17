@@ -536,10 +536,15 @@
   }
 
   /* ---------- texto que acende palavra a palavra, atado ao scroll ----------
+     Porte do ScrollReveal (React Bits) sem React/GSAP, com os parâmetros que
+     você passou: baseOpacity .1, enableBlur, baseRotation 1, blurStrength 4.
+     Duas trilhas com scrub, como no original:
+       rotação  — o parágrafo entra torto e desentorta   ('top bottom' → 'bottom bottom')
+       palavras — opacidade .1→1 e blur 4px→0, escalonadas ('top bottom-=20%' → 'bottom bottom')
      Mesmo scrub dos títulos (.titulo-float): progresso calculado no scroll, não
      view-timeline — pelo mesmo motivo, a timeline CSS não ativa em todo navegador.
-     Aqui o JS só escreve --p no parágrafo; quem acende cada palavra é o clamp()
-     do CSS, então é UMA escrita de estilo por parágrafo por frame.
+     O JS escreve só --p e --pr no parágrafo; quem acende cada palavra é o CSS,
+     então é no máximo DUAS escritas de estilo por parágrafo por frame.
      Sem JS = texto normal, opaco e legível. */
   var paragrafos = [];
   document.querySelectorAll(
@@ -564,26 +569,37 @@
     el.appendChild(frag);
     el.style.setProperty("--n", n);
     el.classList.add("wordreveal");
-    paragrafos.push({ el: el, ultimo: -1 });
+    if (semMovimento) el.classList.add("suave");   // sem blur nem rotação, só o acender
+    paragrafos.push({ el: el, ultimo: -1, ultimoR: -1 });
   });
 
-  if (paragrafos.length && !semMovimento) {
+  if (paragrafos.length) {
+    var travaP = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
     var pintarTexto = function () {
       var alturaVis = window.innerHeight;
-      // curso: começa quando o parágrafo entra pela base e fecha com ele
-      // acima do meio da tela — a frase termina de acender antes de você
-      // terminar de ler, nunca depois.
-      var inicio = alturaVis * 0.92;
-      var fim = alturaVis * 0.42;
+      // Curso mínimo: no GSAP, 'bottom bottom' num parágrafo baixo daria curso
+      // quase zero (ou negativo) e a frase acenderia de estalo. Piso de 30% da
+      // tela para as citações curtas terem o mesmo scrub das longas.
+      var piso = alturaVis * 0.3;
       paragrafos.forEach(function (t) {
         var caixa = t.el.getBoundingClientRect();
         if (caixa.bottom < -200 || caixa.top > alturaVis + 200) return;   // fora da tela: nem calcula
-        var p = (inicio - caixa.top) / Math.max(1, inicio - fim + caixa.height);
-        p = p < 0 ? 0 : p > 1 ? 1 : p;
+
+        // palavras: começa com o topo a 80% da tela, fecha quando a base encosta na base
+        var p = travaP((alturaVis * 0.8 - caixa.top) / Math.max(caixa.height - alturaVis * 0.2, piso));
         var q = Math.round(p * 100) / 100;
-        if (q === t.ultimo) return;                                       // nada mudou: não escreve
-        t.ultimo = q;
-        t.el.style.setProperty("--p", q);
+        if (q !== t.ultimo) {
+          t.ultimo = q;
+          t.el.style.setProperty("--p", q);
+          t.el.classList.toggle("pronto", q === 1);   // acendeu tudo: tira o blur do caminho
+        }
+        if (semMovimento) return;
+
+        // rotação: começa com o topo entrando pela base da tela
+        var pr = Math.round(travaP((alturaVis - caixa.top) / Math.max(caixa.height, piso)) * 100) / 100;
+        if (pr === t.ultimoR) return;
+        t.ultimoR = pr;
+        t.el.style.setProperty("--pr", pr);
       });
     };
     var agendadoP = false;

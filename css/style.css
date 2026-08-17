@@ -553,16 +553,28 @@ p { margin: 0 0 1rem; }
 .js .gallery .reveal:nth-child(3) { transition-delay: .14s; }
 .js .gallery .reveal:nth-child(4) { transition-delay: .21s; }
 
-/* ---- texto que acende palavra a palavra ----
-   --p (0→1) é o progresso do parágrafo no scroll, escrito pelo JS.
-   Cada palavra acende quando --p passa do índice dela. --p fica em 1
-   (tudo aceso) se o JS não rodar ou se o usuário pediu menos movimento. */
-.wordreveal { --p: 1; }
-.wordreveal .w {
-  /* +5 = respiro no fim (a última palavra acende antes do fim do curso);
-     /5 = quantas palavras ficam acendendo ao mesmo tempo — o degradê */
-  opacity: clamp(.17, calc((var(--p) * (var(--n) + 5) - var(--i)) / 5), 1);
+/* ---- texto que acende palavra a palavra (porte do ScrollReveal, React Bits) ----
+   --p (palavras) e --pr (rotação) são o progresso no scroll, escritos pelo JS.
+   Ambos em 1 = estado final: se o JS não rodar, o texto é texto normal.
+   A conta das palavras é a do GSAP: stagger .05 sobre tween de .5 = 10 palavras
+   acendendo ao mesmo tempo, num curso de (n + 9) passos. --l é o progresso da
+   palavra sozinha, 0→1, e sai igual ao `local` que o GSAP daria a ela. */
+.wordreveal {
+  --p: 1; --pr: 1;
+  transform-origin: 0% 50%;
+  transform: rotate(calc((1 - var(--pr)) * 1deg));      /* baseRotation: 1 */
 }
+.wordreveal .w {
+  --l: clamp(0, calc((var(--p) * (var(--n) + 9) - var(--i)) / 10), 1);
+  display: inline-block;                                /* blur e transform por palavra */
+  opacity: calc(.1 + .9 * var(--l));                    /* baseOpacity: .1 */
+  filter: blur(calc((1 - var(--l)) * 4px));             /* blurStrength: 4 */
+}
+/* frase inteira acesa: sai do caminho do compositor (filter em ~50 spans custa) */
+.wordreveal.pronto .w { filter: none; }
+/* menos movimento: fica só o acender, sem borrão nem inclinação */
+.wordreveal.suave { transform: none; }
+.wordreveal.suave .w { filter: none; }
 
 /* =========================================================
    RESPONSIVO
