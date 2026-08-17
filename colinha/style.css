@@ -161,7 +161,7 @@ body[data-tema="elton"] {
 .visto-marca {
   position: absolute; z-index: 1;
   left: 4.15em; width: 2.1em;
-  bottom: -.18em; height: .36em;
+  bottom: -.77em; height: .98em;
   color: var(--lima);
   pointer-events: none;
 }
@@ -522,6 +522,11 @@ body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .marca {
 /* Título ao lado dos passos é o arranjo da peça, mas ela é bem mais larga em
    proporção que um celular: abaixo disso a coluna dos passos fica com três
    linhas por item e o topo engorda. Aí eles voltam a ficar um sob o outro. */
+/* O visto desce 1,2rem abaixo da linha do titulo; no mobile os passos vem
+   logo abaixo e ficariam riscados por ele. O respiro extra so existe no
+   layout empilhado — de 26rem pra cima o titulo fica ao lado dos passos e a
+   regra do breakpoint zera a margem de novo. */
+body[data-tema="elton"] .marca { margin-bottom: 1.4rem; }
 @media (min-width: 26rem) {
   body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .topo-txt {
     display: flex; align-items: center; gap: .8rem;

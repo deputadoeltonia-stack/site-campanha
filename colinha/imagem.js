@@ -341,22 +341,22 @@ function desenharTopo(ctx, t, simbolo, padrao) {
   ctx.font = fonte(t, 800, COND, 62)
   ctx.fillText('COMO VOTAR', MARGEM, 96)
 
-  // O risco lima da identidade cruza POR CIMA da base do "OTA" de VOTAR —
+  // O visto lima da identidade cruza POR CIMA da base do "OTA" de VOTAR —
   // por isso vem DEPOIS do fillText (no canvas quem desenha depois fica por
-  // cima). Path = modulo OFICIAL do sublinhado (ID 26 ELTON p.11, o risco de
-  // "medico"/"compromisso"), viewBox 85.7x39.8 esticado sem manter proporcao.
-  // Mesmas medidas da tela, em em do corpo do titulo.
+  // cima). Path = visto OFICIAL (ID 26 ELTON p.7), proporcao natural
+  // 170.7x79.3; o corpo dele desce abaixo da linha de base, so a ponta alta
+  // cruza as letras. Mesmas medidas da tela, em em do corpo do titulo.
   if (t.peca) {
     const corpo = 62 // o mesmo px do fillText acima
     const x0 = MARGEM + 4.15 * corpo
     const larg = 2.1 * corpo
-    const alt = 0.36 * corpo
-    const base = 96 + 0.18 * corpo // 96 = linha de base do titulo
-    const px = (x, y) => [x0 + (x / 85.7) * larg, base - alt + (y / 39.8) * alt]
+    const alt = larg * (79.3 / 170.7)
+    const base = 96 + 0.77 * corpo // 96 = linha de base do titulo
+    const px = (x, y) => [x0 + (x / 170.7) * larg, base - alt + (y / 79.3) * alt]
     ctx.fillStyle = t.lima ?? t.destaque
     ctx.beginPath()
-    const pts = [[85.7, 0], [46.8, 12.5], [23.4, 20.1], [0, 12.6], [0, 32.3],
-      [3, 33.2], [23.4, 39.8], [77.6, 22.3], [85.7, 19.7]]
+    const pts = [[170.7, 0], [93.3, 25], [46.5, 40.1], [0, 25.1], [0, 64.3],
+      [6, 66.2], [46.5, 79.3], [154.6, 44.4], [170.7, 39.2]]
     pts.forEach(([x, y], i) => {
       const [cx, cy] = px(x, y)
       i ? ctx.lineTo(cx, cy) : ctx.moveTo(cx, cy)
