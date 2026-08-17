@@ -133,7 +133,7 @@ body[data-tema="elton"] {
   background-image:
     radial-gradient(34rem 20rem at 0% 100%, rgba(64, 170, 214, .42), rgba(64, 170, 214, 0) 62%),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 135.6 71'%3E%3Crect width='135.6' height='71' fill='%23061e4c'/%3E%3Cpath d='M135.6 0 L135.6 35.8 L111.7 43.5 L92.3 49.8 L71.4 56.5 L37 67.7 L23.9 63.4 L0 55.7 L0 19.9 L37 31.9 Z' fill='%230a3983'/%3E%3C/svg%3E");
-  background-size: auto, 8.5rem auto;
+  background-size: auto, 6rem auto;
 }
 
 .topo-int {

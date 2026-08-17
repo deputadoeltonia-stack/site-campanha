@@ -296,7 +296,7 @@ function desenharTopo(ctx, t, simbolo, padrao) {
     // Escala pela altura do cabecalho (~3,2 periodos), como na arte.
     const P = [[135.6, 0], [135.6, 35.8], [111.7, 43.5], [92.3, 49.8],
       [71.4, 56.5], [37, 67.7], [23.9, 63.4], [0, 55.7], [0, 19.9], [37, 31.9]]
-    const k = (TOPO / 3.2) / 71
+    const k = (TOPO / 4.5) / 71
     const col = 135.6 * k
     const per = 71 * k
     ctx.fillStyle = t.chevClaro
