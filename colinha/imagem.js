@@ -31,7 +31,9 @@ export const TEMAS = {
                      // ele caia em cima do nome assim que o eleitor digitava
     fotoSemDestaque: true, // campo pre-definido sem borda verde
     seloNoCorpo: true, // na arte ele flutua na faixa dos senadores
-    digitoItalico: true, // Gunterz Bold Italic da peca; Geometos inclinada aqui
+    // Numerais do santinho: retos e pesados (foto da peca), tinta em ~72% da
+    // altura da caixa — nada do falso italico antigo.
+    digitoAltura: 0.72,
     // peca: true liga o que so a peca do Dr. Elton tem — pincel no titulo,
     // fitas de chevron e faixa lima no pe.
     peca: true,

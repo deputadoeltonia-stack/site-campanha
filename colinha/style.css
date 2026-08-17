@@ -393,9 +393,11 @@ body[data-tema="elton"] .rotulo { font-family: var(--titulo); font-weight: 800; 
   color: var(--marinho);
   transition: background-color .12s ease, border-color .12s ease;
 }
-/* Os numerais da peca do Dr. Elton sao o Gunterz Bold Italic do manual —
-   inclinados. Sem o arquivo da fonte, a Geometos itálica e o mais perto. */
-body[data-tema="elton"] .digito { font-style: italic; }
+/* Numerais do santinho do Dr. Elton (foto da peca): retos, geometricos e
+   pesados — a Geometos Neue Black upright, sem o falso italico de antes.
+   Corpo maior que o padrao: na foto a tinta do algarismo ocupa ~72% da
+   caixa (15.5cqw davam 61%). O padding-top otico em em escala junto. */
+body[data-tema="elton"] .digito { font-size: 21.6cqw; }
 .digito.preenchido { background: var(--limao); border-color: var(--limao); box-shadow: none; }
 .campo.travado .digito.preenchido {
   background: var(--cx-travado); border-color: var(--cx-travado);
