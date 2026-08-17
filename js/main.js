@@ -603,13 +603,15 @@
           entrelinha = Math.min(entrelinha, linhas[k] - linhas[k - 1]);
         }
       });
-      faixa = Math.round(Math.max(entrelinha === Infinity ? 0 : entrelinha, 24) * 1.5);
+      faixa = Math.round(Math.max(entrelinha === Infinity ? 0 : entrelinha, 24) * 1.2);
       document.documentElement.style.setProperty("--faixa", faixa);
     };
 
     var pintarTexto = function () {
       var alturaVis = window.innerHeight;
-      var limiar = alturaVis * 0.94;   // linha da tela onde a palavra ainda está borrada
+      // Linha da tela onde a palavra ainda está borrada. Colada na base: com a
+      // faixa de 1,2 linha acima dela, só a última linha visível pega borrão.
+      var limiar = alturaVis * 0.99;
       // fim da página: o que sobrou embaixo nunca vai cruzar a faixa — acende tudo
       var noFim = window.scrollY + alturaVis >= document.documentElement.scrollHeight - 2;
       paragrafos.forEach(function (t) {
