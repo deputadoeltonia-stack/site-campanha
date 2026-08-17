@@ -127,15 +127,16 @@
         : (Math.pow(2 * x - 2, 2) * ((c + 1) * (x * 2 - 2) + c) + 2) / 2;
     };
     var trava = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
-    var ATRASO = 0.02;   // stagger: fração do curso que cada letra espera
+    var ATRASO = 0.04;   // stagger: fração do curso que cada letra espera
 
     var desenhar = function (t) {
       var caixa = t.el.getBoundingClientRect();
       var alturaVis = window.innerHeight;
-      // mesmas marcas do original: começa com o topo do bloco a meia tela de
-      // distância e termina quando a base passa de 60% da altura da janela.
-      var inicio = alturaVis * 1.0;
-      var fim = alturaVis * 0.6;
+      // curso do efeito: começa quando o título encosta na base da janela e só
+      // fecha perto do topo. Faixa longa de propósito — terminando no meio da
+      // tela, a animação acabava antes de você chegar a olhar o título.
+      var inicio = alturaVis * 1.05;
+      var fim = alturaVis * 0.25;
       var p = trava((inicio - caixa.top) / Math.max(1, inicio - fim + caixa.height));
       if (p === 1 && t.pronto) return;             // já terminou: para de escrever
       t.pronto = p === 1;
