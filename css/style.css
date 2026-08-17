@@ -553,19 +553,23 @@ p { margin: 0 0 1rem; }
 .js .gallery .reveal:nth-child(3) { transition-delay: .14s; }
 .js .gallery .reveal:nth-child(4) { transition-delay: .21s; }
 
-/* ---- texto que acende palavra a palavra (porte do ScrollReveal, React Bits) ----
-   --p (palavras) e --pr (rotação) são o progresso no scroll, escritos pelo JS.
-   Ambos em 1 = estado final: se o JS não rodar, o texto é texto normal.
-   A conta das palavras é a do GSAP: stagger .05 sobre tween de .5 = 10 palavras
-   acendendo ao mesmo tempo, num curso de (n + 9) passos. --l é o progresso da
-   palavra sozinha, 0→1, e sai igual ao `local` que o GSAP daria a ela. */
+/* ---- texto que acende linha a linha (porte do ScrollReveal, React Bits) ----
+   O borrão é uma faixa presa à base da janela, com ~1,5 linha de altura: só a
+   linha entrando embaixo fica embaçada, o que já subiu está limpo.
+     --y  progresso do parágrafo, em px, escrito pelo JS a cada frame
+     --o  distância da palavra até o topo do parágrafo, medida uma vez
+     --faixa  altura do borrão em px (entrelinha real × 1,5)
+   --l é o quanto ESTA palavra já saiu da faixa, 0→1. Números sem unidade
+   porque calc() não divide px por px. --y alto = tudo aceso, que é o estado
+   quando o JS não roda. */
+:root { --faixa: 40; }
 .wordreveal {
-  --p: 1; --pr: 1;
+  --y: 99999; --o: 0; --pr: 1;
   transform-origin: 0% 50%;
   transform: rotate(calc((1 - var(--pr)) * 1deg));      /* baseRotation: 1 */
 }
 .wordreveal .w {
-  --l: clamp(0, calc((var(--p) * (var(--n) + 9) - var(--i)) / 10), 1);
+  --l: clamp(0, calc((var(--y) - var(--o)) / var(--faixa)), 1);
   display: inline-block;                                /* blur e transform por palavra */
   opacity: calc(.1 + .9 * var(--l));                    /* baseOpacity: .1 */
   filter: blur(calc((1 - var(--l)) * 4px));             /* blurStrength: 4 */

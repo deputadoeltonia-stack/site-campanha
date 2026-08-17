@@ -535,16 +535,22 @@
     dlg.addEventListener("close", function () { lbImg.removeAttribute("src"); });
   }
 
-  /* ---------- texto que acende palavra a palavra, atado ao scroll ----------
+  /* ---------- texto que acende linha a linha, atado ao scroll ----------
      Porte do ScrollReveal (React Bits) sem React/GSAP, com os parâmetros que
      você passou: baseOpacity .1, enableBlur, baseRotation 1, blurStrength 4.
-     Duas trilhas com scrub, como no original:
-       rotação  — o parágrafo entra torto e desentorta   ('top bottom' → 'bottom bottom')
-       palavras — opacidade .1→1 e blur 4px→0, escalonadas ('top bottom-=20%' → 'bottom bottom')
-     Mesmo scrub dos títulos (.titulo-float): progresso calculado no scroll, não
-     view-timeline — pelo mesmo motivo, a timeline CSS não ativa em todo navegador.
-     O JS escreve só --p e --pr no parágrafo; quem acende cada palavra é o CSS,
-     então é no máximo DUAS escritas de estilo por parágrafo por frame.
+
+     Uma mudança de propósito no ScrollTrigger do original: lá o curso é o
+     parágrafo inteiro ('top bottom-=20%' → 'bottom bottom'), então parágrafo
+     grande fica borrado INTEIRO enquanto sobe — texto ilegível no meio da tela.
+     Aqui o borrão é uma faixa presa à base da JANELA, com a altura de ~1,5
+     linha: só a linha que está entrando embaixo fica embaçada, e tudo que já
+     subiu está limpo. Cada palavra é medida uma vez (--o, distância do topo do
+     parágrafo); no scroll o JS escreve UM número por parágrafo (--y) e o CSS
+     resolve palavra por palavra. Palavras da mesma linha têm o mesmo --o, então
+     acendem juntas — é linha a linha, não palavra a palavra.
+
+     Scrub calculado no scroll, não view-timeline nem ScrollTrigger — mesma
+     escolha já feita nos títulos (.titulo-float).
      Sem JS = texto normal, opaco e legível. */
   var paragrafos = [];
   document.querySelectorAll(
@@ -560,55 +566,93 @@
       if (/^\s+$/.test(parte)) { frag.appendChild(document.createTextNode(parte)); return; }
       var s = document.createElement("span");
       s.className = "w";
-      s.style.setProperty("--i", n++);
       s.textContent = parte;
       frag.appendChild(s);
+      n++;
     });
     if (!n) return;
     el.textContent = "";
     el.appendChild(frag);
-    el.style.setProperty("--n", n);
     el.classList.add("wordreveal");
     if (semMovimento) el.classList.add("suave");   // sem blur nem rotação, só o acender
-    paragrafos.push({ el: el, ultimo: -1, ultimoR: -1 });
+    paragrafos.push({ el: el, palavras: el.querySelectorAll(".w"), ultimo: null, ultimoR: -1 });
   });
 
   if (paragrafos.length) {
     var travaP = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
+    var faixa = 1;      // altura do borrão, em px — ~1,5 linha, medida no texto real
+
+    /* Mede cada palavra uma vez: --o = distância do topo do parágrafo.
+       Lê tudo antes de escrever qualquer coisa; ler rect depois de escrever
+       estilo no mesmo laço força recálculo de layout por palavra. */
+    var medir = function () {
+      var entrelinha = Infinity;
+      paragrafos.forEach(function (t) {
+        var topo = t.el.getBoundingClientRect().top;
+        var linhas = [];
+        var offs = Array.prototype.map.call(t.palavras, function (w) {
+          var o = Math.round(w.getBoundingClientRect().top - topo);
+          if (linhas.indexOf(o) === -1) linhas.push(o);
+          return o;
+        });
+        offs.forEach(function (o, k) { t.palavras[k].style.setProperty("--o", o); });
+        t.ultimo = null;
+        // entrelinha real = menor distância entre duas linhas vizinhas
+        linhas.sort(function (a, b) { return a - b; });
+        for (var k = 1; k < linhas.length; k++) {
+          entrelinha = Math.min(entrelinha, linhas[k] - linhas[k - 1]);
+        }
+      });
+      faixa = Math.round(Math.max(entrelinha === Infinity ? 0 : entrelinha, 24) * 1.5);
+      document.documentElement.style.setProperty("--faixa", faixa);
+    };
+
     var pintarTexto = function () {
       var alturaVis = window.innerHeight;
-      // Curso mínimo: no GSAP, 'bottom bottom' num parágrafo baixo daria curso
-      // quase zero (ou negativo) e a frase acenderia de estalo. Piso de 30% da
-      // tela para as citações curtas terem o mesmo scrub das longas.
-      var piso = alturaVis * 0.3;
+      var limiar = alturaVis * 0.94;   // linha da tela onde a palavra ainda está borrada
+      // fim da página: o que sobrou embaixo nunca vai cruzar a faixa — acende tudo
+      var noFim = window.scrollY + alturaVis >= document.documentElement.scrollHeight - 2;
       paragrafos.forEach(function (t) {
         var caixa = t.el.getBoundingClientRect();
         if (caixa.bottom < -200 || caixa.top > alturaVis + 200) return;   // fora da tela: nem calcula
 
-        // palavras: começa com o topo a 80% da tela, fecha quando a base encosta na base
-        var p = travaP((alturaVis * 0.8 - caixa.top) / Math.max(caixa.height - alturaVis * 0.2, piso));
-        var q = Math.round(p * 100) / 100;
-        if (q !== t.ultimo) {
-          t.ultimo = q;
-          t.el.style.setProperty("--p", q);
-          t.el.classList.toggle("pronto", q === 1);   // acendeu tudo: tira o blur do caminho
+        var y = noFim ? 99999 : Math.round(limiar - caixa.top);
+        if (y !== t.ultimo) {
+          t.ultimo = y;
+          t.el.style.setProperty("--y", y);
+          // tudo aceso: tira o filter do caminho do compositor
+          t.el.classList.toggle("pronto", y >= caixa.height + faixa);
         }
         if (semMovimento) return;
 
-        // rotação: começa com o topo entrando pela base da tela
-        var pr = Math.round(travaP((alturaVis - caixa.top) / Math.max(caixa.height, piso)) * 100) / 100;
+        // rotação: o parágrafo entra 1deg torto e desentorta enquanto sobe
+        var pr = Math.round(travaP((alturaVis - caixa.top) / Math.max(caixa.height, alturaVis * 0.3)) * 100) / 100;
         if (pr === t.ultimoR) return;
         t.ultimoR = pr;
         t.el.style.setProperty("--pr", pr);
       });
     };
+
     var agendadoP = false;
     window.addEventListener("scroll", function () {
       if (agendadoP) return;
       agendadoP = true;
       requestAnimationFrame(function () { agendadoP = false; pintarTexto(); });
     }, { passive: true });
-    window.addEventListener("resize", pintarTexto);
+    // remedir é caro (lê o rect de cada palavra) e no mobile o resize dispara a
+    // cada mexida da barra de URL — só remede quando a LARGURA muda de verdade.
+    var larguraP = window.innerWidth, remedir;
+    window.addEventListener("resize", function () {
+      if (window.innerWidth === larguraP) { pintarTexto(); return; }
+      larguraP = window.innerWidth;
+      clearTimeout(remedir);
+      remedir = setTimeout(function () { medir(); pintarTexto(); }, 150);
+    });
+    medir();
     pintarTexto();
+    // a fonte carregada remexe a quebra de linha: mede de novo quando ela chega
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { medir(); pintarTexto(); });
+    }
   }
 })();
