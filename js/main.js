@@ -115,62 +115,29 @@
     titulo.appendChild(fatiado);
     Array.prototype.forEach.call(titulo.children, function (n) { n.setAttribute("aria-hidden", "true"); });
     titulo.dataset.fatiado = "1";
-    titulosFloat.push({ el: titulo, letras: titulo.querySelectorAll(".char"), pronto: false });
+    titulo.classList.add("float-pronto");   // só agora as letras podem começar escondidas
+    titulosFloat.push({ el: titulo });
   });
 
+  // Dispara sozinho quando o título entra na tela e roda em tempo próprio (o
+  // scrub antigo dependia de quanto você rolava: passando rápido, ninguém via).
+  // A cascata em si é CSS; aqui só decide a HORA. Uma vez revelado, fica.
   if (titulosFloat.length) {
-    // back.inOut(2) do GSAP: passa do ponto e volta. É o "peso" do efeito.
-    var backInOut = function (x) {
-      var c = 2 * 1.525;
-      return x < 0.5
-        ? (Math.pow(2 * x, 2) * ((c + 1) * 2 * x - c)) / 2
-        : (Math.pow(2 * x - 2, 2) * ((c + 1) * (x * 2 - 2) + c) + 2) / 2;
-    };
-    var trava = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
-    var ATRASO = 0.02;      // stagger do original
-    var INTENSIDADE = 0.85; // 1 = ScrollFloat puro; abaixo disso, o mesmo efeito mais contido
-    // Quem pediu menos movimento no sistema não fica sem efeito nenhum: recebe
-    // a mesma cascata, só que curta e sem o esticão — some o que embrulha o
-    // estômago (percurso longo, salto elástico), fica o que comunica.
-    var SUBIDA = semMovimento ? 14 : 120 * INTENSIDADE;   // % de deslocamento (yPercent)
-    var ESTICA = semMovimento ? 0 : INTENSIDADE;          // quanto da distorção entra
-    var curva = semMovimento ? function (x) { return x; } : backInOut;
-
-    var desenhar = function (t) {
-      var caixa = t.el.getBoundingClientRect();
-      var alturaVis = window.innerHeight;
-      // marcas do snippet original, traduzidas do GSAP:
-      //   scrollStart 'center bottom+=50%' → começa com o CENTRO do título a
-      //                                      1,5 tela do topo da janela
-      //   scrollEnd   'bottom bottom-=40%' → fecha com a BASE do título a 60%
-      //                                      da altura da janela
-      var meio = caixa.top + caixa.height / 2;
-      var p = trava((alturaVis * 1.5 - meio) / Math.max(1, alturaVis * 0.9 + caixa.height / 2));
-      if (p === 1 && t.pronto) return;             // já terminou: para de escrever
-      t.pronto = p === 1;
-
-      var n = t.letras.length;
-      var curso = 1 + ATRASO * (n - 1);
-      for (var i = 0; i < n; i++) {
-        var local = trava((p * curso - i * ATRASO));
-        var e = curva(local);
-        var letra = t.letras[i];
-        letra.style.opacity = trava(e);             // acende junto com a subida, não antes
-        letra.style.transform = local === 1 ? "" :
-          "translateY(" + (SUBIDA - SUBIDA * e) + "%) scale(" +
-            (1 - 0.3 * ESTICA * (1 - e)) + "," + (1 + 1.3 * ESTICA * (1 - e)) + ")";
-      }
-    };
-
-    var pintarTitulos = function () { titulosFloat.forEach(desenhar); };
-    var agendadoT = false;
-    window.addEventListener("scroll", function () {
-      if (agendadoT) return;
-      agendadoT = true;
-      requestAnimationFrame(function () { agendadoT = false; pintarTitulos(); });
-    }, { passive: true });
-    window.addEventListener("resize", pintarTitulos);
-    pintarTitulos();
+    var revelar = function (t) { t.el.classList.add("revela"); };
+    if ("IntersectionObserver" in window) {
+      var olho = new IntersectionObserver(function (entradas) {
+        entradas.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          revelar({ el: e.target });
+          olho.unobserve(e.target);
+        });
+      }, { threshold: 0.25, rootMargin: "0px 0px -12% 0px" });
+      titulosFloat.forEach(function (t) { olho.observe(t.el); });
+      // failsafe: título nunca pode ficar invisível porque o observer falhou
+      setTimeout(function () { titulosFloat.forEach(revelar); }, 3000);
+    } else {
+      titulosFloat.forEach(revelar);
+    }
   }
 
   /* ---------- seção atual marcada no cabeçalho ----------
