@@ -135,7 +135,7 @@ body[data-tema="elton"] {
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 135.6 71'%3E%3Crect width='135.6' height='71' fill='%23061e4c'/%3E%3Cpath d='M135.6 0 L135.6 35.8 L111.7 43.5 L92.3 49.8 L71.4 56.5 L37 67.7 L23.9 63.4 L0 55.7 L0 19.9 L37 31.9 Z' fill='%230a3983'/%3E%3C/svg%3E");
   /* Proporcao da peca impressa: ~8 colunas na largura (coluna = 13% dela).
      Numa tela de 375px isso da 3rem por coluna. */
-  background-size: auto, 2.2rem auto;
+  background-size: auto, 2.6rem auto;
 }
 
 .topo-int {
@@ -265,7 +265,7 @@ body[data-tema="elton"] .selo { filter: drop-shadow(0 3px 7px rgba(14, 31, 58, .
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 135.6 71'%3E%3Crect width='135.6' height='71' fill='%23a2d600'/%3E%3Cpath d='M135.6 0 L135.6 35.8 L111.7 43.5 L92.3 49.8 L71.4 56.5 L37 67.7 L23.9 63.4 L0 55.7 L0 19.9 L37 31.9 Z' fill='%23bdff00'/%3E%3C/svg%3E");
   /* Na peca a faixa e bem mais miuda que o topo: ~20 colunas na largura
      (coluna = 5% dela) — 1.2rem numa tela de 375px. */
-  background-size: .9rem auto;
+  background-size: 1.05rem auto;
 }
 body:is([data-tema="tozi"], [data-tema="dulce"]) .faixa { display: none; }
 
