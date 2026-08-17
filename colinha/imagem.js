@@ -320,7 +320,7 @@ function desenharTopo(ctx, t, simbolo, padrao) {
     ctx.fillStyle = 'rgba(26,23,78,.62)'
     ctx.fillRect(0, 0, L, TOPO)
   } else if (t.chevClaro) {
-    desenharPadraoOficial(ctx, 0, TOPO, t.chevClaro, 0.112)
+    desenharPadraoOficial(ctx, 0, TOPO, t.chevClaro, 0.121)
   } else if (!t.topoLiso) {
     desenharFitas(ctx, t.topoRisco2 ?? t.topoRisco, t.topoRisco, 0, 0, L, TOPO)
   }
@@ -773,7 +773,7 @@ export async function desenhar(colinha, config) {
     // versao verde do manual (p.22) e na mesma escala.
     ctx.fillStyle = t.faixa ?? t.destaque
     ctx.fillRect(0, A, L, FAIXA)
-    if (t.faixaFita) desenharPadraoOficial(ctx, A, FAIXA, t.faixaFita, 0.044)
+    if (t.faixaFita) desenharPadraoOficial(ctx, A, FAIXA, t.faixaFita, 0.048)
   }
 
   return new Promise((resolve) => cv.toBlob(resolve, 'image/png'))
