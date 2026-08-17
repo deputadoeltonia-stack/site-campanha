@@ -70,10 +70,15 @@
     }
   });
 
-  /* ---------- títulos fatiados p/ o efeito de subir letra a letra ----------
-     Só o corte do texto mora aqui; quem anima é o CSS (view-timeline).
+  /* ---------- títulos que sobem letra a letra, atados ao scroll ----------
+     Porte do ScrollFloat (React Bits) sem React/GSAP. Foi de view-timeline
+     (CSS) pra cá porque a timeline nomeada não ativa em parte dos navegadores;
+     o progresso calculado no scroll roda em todos e é o MESMO scrub.
      O h2 ganha aria-label com o texto inteiro e as letras somem do leitor
      de tela — senão o VoiceOver soletraria o título. */
+  var titulosFloat = [];
+  var semMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   document.querySelectorAll(".titulo-float").forEach(function (titulo) {
     if (titulo.dataset.fatiado) return;
     var indice = 0;
@@ -110,7 +115,53 @@
     titulo.appendChild(fatiado);
     Array.prototype.forEach.call(titulo.children, function (n) { n.setAttribute("aria-hidden", "true"); });
     titulo.dataset.fatiado = "1";
+    if (!semMovimento) titulosFloat.push({ el: titulo, letras: titulo.querySelectorAll(".char"), pronto: false });
   });
+
+  if (titulosFloat.length) {
+    // back.inOut(2) do GSAP: passa do ponto e volta. É o "peso" do efeito.
+    var backInOut = function (x) {
+      var c = 2 * 1.525;
+      return x < 0.5
+        ? (Math.pow(2 * x, 2) * ((c + 1) * 2 * x - c)) / 2
+        : (Math.pow(2 * x - 2, 2) * ((c + 1) * (x * 2 - 2) + c) + 2) / 2;
+    };
+    var trava = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
+    var ATRASO = 0.02;   // stagger: fração do curso que cada letra espera
+
+    var desenhar = function (t) {
+      var caixa = t.el.getBoundingClientRect();
+      var alturaVis = window.innerHeight;
+      // mesmas marcas do original: começa com o topo do bloco a meia tela de
+      // distância e termina quando a base passa de 60% da altura da janela.
+      var inicio = alturaVis * 1.0;
+      var fim = alturaVis * 0.6;
+      var p = trava((inicio - caixa.top) / Math.max(1, inicio - fim + caixa.height));
+      if (p === 1 && t.pronto) return;             // já terminou: para de escrever
+      t.pronto = p === 1;
+
+      var n = t.letras.length;
+      var curso = 1 + ATRASO * (n - 1);
+      for (var i = 0; i < n; i++) {
+        var local = trava((p * curso - i * ATRASO));
+        var e = backInOut(local);
+        var letra = t.letras[i];
+        letra.style.opacity = trava(e);             // acende junto com a subida, não antes
+        letra.style.transform = local === 1 ? "" :
+          "translateY(" + (120 - 120 * e) + "%) scale(" + (0.7 + 0.3 * e) + "," + (2.3 - 1.3 * e) + ")";
+      }
+    };
+
+    var pintarTitulos = function () { titulosFloat.forEach(desenhar); };
+    var agendadoT = false;
+    window.addEventListener("scroll", function () {
+      if (agendadoT) return;
+      agendadoT = true;
+      requestAnimationFrame(function () { agendadoT = false; pintarTitulos(); });
+    }, { passive: true });
+    window.addEventListener("resize", pintarTitulos);
+    pintarTitulos();
+  }
 
   /* ---------- seção atual marcada no cabeçalho ----------
      Sem observer por seção: uma passada no scroll decide qual âncora está

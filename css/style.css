@@ -105,26 +105,11 @@ p { margin: 0 0 1rem; }
 
 .section-title { font-size: var(--step-3); }
 /* ---------- título que sobe letra a letra, atado ao scroll ----------
-   Mesmo efeito do ScrollFloat (React Bits), sem React nem GSAP: o navegador
-   já sabe atar animação a scroll (view-timeline). O JS só fatia o texto.
-   Sem suporte a view-timeline, a animação não encontra a linha do tempo e
-   nada roda — o título aparece normal, que é o fallback certo. */
-.titulo-float { view-timeline-name: --tf; view-timeline-axis: block; }
+   Efeito do ScrollFloat (React Bits) sem React nem GSAP. Quem move as letras
+   é o main.js (progresso calculado no scroll = o mesmo scrub); aqui fica só a
+   forma. Sem JS o título aparece inteiro e parado — nada some da página. */
 .titulo-float .word { display: inline-block; white-space: pre; } /* quebra entre palavras, nunca no meio de uma */
-.titulo-float .char {
-  display: inline-block;   /* sem will-change: são ~240 letras na página e a animação já roda no compositor */
-  animation: subirLetra linear both;
-  animation-timeline: --tf;
-  /* cada letra entra um pouco depois da anterior (o "stagger" do original) */
-  animation-range: entry calc(26% + var(--i, 0) * 0.5%) cover calc(46% + var(--i, 0) * 0.5%);
-}
-@keyframes subirLetra {
-  from { opacity: 0; transform: translateY(120%) scale(.7, 2.3); transform-origin: 50% 0%; }
-  to   { opacity: 1; transform: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .titulo-float .char { animation: none; }
-}
+.titulo-float .char { display: inline-block; transform-origin: 50% 0%; }
 .section-title.light { color: var(--surface); }
 
 /* ---------- botões ---------- */
