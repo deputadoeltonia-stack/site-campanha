@@ -452,7 +452,7 @@ p { margin: 0 0 1rem; }
 .footer-col h4 { color: var(--surface); font-size: .82rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: .14em; }
 .footer-col a { display: block; text-decoration: none; color: var(--paper-mut); padding: .28rem 0; transition: color .2s; }
 .footer-col a:hover { color: var(--gold-lt); }
-.footer-wpp { font-weight: 700; color: var(--gold-lt) !important; }
+.footer-wpp { font-weight: 700; }
 .socials { display: flex; flex-direction: column; }
 .footer-lgpd p { font-family: var(--prose); font-size: var(--step--1); line-height: 1.6; }
 .footer-bottom { display: flex; flex-wrap: wrap; gap: .4rem 1.5rem; justify-content: space-between; padding-block: 1.5rem; border-top: 1px solid var(--line-lt); font-size: .8rem; }
