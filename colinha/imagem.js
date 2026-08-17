@@ -346,10 +346,10 @@ function desenharTopo(ctx, t, simbolo, padrao) {
   // base. O path vive num viewBox 56x32, esticado sem manter proporcao.
   if (t.peca) {
     const corpo = 62 // o mesmo px do fillText abaixo
-    const x0 = MARGEM + 4.24 * corpo
-    const larg = 2.5 * corpo
-    const alt = 0.6 * corpo
-    const base = 96 + 0.02 * corpo // 96 = linha de base do titulo
+    const x0 = MARGEM + 4.1 * corpo
+    const larg = 2.42 * corpo
+    const alt = 0.58 * corpo
+    const base = 96 + 0.18 * corpo // 96 = linha de base do titulo
     const px = (x, y) => [x0 + (x / 56) * larg, base - alt + (y / 32) * alt]
     ctx.fillStyle = t.lima ?? t.destaque
     ctx.beginPath()

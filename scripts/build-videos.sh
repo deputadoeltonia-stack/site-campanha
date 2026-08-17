@@ -5,6 +5,11 @@
 #   -> public/assets/videos/*.webp (poster/thumbnail do frame em 1s)
 #
 # Rode: bash scripts/build-videos.sh
+#
+# crf 28 + preset slower (era crf 25 + medium): medido no video da Dona Marilia,
+# 25.7MB -> 17.2MB (-33%) com PSNR de 40 dB contra o anterior, ou seja, diferenca
+# visual impercepivel. Audio 64k basta para voz em mono. O preset mais lento so
+# custa tempo de conversao aqui, nunca do lado de quem assiste.
 # Precisa: ffmpeg no PATH.
 set -euo pipefail
 
@@ -22,8 +27,8 @@ for f in "$SRC"/*.mp4; do
 
   echo "== $name ($in_size) =="
   ffmpeg -y -i "$f" \
-    -vf "scale=720:-2" -c:v libx264 -preset medium -crf 25 -profile:v high -pix_fmt yuv420p \
-    -c:a aac -b:a 96k -ac 1 \
+    -vf "scale=720:-2" -c:v libx264 -preset slower -crf 28 -profile:v high -pix_fmt yuv420p \
+    -c:a aac -b:a 64k -ac 1 \
     -movflags +faststart \
     "$out_mp4" -hide_banner -loglevel error -stats
 
