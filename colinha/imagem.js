@@ -268,13 +268,13 @@ function desenharFitas(ctx, corA, corB, x0, y0, larg, alt, seg = 68, queda = 16,
 
 // Pattern oficial do manual (ID 26 ELTON, p.21/22), poligono exato do vetor:
 // colunas de 135,6 x periodo 71, fita clara de 35,8 sobre o fundo escuro
-// (50/50, vale assimetrico em x=37). Escala unica para topo e faixa: 4,5
-// periodos na altura do cabecalho — o tamanho aprovado na tela.
-function desenharPadraoOficial(ctx, y0, alt, cor) {
+// (50/50, vale assimetrico em x=37). colFrac = coluna como fracao da largura
+// da folha — proporcoes medidas na peca impressa: topo ~0,13, faixa ~0,05.
+function desenharPadraoOficial(ctx, y0, alt, cor, colFrac) {
   const P = [[135.6, 0], [135.6, 35.8], [111.7, 43.5], [92.3, 49.8],
     [71.4, 56.5], [37, 67.7], [23.9, 63.4], [0, 55.7], [0, 19.9], [37, 31.9]]
-  const k = (TOPO / 4.5) / 71
-  const col = 135.6 * k
+  const col = L * colFrac
+  const k = col / 135.6
   const per = 71 * k
   ctx.save()
   ctx.beginPath()
@@ -320,7 +320,7 @@ function desenharTopo(ctx, t, simbolo, padrao) {
     ctx.fillStyle = 'rgba(26,23,78,.62)'
     ctx.fillRect(0, 0, L, TOPO)
   } else if (t.chevClaro) {
-    desenharPadraoOficial(ctx, 0, TOPO, t.chevClaro)
+    desenharPadraoOficial(ctx, 0, TOPO, t.chevClaro, 0.13)
   } else if (!t.topoLiso) {
     desenharFitas(ctx, t.topoRisco2 ?? t.topoRisco, t.topoRisco, 0, 0, L, TOPO)
   }
@@ -773,7 +773,7 @@ export async function desenhar(colinha, config) {
     // versao verde do manual (p.22) e na mesma escala.
     ctx.fillStyle = t.faixa ?? t.destaque
     ctx.fillRect(0, A, L, FAIXA)
-    if (t.faixaFita) desenharPadraoOficial(ctx, A, FAIXA, t.faixaFita)
+    if (t.faixaFita) desenharPadraoOficial(ctx, A, FAIXA, t.faixaFita, 0.05)
   }
 
   return new Promise((resolve) => cv.toBlob(resolve, 'image/png'))
