@@ -127,23 +127,25 @@
         : (Math.pow(2 * x - 2, 2) * ((c + 1) * (x * 2 - 2) + c) + 2) / 2;
     };
     var trava = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
-    var ATRASO = 0.04;   // stagger: fração do curso que cada letra espera
+    var ATRASO = 0.02;      // stagger do original
+    var INTENSIDADE = 0.85; // 1 = ScrollFloat puro; abaixo disso, o mesmo efeito mais contido
     // Quem pediu menos movimento no sistema não fica sem efeito nenhum: recebe
     // a mesma cascata, só que curta e sem o esticão — some o que embrulha o
     // estômago (percurso longo, salto elástico), fica o que comunica.
-    var SUBIDA = semMovimento ? 14 : 120;   // % de deslocamento
-    var ESTICA = semMovimento ? 0 : 1;      // quanto da distorção entra
+    var SUBIDA = semMovimento ? 14 : 120 * INTENSIDADE;   // % de deslocamento (yPercent)
+    var ESTICA = semMovimento ? 0 : INTENSIDADE;          // quanto da distorção entra
     var curva = semMovimento ? function (x) { return x; } : backInOut;
 
     var desenhar = function (t) {
       var caixa = t.el.getBoundingClientRect();
       var alturaVis = window.innerHeight;
-      // curso do efeito: começa quando o título encosta na base da janela e só
-      // fecha perto do topo. Faixa longa de propósito — terminando no meio da
-      // tela, a animação acabava antes de você chegar a olhar o título.
-      var inicio = alturaVis * 1.05;
-      var fim = alturaVis * 0.25;
-      var p = trava((inicio - caixa.top) / Math.max(1, inicio - fim + caixa.height));
+      // marcas do snippet original, traduzidas do GSAP:
+      //   scrollStart 'center bottom+=50%' → começa com o CENTRO do título a
+      //                                      1,5 tela do topo da janela
+      //   scrollEnd   'bottom bottom-=40%' → fecha com a BASE do título a 60%
+      //                                      da altura da janela
+      var meio = caixa.top + caixa.height / 2;
+      var p = trava((alturaVis * 1.5 - meio) / Math.max(1, alturaVis * 0.9 + caixa.height / 2));
       if (p === 1 && t.pronto) return;             // já terminou: para de escrever
       t.pronto = p === 1;
 
