@@ -115,7 +115,7 @@
     titulo.appendChild(fatiado);
     Array.prototype.forEach.call(titulo.children, function (n) { n.setAttribute("aria-hidden", "true"); });
     titulo.dataset.fatiado = "1";
-    if (!semMovimento) titulosFloat.push({ el: titulo, letras: titulo.querySelectorAll(".char"), pronto: false });
+    titulosFloat.push({ el: titulo, letras: titulo.querySelectorAll(".char"), pronto: false });
   });
 
   if (titulosFloat.length) {
@@ -128,6 +128,12 @@
     };
     var trava = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
     var ATRASO = 0.04;   // stagger: fração do curso que cada letra espera
+    // Quem pediu menos movimento no sistema não fica sem efeito nenhum: recebe
+    // a mesma cascata, só que curta e sem o esticão — some o que embrulha o
+    // estômago (percurso longo, salto elástico), fica o que comunica.
+    var SUBIDA = semMovimento ? 14 : 120;   // % de deslocamento
+    var ESTICA = semMovimento ? 0 : 1;      // quanto da distorção entra
+    var curva = semMovimento ? function (x) { return x; } : backInOut;
 
     var desenhar = function (t) {
       var caixa = t.el.getBoundingClientRect();
@@ -145,11 +151,12 @@
       var curso = 1 + ATRASO * (n - 1);
       for (var i = 0; i < n; i++) {
         var local = trava((p * curso - i * ATRASO));
-        var e = backInOut(local);
+        var e = curva(local);
         var letra = t.letras[i];
         letra.style.opacity = trava(e);             // acende junto com a subida, não antes
         letra.style.transform = local === 1 ? "" :
-          "translateY(" + (120 - 120 * e) + "%) scale(" + (0.7 + 0.3 * e) + "," + (2.3 - 1.3 * e) + ")";
+          "translateY(" + (SUBIDA - SUBIDA * e) + "%) scale(" +
+            (1 - 0.3 * ESTICA * (1 - e)) + "," + (1 + 1.3 * ESTICA * (1 - e)) + ")";
       }
     };
 
@@ -526,5 +533,66 @@
       if (e.target === dlg || e.target.classList.contains("lightbox-close")) dlg.close();
     });
     dlg.addEventListener("close", function () { lbImg.removeAttribute("src"); });
+  }
+
+  /* ---------- texto que acende palavra a palavra, atado ao scroll ----------
+     Mesmo scrub dos títulos (.titulo-float): progresso calculado no scroll, não
+     view-timeline — pelo mesmo motivo, a timeline CSS não ativa em todo navegador.
+     Aqui o JS só escreve --p no parágrafo; quem acende cada palavra é o clamp()
+     do CSS, então é UMA escrita de estilo por parágrafo por frame.
+     Sem JS = texto normal, opaco e legível. */
+  var paragrafos = [];
+  document.querySelectorAll(
+    "#quem-sou .lead-para, .timeline .tl-body > .prose, " +
+    ".pledge-body > .pledge-quote, .pledge-body > .prose, .quotes blockquote"
+  ).forEach(function (el) {
+    if (el.children.length) return;              // só texto puro; com markup dentro, não mexe
+    var partes = el.textContent.split(/(\s+)/);
+    var frag = document.createDocumentFragment();
+    var n = 0;
+    partes.forEach(function (parte) {
+      if (!parte) return;
+      if (/^\s+$/.test(parte)) { frag.appendChild(document.createTextNode(parte)); return; }
+      var s = document.createElement("span");
+      s.className = "w";
+      s.style.setProperty("--i", n++);
+      s.textContent = parte;
+      frag.appendChild(s);
+    });
+    if (!n) return;
+    el.textContent = "";
+    el.appendChild(frag);
+    el.style.setProperty("--n", n);
+    el.classList.add("wordreveal");
+    paragrafos.push({ el: el, ultimo: -1 });
+  });
+
+  if (paragrafos.length && !semMovimento) {
+    var pintarTexto = function () {
+      var alturaVis = window.innerHeight;
+      // curso: começa quando o parágrafo entra pela base e fecha com ele
+      // acima do meio da tela — a frase termina de acender antes de você
+      // terminar de ler, nunca depois.
+      var inicio = alturaVis * 0.92;
+      var fim = alturaVis * 0.42;
+      paragrafos.forEach(function (t) {
+        var caixa = t.el.getBoundingClientRect();
+        if (caixa.bottom < -200 || caixa.top > alturaVis + 200) return;   // fora da tela: nem calcula
+        var p = (inicio - caixa.top) / Math.max(1, inicio - fim + caixa.height);
+        p = p < 0 ? 0 : p > 1 ? 1 : p;
+        var q = Math.round(p * 100) / 100;
+        if (q === t.ultimo) return;                                       // nada mudou: não escreve
+        t.ultimo = q;
+        t.el.style.setProperty("--p", q);
+      });
+    };
+    var agendadoP = false;
+    window.addEventListener("scroll", function () {
+      if (agendadoP) return;
+      agendadoP = true;
+      requestAnimationFrame(function () { agendadoP = false; pintarTexto(); });
+    }, { passive: true });
+    window.addEventListener("resize", pintarTexto);
+    pintarTexto();
   }
 })();

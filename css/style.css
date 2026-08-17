@@ -553,6 +553,17 @@ p { margin: 0 0 1rem; }
 .js .gallery .reveal:nth-child(3) { transition-delay: .14s; }
 .js .gallery .reveal:nth-child(4) { transition-delay: .21s; }
 
+/* ---- texto que acende palavra a palavra ----
+   --p (0→1) é o progresso do parágrafo no scroll, escrito pelo JS.
+   Cada palavra acende quando --p passa do índice dela. --p fica em 1
+   (tudo aceso) se o JS não rodar ou se o usuário pediu menos movimento. */
+.wordreveal { --p: 1; }
+.wordreveal .w {
+  /* +5 = respiro no fim (a última palavra acende antes do fim do curso);
+     /5 = quantas palavras ficam acendendo ao mesmo tempo — o degradê */
+  opacity: clamp(.17, calc((var(--p) * (var(--n) + 5) - var(--i)) / 5), 1);
+}
+
 /* =========================================================
    RESPONSIVO
    ========================================================= */
