@@ -254,13 +254,14 @@ body[data-tema="elton"] .selo { filter: drop-shadow(0 3px 7px rgba(14, 31, 58, .
 
 .folha { width: 100%; max-width: 26rem; margin: 0 auto; padding: 1rem .9rem 2rem; flex: 1 0 auto; }
 
-/* faixa lima de chevrons que fecha a peca impressa — mesmo pattern do topo,
-   nos verdes medidos na arte */
+/* faixa lima que fecha a peca — o MESMO pattern oficial do topo (manual
+   p.22, a versao verde: fita clara %23bdff00 sobre %23a2d600), na mesma
+   escala de 6rem por coluna */
 .faixa {
   flex: none; height: calc(2.5rem + env(safe-area-inset-bottom));
-  background-color: #97c53f;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 36'%3E%3Crect width='64' height='36' fill='%2397c53f'/%3E%3Cpath d='M0 0 L32 15 L64 0 L64 18 L32 33 L0 18 Z' fill='%23a6cf45'/%3E%3Cpath d='M0 18 L32 33 L64 18 L64 36 L32 51 L0 36 Z M0 -18 L32 -3 L64 -18 L64 0 L32 15 L0 0 Z' fill='%238dbd35'/%3E%3C/svg%3E");
-  background-size: 2.4rem auto;
+  background-color: #a2d600;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 135.6 71'%3E%3Crect width='135.6' height='71' fill='%23a2d600'/%3E%3Cpath d='M135.6 0 L135.6 35.8 L111.7 43.5 L92.3 49.8 L71.4 56.5 L37 67.7 L23.9 63.4 L0 55.7 L0 19.9 L37 31.9 Z' fill='%23bdff00'/%3E%3C/svg%3E");
+  background-size: 6rem auto;
 }
 body:is([data-tema="tozi"], [data-tema="dulce"]) .faixa { display: none; }
 

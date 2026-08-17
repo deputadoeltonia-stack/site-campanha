@@ -35,7 +35,8 @@ export const TEMAS = {
     // peca: true liga o que so a peca do Dr. Elton tem — pincel no titulo,
     // fitas de chevron e faixa lima no pe.
     peca: true,
-    faixa: '#97c53f', faixaFita: '#a6cf45', faixaFita2: '#8dbd35',
+    // Faixa do pe na versao lima do pattern oficial (manual p.22).
+    faixa: '#a2d600', faixaFita: '#bdff00',
     titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
   },
@@ -265,6 +266,34 @@ function desenharFitas(ctx, corA, corB, x0, y0, larg, alt, seg = 68, queda = 16,
   ctx.restore()
 }
 
+// Pattern oficial do manual (ID 26 ELTON, p.21/22), poligono exato do vetor:
+// colunas de 135,6 x periodo 71, fita clara de 35,8 sobre o fundo escuro
+// (50/50, vale assimetrico em x=37). Escala unica para topo e faixa: 4,5
+// periodos na altura do cabecalho — o tamanho aprovado na tela.
+function desenharPadraoOficial(ctx, y0, alt, cor) {
+  const P = [[135.6, 0], [135.6, 35.8], [111.7, 43.5], [92.3, 49.8],
+    [71.4, 56.5], [37, 67.7], [23.9, 63.4], [0, 55.7], [0, 19.9], [37, 31.9]]
+  const k = (TOPO / 4.5) / 71
+  const col = 135.6 * k
+  const per = 71 * k
+  ctx.save()
+  ctx.beginPath()
+  ctx.rect(0, y0, L, alt)
+  ctx.clip()
+  ctx.fillStyle = cor
+  for (let x = 0; x < L; x += col) {
+    for (let y = y0 - per; y < y0 + alt + per; y += per) {
+      ctx.beginPath()
+      P.forEach(([px, py], i) => {
+        i ? ctx.lineTo(x + px * k, y + py * k) : ctx.moveTo(x + px * k, y + py * k)
+      })
+      ctx.closePath()
+      ctx.fill()
+    }
+  }
+  ctx.restore()
+}
+
 function desenharTopo(ctx, t, simbolo, padrao) {
   ctx.fillStyle = t.topo
   ctx.fillRect(0, 0, L, TOPO)
@@ -291,27 +320,7 @@ function desenharTopo(ctx, t, simbolo, padrao) {
     ctx.fillStyle = 'rgba(26,23,78,.62)'
     ctx.fillRect(0, 0, L, TOPO)
   } else if (t.chevClaro) {
-    // Pattern oficial do manual (ID 26 ELTON, p.21), poligono exato do vetor:
-    // colunas de 135,6 x periodo 71, fita clara de 35,8 sobre o fundo escuro.
-    // Escala pela altura do cabecalho (~3,2 periodos), como na arte.
-    const P = [[135.6, 0], [135.6, 35.8], [111.7, 43.5], [92.3, 49.8],
-      [71.4, 56.5], [37, 67.7], [23.9, 63.4], [0, 55.7], [0, 19.9], [37, 31.9]]
-    const k = (TOPO / 4.5) / 71
-    const col = 135.6 * k
-    const per = 71 * k
-    ctx.fillStyle = t.chevClaro
-    for (let x = 0; x < L; x += col) {
-      for (let y = -per; y < TOPO + per; y += per) {
-        ctx.beginPath()
-        P.forEach(([px, py], i) => {
-          const cx = x + px * k
-          const cy = y + py * k
-          i ? ctx.lineTo(cx, cy) : ctx.moveTo(cx, cy)
-        })
-        ctx.closePath()
-        ctx.fill()
-      }
-    }
+    desenharPadraoOficial(ctx, 0, TOPO, t.chevClaro)
   } else if (!t.topoLiso) {
     desenharFitas(ctx, t.topoRisco2 ?? t.topoRisco, t.topoRisco, 0, 0, L, TOPO)
   }
@@ -760,13 +769,11 @@ export async function desenhar(colinha, config) {
   ctx.fillText('Confira sempre na urna.', L / 2, A - 18)
 
   if (FAIXA) {
+    // A faixa lima fecha a peca com o MESMO pattern oficial do topo, na
+    // versao verde do manual (p.22) e na mesma escala.
     ctx.fillStyle = t.faixa ?? t.destaque
     ctx.fillRect(0, A, L, FAIXA)
-    desenharFitas(
-      ctx,
-      t.faixaFita ?? 'rgba(111,143,38,.32)', t.faixaFita2 ?? t.faixaFita ?? 'rgba(111,143,38,.32)',
-      0, A, L, FAIXA, 56, 13, 16,
-    )
+    if (t.faixaFita) desenharPadraoOficial(ctx, A, FAIXA, t.faixaFita)
   }
 
   return new Promise((resolve) => cv.toBlob(resolve, 'image/png'))
