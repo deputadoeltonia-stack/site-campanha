@@ -19,9 +19,11 @@
 
 <header class="topo">
   <div class="topo-volta" id="volta-area" hidden>
-    <a id="volta" class="volta">
+    <!-- O nome acessivel vive no aria-label: no celular o link vira so a seta
+         (ver style.css) e o rotulo visivel sai do fluxo. -->
+    <a id="volta" class="volta" aria-label="Voltar ao site">
       <svg viewBox="0 0 10 16" aria-hidden="true"><path d="M8 1 L2 8 L8 15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Voltar ao site
+      <span class="volta-txt">Voltar ao site</span>
     </a>
   </div>
   <div class="topo-int">

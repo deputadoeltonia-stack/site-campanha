@@ -71,7 +71,7 @@ export const TEMAS = {
     // tecla CONFIRMA num lima mais vivo que o verde das caixas.
     topo: '#005474', topoRisco: '#005b79', destaque: '#8dc73f', lima: '#bfd736',
     fundo: '#e7e8e8', fundo2: '#e7e8e8', caixa: '#ffffff', linha: '#d3d4d4',
-    txt: '#062240', rot: '#6d6f71',
+    txt: '#062240', rot: '#656769', // mesmo ajuste de contraste da tela (4,63:1)
     travadoTxt: '#062240', // caixa travada segue verde; so o digito escurece
     // O selo e o adesivo oficial, extraido em vetor do santinho (ja com o
     // 44400 e com a inclinacao do lockup na propria arte). Raio 129 = 23,9%

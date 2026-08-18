@@ -451,10 +451,14 @@ body[data-tema="elton"] .digito { font-size: 21.6cqw; }
 
 /* Marcacao legal obrigatoria: menor e mais apagada que o rodape, como na
    lateral do santinho impresso, sem competir com o aviso da urna. */
+/* Discreta pelo CORPO, nao pela opacidade: a .72 de antes derrubava o
+   contraste para 2,8:1 e o CNPJ e justamente o texto que precisa ser
+   legivel quando alguem vai conferir quem pagou a peca. Sem ela, o
+   proprio --mut ja da 4,5:1 nos tres temas. */
 .legal {
   margin: .5rem 0 0; text-align: center;
-  font-size: .6rem; line-height: 1.35; letter-spacing: .01em;
-  color: var(--mut); opacity: .72; text-wrap: balance;
+  font-size: .64rem; line-height: 1.35; letter-spacing: .01em;
+  color: var(--mut); text-wrap: balance;
 }
 
 /* --- busca geral do topo ------------------------------------------------ */
@@ -747,7 +751,7 @@ body[data-tema="tozi"] .rodape {
 body[data-tema="dulce"] {
   --marinho: #005474; --marinho-2: #005b79; --limao: #8dc73f; --lima: #bfd736;
   --limao-esc: #1f7a68; --bg: #e7e8e8; --bg-2: #e7e8e8;
-  --txt: #062240; --rot: #6d6f71; --mut: #5c6a72;
+  --txt: #062240; --rot: #656769; /* 4,63:1 no fundo dela; o #6d6f71 do impresso dava 4,11 */ --mut: #5c6a72;
   --linha: #d3d4d4; --marca: #005474; --acento: #0a4b69;
   --cx-travado: #8dc73f; --cx-travado-txt: #062240;
   --display: "Avenir LT Std", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -954,15 +958,69 @@ body.sem-rolagem { overflow: hidden; }
      empilhado em vez do tamanho reduzido do arranjo lado a lado. */
   body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .marca { font-size: 1.25rem; }
   body[data-tema="elton"] .marca { font-size: 1.35rem; }
-  /* O rosto do Tozi sobe 4,9rem para dentro do cabecalho; com o cabecalho de
-     150px para 55px ele passava por cima da busca. Encolhido em 30% ele volta
-     a caber na faixa navy e para antes do campo (proporcao preservada:
-     6.2 x 0.636 = 3.94). */
+  /* O rosto do Tozi sobe para dentro do cabecalho. Com o cabecalho de 150px
+     para ~74px ele nao cabe mais no tamanho da peca: passava por cima da
+     busca, e identidade por cima de campo e justamente o que o produto nao
+     faz. Reduzido a altura da propria faixa navy, ele vira vinheta de canto e
+     morre 12px antes do campo (proporcao preservada: 3.5 x 0.636 = 2.23). */
   body[data-tema="tozi"] .folha::before {
-    top: -3.35rem; height: 6.2rem;
-    width: calc(2.5rem + var(--sangra));
-    background-size: 3.94rem 6.2rem;
+    top: -3.2rem; height: 3.5rem;
+    width: calc(2rem + var(--sangra));
+    background-size: 2.23rem 3.5rem;
   }
+
+  /* Voltar e titulo na MESMA linha. Sozinha, a barra do voltar custava 41px
+     de altura para uma frase de tres palavras. */
+  .topo { display: flex; align-items: center; gap: .7rem; }
+  .topo-volta { max-width: none; margin: 0; flex: none; }
+  .topo-int { flex: 1; min-width: 0; }
+  /* So a seta, num disco de vidro: o cabecalho e um pattern de chevrons, e um
+     controle chapado sobre ele ou some ou vira mancha. O desfoque separa o
+     alvo do fundo sem inventar uma cor que nao existe na identidade. */
+  .volta {
+    width: 40px; height: 40px; min-height: 0;
+    padding: 0; margin: 0; justify-content: center;
+    position: relative;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .16);
+    border: 1px solid rgba(255, 255, 255, .34);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .22);
+    -webkit-backdrop-filter: blur(10px) saturate(1.4);
+    backdrop-filter: blur(10px) saturate(1.4);
+  }
+  /* O disco tem 40px para nao engordar a linha; o alvo de toque continua 44.  */
+  .volta::before { content: ""; position: absolute; inset: -2px; border-radius: 50%; }
+  /* Fundo mais claro nao chega como foco num controle que ja e translucido:
+     no teclado o anel branco e o unico sinal que se le sobre o pattern. */
+  .volta:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  /* Otico: a seta e assimetrica (aponta para a esquerda) e sentava 1px a
+     direita do centro do disco. */
+  .volta svg { width: .56rem; margin-left: -1px; }
+  .volta-txt { display: none; }
+
+  /* --- densidade: o objetivo e a folha inteira na primeira tela ----------- */
+  /* Cortes na MOLDURA (respiros, faixa, ar sob o selo), nunca no conteudo:
+     caixas, fotos, rotulos e alvos de toque ficam do tamanho que estao. */
+  .folha { padding-top: 1rem; padding-bottom: 1rem; }
+  .busca-geral { margin-bottom: .75rem; }
+  .colinha { gap: .55rem; }
+  .rotulo { margin-bottom: .2rem; }
+  /* No desktop o selo transborda o ultimo campo e o ar antes dos botoes
+     (3,6 a 4rem) existe so para absorver esse transbordo. No celular esse ar
+     custa mais do que vale: encostando o selo no PE do campo ele deixa de
+     transbordar, e o respiro dos botoes volta ao 1,25rem do resto da folha.
+     O vao a direita de um cargo de 2 digitos e permanente, entao ele continua
+     no lugar da peca, sem chegar perto das caixas. */
+  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo > .selo {
+    top: auto; bottom: 0;
+  }
+  body[data-tema="elton"] .campo > .selo { width: 5.9rem; }
+  body[data-tema="tozi"] .campo > .selo { width: 5.6rem; }
+  body[data-tema="dulce"] .campo > .selo { width: 5.2rem; }
+  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .acoes { margin-top: 1.25rem; }
+  .rodape { margin-top: .8rem; }
+  /* A faixa fecha a peca; no celular ela so precisa registrar a cor. */
+  .faixa { height: calc(1.5rem + env(safe-area-inset-bottom)); }
 }
 
 @media print {
