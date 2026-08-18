@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Política de Privacidade — Dr. Elton 4412</title>
+  <meta name="description" content="Como a campanha do Dr. Elton trata os dados de quem preenche o formulário do site: quais dados, para quê, com quem, onde ficam e como pedir exclusão." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://drelton4412.com.br/privacidade/" />
+  <meta name="theme-color" content="#171E31" />
+
+  <link rel="icon" href="../public/assets/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="../public/assets/apple-touch-icon.png" />
+
+  <link rel="preload" href="../public/fonts/geometos.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="../public/fonts/avenir-400.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="../css/style.css?v=64" />
+
+  <!-- Página de texto. Em vez de repetir o cabeçalho do site (que carrega a
+       marca em imagem e o menu inteiro para mostrar duas linhas), ela traz um
+       cabeçalho próprio de uma linha. O CSS é o mesmo do site, então cores,
+       fontes, foco visível e o comportamento responsivo vêm de lá. -->
+  <style>
+    .doc-topo { background: var(--ink); color: var(--paper-txt); padding: 1rem 0; }
+    .doc-topo .wrap {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem; flex-wrap: wrap;
+    }
+    .doc-marca {
+      font-family: var(--display-alt); font-size: 1.05rem; font-weight: 800;
+      letter-spacing: .02em; color: #fff; text-decoration: none;
+    }
+    .doc-marca span { color: var(--lime); }
+    .doc-voltar { font-family: var(--body); font-size: .92rem; color: var(--paper-txt); text-decoration: none; }
+    .doc-voltar:hover { text-decoration: underline; }
+
+    .doc { background: var(--bg); padding: clamp(2rem, 6vw, 3.5rem) 0 4rem; }
+    .doc .wrap { max-width: 46rem; }
+    .doc h1 { font-family: var(--display-alt); font-size: clamp(1.7rem, 5vw, 2.4rem); margin: 0 0 .4rem; color: var(--ink-txt); }
+    /* .doc .doc-data, nao .doc-data: `.doc p` tem especificidade maior e
+       pintava a data com a cor cheia do corpo. */
+    .doc .doc-data {
+      font-family: var(--body); font-size: .8rem; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--ink-mut); margin: 0 0 2rem;
+    }
+    .doc h2 {
+      font-family: var(--display-alt); font-size: 1.15rem; color: var(--ink-txt);
+      margin: 2.2rem 0 .6rem; padding-top: 1.3rem; border-top: 1px solid var(--line);
+    }
+    .doc h2:first-of-type { border-top: none; padding-top: 0; }
+    .doc p, .doc li { font-family: var(--prose); line-height: 1.7; color: var(--ink-txt); max-width: 62ch; }
+    .doc ul, .doc ol { padding-left: 1.15rem; }
+    .doc li { margin-bottom: .4rem; }
+    .doc strong { font-weight: 700; }
+    /* :not(.btn) porque `.doc a` tem especificidade maior que a do botão e
+       pintaria o texto dele de azul sobre o próprio fundo. */
+    .doc a:not(.btn) { color: var(--blue); text-underline-offset: 2px; }
+
+    .doc dl { margin: 0; display: grid; gap: .85rem; }
+    .doc dt {
+      font-family: var(--body); font-weight: 700; font-size: .78rem;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--ink-mut);
+    }
+    .doc dd { margin: .1rem 0 0; font-family: var(--prose); color: var(--ink-txt); }
+
+    .doc-quadro {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 10px; padding: 1.15rem 1.3rem; margin: 1.3rem 0;
+    }
+    .doc-quadro p:last-child { margin-bottom: 0; }
+    .doc-contato { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1rem; }
+    /* O .btn-gold do site é lima sobre escuro, e o brilho dele foi calibrado
+       para aquele fundo: no cartão branco vira halo. O texto escuro sobre lima
+       segue em 14,9:1. */
+    .doc-contato .btn { font-size: .92rem; box-shadow: 0 2px 10px -4px rgba(23, 30, 49, .35); }
+    .doc-contato .btn:hover { box-shadow: 0 6px 16px -6px rgba(23, 30, 49, .45); }
+  </style>
+</head>
+<body>
+
+  <header class="doc-topo">
+    <div class="wrap">
+      <a class="doc-marca" href="../">DR. ELTON <span>4412</span></a>
+      <a class="doc-voltar" href="../">← Voltar ao site</a>
+    </div>
+  </header>
+
+  <main class="doc">
+    <div class="wrap">
+
+      <h1>Política de Privacidade</h1>
+      <p class="doc-data">Versão de 18 de agosto de 2026</p>
+
+      <p>
+        Esta página explica o que a campanha faz com os dados de quem preenche o
+        formulário “Quero participar”. Ela vale para
+        <strong>drelton4412.com.br</strong> e para a Colinha Digital hospedada
+        em <strong>/colinha/</strong>.
+      </p>
+
+      <h2>Quem é o responsável pelos dados</h2>
+      <dl>
+        <div>
+          <dt>Controlador</dt>
+          <dd>ELEIÇÃO 2026 ELTON ALVES RIBEIRO DE CARVALHO JUNIOR DEPUTADO FEDERAL</dd>
+        </div>
+        <div>
+          <dt>CNPJ de campanha</dt>
+          <dd>68.237.359/0001-10</dd>
+        </div>
+      </dl>
+
+      <h2>Quais dados são coletados</h2>
+      <p>
+        Apenas <strong>nome</strong> e <strong>telefone</strong>, e apenas quando
+        você mesmo os digita no formulário. Junto com eles é gravada a data do
+        envio e a informação de que o cadastro veio deste site.
+      </p>
+      <p>
+        O site <strong>não usa cookies, não tem Google Analytics, não tem pixel
+        de rede social e não instala nenhum rastreador</strong>. Os vídeos e as
+        fontes são servidos pelo próprio site, sem player de terceiro. Navegar
+        aqui sem preencher o formulário não gera cadastro nenhum.
+      </p>
+
+      <h2>Para que servem e com que base legal</h2>
+      <p>
+        Servem para a equipe da campanha entrar em contato com você, por telefone
+        ou WhatsApp, sobre a campanha eleitoral de 2026. Nada além disso. A base
+        legal é o <strong>seu consentimento</strong>, dado ao marcar a caixa de
+        autorização antes de enviar o formulário (Lei 13.709/2018, art. 7º, I).
+      </p>
+      <p>
+        Seus dados <strong>não são vendidos</strong> e não são usados para
+        qualquer finalidade fora da campanha.
+      </p>
+
+      <h2>Com quem são compartilhados</h2>
+      <!-- PONTO DE DECISÃO 1 — advogado eleitoral.
+           Este texto descreve o que o código faz HOJE: os formulários dos três
+           sites (site-campanha, site-tozi, site-dulcerita) enviam para o MESMO
+           endpoint do Google Apps Script, ou seja, para a mesma planilha,
+           separados apenas por um campo `origem`.
+           SE as bases forem separadas por CNPJ, troque esta seção inteira por:
+           "Seus dados ficam apenas com a campanha do Dr. Elton e não são
+           compartilhados com nenhuma outra campanha, empresa ou pessoa." -->
+      <p>
+        O cadastro é gravado em uma base operada em conjunto pelas campanhas da
+        mesma federação partidária listadas abaixo, e a equipe de cada uma pode
+        acessá-la:
+      </p>
+      <ul>
+        <li>ELEIÇÃO 2026 ELTON ALVES RIBEIRO DE CARVALHO JUNIOR DEPUTADO FEDERAL — CNPJ 68.237.359/0001-10</li>
+        <li>ELEIÇÃO 2026 LUIZ ANTONIO TOZI DEPUTADO ESTADUAL — CNPJ 68.283.009/0001-90</li>
+        <li>ELEIÇÃO 2026 DULCE RITA CHAVES DE ANDRADE DABKIWIC — CNPJ 68.283.179/0001-75</li>
+      </ul>
+      <p>
+        Fora dessas campanhas, seus dados não são repassados a terceiros. As duas
+        únicas exceções são o provedor de tecnologia descrito na seção seguinte,
+        que apenas armazena a base, e as autoridades, quando houver obrigação
+        legal.
+      </p>
+
+      <h2>Onde os dados ficam armazenados</h2>
+      <p>
+        A base é mantida em serviço de nuvem do <strong>Google</strong> (Google
+        Apps Script e Google Planilhas), cujos servidores ficam
+        <strong>fora do Brasil</strong>. Isso caracteriza transferência
+        internacional de dados, feita com fundamento no seu consentimento
+        específico para essa transferência (Lei 13.709/2018, art. 33, VIII), que
+        você dá ao marcar a autorização no formulário.
+      </p>
+
+      <h2>Por quanto tempo ficam guardados</h2>
+      <!-- PONTO DE DECISÃO 2 — confirmar o prazo com o advogado e o contador.
+           O prazo abaixo é o que faz sentido para dado de campanha, mas quem
+           define é a campanha, e o que estiver escrito aqui tem que ser
+           cumprido de verdade. -->
+      <p>
+        Até o encerramento do processo eleitoral de 2026, incluído o prazo de
+        prestação de contas à Justiça Eleitoral. Depois disso os dados são
+        eliminados, salvo se você pedir a exclusão antes, o que pode ser feito a
+        qualquer momento.
+      </p>
+
+      <h2>Seus direitos e como exercê-los</h2>
+      <p>A qualquer momento, sem precisar justificar, você pode pedir para:</p>
+      <ul>
+        <li>saber se a campanha tem dados seus e quais são;</li>
+        <li>corrigir dado incompleto ou errado;</li>
+        <li><strong>excluir</strong> seus dados da base;</li>
+        <li>revogar o consentimento, o que interrompe o contato;</li>
+        <li>receber os dados que você forneceu, em formato legível.</li>
+      </ul>
+
+      <div class="doc-quadro">
+        <!-- PONTO DE DECISÃO 3 — a LGPD (art. 41) pede a indicação do
+             encarregado pelo tratamento de dados. Os canais abaixo são os que
+             já estão publicados no site; falta nomear a pessoa responsável.
+             Acrescentar aqui: "Encarregado: <nome>". -->
+        <p><strong>Canal para exercer esses direitos.</strong> Escreva ou chame
+        no WhatsApp. O pedido é atendido sem custo e sem burocracia.</p>
+        <div class="doc-contato">
+          <a class="btn btn-gold" href="mailto:contato@drelton.com.br?subject=LGPD%20%E2%80%94%20pedido%20sobre%20meus%20dados">contato@drelton.com.br</a>
+          <a class="btn btn-gold" href="https://wa.me/5512988604385?text=Ol%C3%A1%21%20Quero%20fazer%20um%20pedido%20sobre%20os%20meus%20dados%20%28LGPD%29." target="_blank" rel="noopener">WhatsApp (12) 98860-4385</a>
+        </div>
+      </div>
+
+      <h2>Segurança</h2>
+      <p>
+        O site é servido apenas por conexão criptografada (HTTPS). O acesso à
+        base é restrito à equipe da campanha. Se ocorrer incidente de segurança
+        com risco relevante a você, a comunicação será feita nos termos da
+        Lei 13.709/2018.
+      </p>
+
+      <h2>A Colinha Digital</h2>
+      <p>
+        A Colinha Digital funciona <strong>inteiramente no seu aparelho</strong>.
+        Os números que você digita ficam guardados só no navegador do próprio
+        celular ou computador e <strong>não são enviados para a campanha</strong>.
+        Ninguém aqui vê em quem você pretende votar. O botão “Começar de novo”
+        apaga tudo na hora.
+      </p>
+      <p>
+        Se você usar “Compartilhe com amigos”, o link gerado leva os números que
+        você escolheu, para que a pessoa veja a mesma colinha. Esse
+        compartilhamento é decisão sua: enviar o link a alguém revela a essa
+        pessoa a sua escolha.
+      </p>
+
+      <h2>Crianças e adolescentes</h2>
+      <p>
+        O formulário é destinado a eleitores. A campanha não coleta dados de
+        crianças de propósito. Se um cadastro de menor de 16 anos for enviado sem
+        o consentimento de um dos pais ou do responsável legal, avise pelos
+        canais acima que ele é excluído da base.
+      </p>
+
+      <h2>Mudanças nesta política</h2>
+      <p>
+        Se algo mudar, esta página é atualizada e a data no topo passa a ser a da
+        nova versão.
+      </p>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-bottom">
+      <p>
+        ELEIÇÃO 2026 ELTON ALVES RIBEIRO DE CARVALHO JUNIOR DEPUTADO FEDERAL<br />
+        CNPJ 68.237.359/0001-10
+      </p>
+      <p class="footer-legal">
+        Uso dos dados conforme a LGPD (Lei 13.709/2018) · Conteúdo de propaganda eleitoral.
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

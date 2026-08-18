@@ -505,6 +505,13 @@ p { margin: 0 0 1rem; }
 .footer-wpp { font-weight: 700; }
 .socials { display: flex; flex-direction: column; }
 .footer-lgpd p { font-family: var(--prose); font-size: var(--step--1); line-height: 1.6; }
+/* O link da politica herda dos outros links do rodape o cinza-claro, o display
+   block e a ausencia de sublinhado — dentro de um paragrafo isso o faz sumir.
+   Seletor com duas classes para ganhar de `.footer-col a` sem !important. */
+.footer-lgpd .footer-privacidade {
+  display: inline; color: var(--gold-lt);
+  text-decoration: underline; text-underline-offset: 3px; padding: 0;
+}
 .footer-bottom { display: flex; flex-wrap: wrap; gap: .4rem 1.5rem; justify-content: space-between; padding-block: 1.5rem; border-top: 1px solid var(--line-lt); font-size: .8rem; }
 .footer-bottom p { margin: 0; }
 .footer-legal { opacity: .6; }
