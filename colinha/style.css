@@ -481,9 +481,6 @@ body[data-tema="elton"] .digito { font-size: 21.6cqw; }
   background: var(--bg-2); color: var(--rot); font-size: .85rem;
   cursor: pointer; display: grid; place-items: center;
 }
-.bg-dica {
-  margin: .45rem .9rem 0; font-size: .78rem; color: var(--mut);
-}
 /* Resultados: cartao solto POR CIMA da folha (nao empurra os campos — a
    lista abre e fecha a cada tecla e o layout pulando e pior que sobrepor). */
 .bg-lista {
