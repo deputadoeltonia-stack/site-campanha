@@ -30,6 +30,14 @@ const el = {
 
 document.body.dataset.tema = config.tema
 
+// Marcacao legal da propaganda: razao social e CNPJ da campanha. Le da config
+// e so da config, como o selo e o campo travado — nunca do dataset do TSE.
+if (config.cnpj) {
+  const legal = document.getElementById('legal')
+  legal.textContent = `${config.razao} · CNPJ ${config.cnpj}`
+  legal.hidden = false
+}
+
 // Embutida num site, a pagina ganha o link de volta para a raiz dele.
 {
   const volta = linkDeVolta(location.pathname)
@@ -493,13 +501,13 @@ async function iniciar() {
     // Na peca impressa o selo ocupa o vazio a direita dos senadores, que so
     // tem 3 digitos. Na tela esse vazio nao e permanente: assim que o eleitor
     // digita o numero, o NOME do senador ocupa exatamente aquela faixa e o
-    // selo passa por cima. Nas colinhas com adesivo (Dulce, Dr. Elton) ele
-    // desce para o ultimo campo e fica ancorado na faixa das CAIXAS (abaixo
-    // do rotulo, ver o CSS), que e vao permanente em cargo de 2 digitos,
-    // transbordando para o respiro antes dos botoes — fecha a folha como uma
-    // assinatura. So o Tozi segue nos senadores (selo de texto, menor).
-    const ancora = config.tema === 'tozi' ? 'campo-senador1' : 'campo-presidente'
-    document.getElementById(ancora).appendChild(document.getElementById('selo'))
+    // selo passa por cima. Por isso as tres campanhas ancoram no ULTIMO campo,
+    // na faixa das CAIXAS (abaixo do rotulo, ver o CSS): num cargo de 2
+    // digitos o vao a direita e permanente, e o transbordo cai no respiro
+    // antes dos botoes — fecha a folha como uma assinatura. O Tozi era a
+    // excecao que sobrou e cobria os nomes dos dois senadores.
+    document.getElementById('campo-presidente')
+      .appendChild(document.getElementById('selo'))
   }
 
   render()

@@ -6,6 +6,13 @@
 <title>Minha colinha de voto</title>
 <meta name="description" content="Monte sua colinha de voto para 4 de outubro. Digite os números e confira os nomes antes de ir votar.">
 <meta name="robots" content="noindex">
+<!-- As tres fontes que a pagina usa, buscadas junto com o CSS em vez de
+     depois dele: sem isto so eram descobertas quando uma regra casava, e
+     comecavam ~60ms atras. Sao os numeros da urna que trocam de desenho na
+     cara de quem ja esta conferindo o voto. -->
+<link rel="preload" as="font" type="font/woff2" href="fonts/geometos-black.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="fonts/avenir-400.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="fonts/avenir-500.woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -77,8 +84,12 @@
   </div>
 
   <p class="rodape">
-    Confira sempre na urna. Esta página não envia seus dados para lugar nenhum.
+    Confira sempre o número do candidato na urna. Seus dados estão seguros e não são compartilhados com terceiros.
   </p>
+
+  <!-- Razao social + CNPJ da campanha. O texto vem da config do candidato
+       (colinha-core.js): o mesmo HTML serve as tres campanhas. -->
+  <p class="legal" id="legal" hidden></p>
 
 </main>
 

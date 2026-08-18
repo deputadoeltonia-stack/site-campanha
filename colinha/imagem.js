@@ -51,8 +51,17 @@ export const TEMAS = {
     // Simbolo e rosto em traco do manual, os mesmos arquivos da tela. Se o
     // navegador nao desenhar o SVG, cai nas listras retas de topoRisco.
     simbolo: 'marca/ondas.svg', rosto: 'marca/rosto.svg',
-    seloNoCorpo: true, // o selo na faixa dos senadores, como na peca
-    digitoItalico: true, // numerais inclinados da peca dele
+    seloNoCorpo: true,
+    // Ultima linha (presidente), igual a tela: nos senadores o selo caia
+    // em cima do nome assim que o eleitor digitava. bordaDireita ja
+    // encolhe o nome na linha que hospeda o selo.
+    seloLinha: 5.05,
+    // Numerais retos: a Geometos nao tem face italica, entao 'italic'
+    // virava oblique sintetico. O skew inclina a tinta sem alterar a
+    // largura de avanco, e o textAlign 'center' centra pelo avanco —
+    // o digito saia visivelmente jogado para a direita na caixa.
+    digitoItalico: false,
+    seloItalico: false,
     titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
   },
@@ -392,13 +401,31 @@ function duasLinhas(ctx, texto, largura) {
   ]
 }
 
+// Raio do selo montado com texto (o do Tozi). O de imagem usa t.seloRaio.
+const SELO_RAIO_TEXTO = 96
+
+// Raio do selo que sera desenhado — 0 quando o site nao tem candidato proprio.
+export function raioDoSelo(t, temSelo, temImagem) {
+  if (!temSelo) return 0
+  return temImagem ? (t.seloRaio ?? 148) : SELO_RAIO_TEXTO
+}
+
+// Onde o nome de uma linha precisa parar. Na linha que hospeda o selo ele para
+// na borda esquerda do selo; nas outras, na margem de sempre. Puro e exportado
+// para o teste conferir a geometria sem canvas.
+export function bordaDoNome(t, idx, seloRaio) {
+  const naLinhaDoSelo = seloRaio > 0 && t.seloNoCorpo
+    && Math.round(t.seloLinha ?? 2.32) === idx
+  return naLinhaDoSelo ? L - MARGEM - 2 * seloRaio - 30 : L - MARGEM - 60
+}
+
 // O selo redondo do candidato, como na peca impressa: circulo na cor da marca
 // com anel de destaque, sobrepondo o topo e o corpo.
-function desenharSelo(ctx, t, slot, imgSelo, seloLogo, seloLogo2, seloTrio) {
+function desenharSelo(ctx, t, slot, imgSelo, raio, seloLogo, seloLogo2, seloTrio) {
   // Botton oficial em imagem (Dr. Elton): desenha e pronto. Maior que o selo
-  // de texto, como na arte.
+  // de texto, como na arte. O raio vem de raioDoSelo — o MESMO numero que
+  // bordaDoNome usa para parar o nome antes do selo.
   if (imgSelo) {
-    const raio = t.seloRaio ?? 148
     const cx = L - MARGEM - raio
     // No corpo (Dr. Elton) ou montado na quebra do cabecalho (Dulce): na
     // imagem as linhas sao compactas e nao sobra bolso para um adesivo do
@@ -418,7 +445,6 @@ function desenharSelo(ctx, t, slot, imgSelo, seloLogo, seloLogo2, seloTrio) {
     return
   }
 
-  const raio = 96
   const cx = L - MARGEM - raio
   // Na peca o selo desce para a faixa dos senadores, que so tem 3 digitos e
   // deixa a direita vazia. Na tela (e aqui) esse vazio nao e permanente: com o
@@ -470,7 +496,7 @@ function desenharSelo(ctx, t, slot, imgSelo, seloLogo, seloLogo2, seloTrio) {
     }
 
     ctx.fillStyle = t.seloNumero ?? t.destaque
-    ctx.font = fonte(t, 800, COND, 46, { italico: true })
+    ctx.font = fonte(t, 800, COND, 46, { italico: t.seloItalico !== false })
     ctx.fillText(slot.numero, cx, cy + 74)
     ctx.restore()
     ctx.textAlign = 'left'
@@ -528,7 +554,7 @@ function desenharSelo(ctx, t, slot, imgSelo, seloLogo, seloLogo2, seloTrio) {
   ctx.fillStyle = t.seloNumero ?? (t.peca ? t.destaque : t.seloAnel ?? t.destaque)
   // Na peca do Dr. Elton o numero domina o selo; nos outros temas segue menor.
   const numTam = t.peca ? 54 : 44
-  ctx.font = fonte(t, 800, COND, numTam, { italico: true })
+  ctx.font = fonte(t, 800, COND, numTam, { italico: t.seloItalico !== false })
   ctx.fillText(slot.numero, cx, cy + (t.peca ? 70 : 64))
   ctx.restore()
   ctx.textAlign = 'left'
@@ -654,7 +680,10 @@ export async function desenhar(colinha, config) {
   // primeiro travado passou a ser o federal — e o selo saiu com o wordmark
   // dela e o numero do Dr. Elton.
   const proprio = colinha.find((s) => s.id === slotTravado(config))
-  if (proprio) desenharSelo(ctx, t, proprio, imgSelo, seloLogo, seloLogo2, seloTrio)
+  // Raio do selo que sera desenhado — 0 quando nao ha selo. O laco das linhas
+  // usa o MESMO numero para saber onde parar o nome.
+  const seloRaio = raioDoSelo(t, Boolean(proprio), Boolean(imgSelo))
+  if (proprio) desenharSelo(ctx, t, proprio, imgSelo, seloRaio, seloLogo, seloLogo2, seloTrio)
 
   // Tamanho do algarismo tirado da peca: no santinho a tinta do digito mede
   // 0,82 da altura da caixa (176px numa caixa de 215). Mede-se a tinta do "4"
@@ -674,14 +703,12 @@ export async function desenhar(colinha, config) {
   let y = Y0
 
   for (const [idx, slot] of colinha.entries()) {
-    // Linha que hospeda o selo (Dulce e Dr. Elton: a ultima): o rotulo para
-    // na borda esquerda do adesivo, senao o fim do nome (ou a sigla) some
-    // por baixo dele.
-    const linhaDoSelo = imgSelo && t.seloNoCorpo
-      && Math.round(t.seloLinha ?? 2.32) === idx
-    const bordaDireita = linhaDoSelo
-      ? L - MARGEM - 2 * (t.seloRaio ?? 148) - 30
-      : L - MARGEM - 60
+    // O nome para na borda esquerda do selo na linha que o hospeda. Vale para
+    // os DOIS tipos de selo: antes so o adesivo em imagem encolhia a borda, e
+    // no tema do Tozi — que monta o selo com texto — "VETERINARIO WILSON
+    // GRASSI" no campo de presidente ia ate x=888 com o selo comecando em
+    // x=824, e o nome saia atravessado por cima dele no PNG.
+    const bordaDireita = bordaDoNome(t, idx, seloRaio)
     // Rotulo do cargo, e o nome resolvido logo depois da barra. Na peca do
     // Dr. Elton o rotulo sai na display da campanha, nao na fonte de texto.
     const display = t.peca || t.rotuloDisplay
@@ -769,7 +796,22 @@ export async function desenhar(colinha, config) {
   ctx.font = fonte(t, 700, COND, 26, { texto: true })
   ctx.fillText(location.hostname, L / 2, A - 50)
   ctx.font = fonte(t, 500, COND, 24, { texto: true })
-  ctx.fillText('Confira sempre na urna.', L / 2, A - 18)
+  ctx.fillText('Confira sempre o n\u00famero do candidato na urna.', L / 2, A - 18)
+
+  // Marcacao legal na margem esquerda, rodada 90deg — o lugar que o santinho
+  // impresso usa para razao social e CNPJ. A faixa 0..MARGEM fica livre: as
+  // fotos so comecam em MARGEM, entao o texto nao disputa espaco com nada.
+  if (config.cnpj) {
+    ctx.save()
+    ctx.translate(MARGEM * 0.62, A - 118)
+    ctx.rotate(-Math.PI / 2)
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'alphabetic'
+    ctx.fillStyle = t.rot
+    ctx.font = fonte(t, 500, COND, 17, { texto: true })
+    ctx.fillText(`${config.razao} \u00b7 CNPJ ${config.cnpj}`, 0, 0)
+    ctx.restore()
+  }
 
   if (FAIXA) {
     // A faixa lima fecha a peca com o MESMO pattern oficial do topo, na

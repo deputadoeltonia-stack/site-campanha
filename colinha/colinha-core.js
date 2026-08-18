@@ -18,6 +18,12 @@ export const CARGOS = [
 export const CANDIDATOS = {
   'colinha.dreltonai.com.br': {
     nome: 'DR. ELTON', cargo: 6, numero: '4412', partido: 'UNIÃO', tema: 'elton',
+    // Marcacao legal da propaganda eleitoral (Lei 9.504/97, art. 38 §1o):
+    // razao social e CNPJ da campanha, como na lateral do santinho impresso.
+    // Vive aqui junto de nome e numero porque e por candidato — a colinha
+    // serve tres campanhas no mesmo codigo.
+    razao: 'ELEIÇÃO 2026 ELTON ALVES RIBEIRO DE CARVALHO JUNIOR DEPUTADO FEDERAL',
+    cnpj: '68.237.359/0001-10',
     foto: 'elton', // fotos/elton.jpg — foto oficial da campanha, nao vem do TSE
     // A peca impressa dele ja traz o governador (Tarcisio, 10). Fixo, como na
     // colinha da Dulce: o slot nao existe no estado, entao nao ha caminho de
@@ -27,6 +33,9 @@ export const CANDIDATOS = {
   // Numero confirmado pelo santinho impresso 7x10 da campanha (15/08/2026).
   'colinhavirtual.dreltonai.com.br': {
     nome: 'PROFESSOR TOZI', cargo: 7, numero: '44447', partido: 'UNIÃO', tema: 'tozi',
+    // Marcacao legal da propaganda, como na lateral do santinho impresso.
+    razao: 'ELEIÇÃO 2026 LUIZ ANTONIO TOZI DEPUTADO ESTADUAL',
+    cnpj: '68.283.009/0001-90',
     foto: 'tozi',
     // A peca conjunta dele traz o Dr. Elton e o governador impressos, igual a
     // da Dulce — e fixos pelo mesmo motivo: o eleitor nao muda nenhum dos dois.
@@ -40,6 +49,16 @@ export const CANDIDATOS = {
   'tozisite-git-main-elton8.vercel.app': { alias: 'colinhavirtual.dreltonai.com.br' },
   'proftozi.com.br': { alias: 'colinhavirtual.dreltonai.com.br' },
   'www.proftozi.com.br': { alias: 'colinhavirtual.dreltonai.com.br' },
+  // Dominios de PRODUCAO 2026 (HostGator) — os que o eleitor recebe no
+  // santinho. Ficavam so na copia do servidor, editados a mao la; qualquer
+  // deploy a partir do git derrubava os tres e a colinha de cada candidato
+  // caia no PADRAO (Dr. Elton) em silencio. Agora vivem aqui.
+  'proftozi44447.com.br': { alias: 'colinhavirtual.dreltonai.com.br' },
+  'www.proftozi44447.com.br': { alias: 'colinhavirtual.dreltonai.com.br' },
+  'drelton4412.com.br': { alias: 'colinha.dreltonai.com.br' },
+  'www.drelton4412.com.br': { alias: 'colinha.dreltonai.com.br' },
+  'dulcerita44400.com.br': { alias: 'colinha2026.dreltonai.com.br' },
+  'www.dulcerita44400.com.br': { alias: 'colinha2026.dreltonai.com.br' },
   // Site da Dulce Rita (projeto Vercel "dulcesite") tambem embute /colinha/.
   // Dominio de producao e sitedulce.vercel.app — um alias errado aqui abre a
   // colinha do Dr. Elton dentro do site dela, em silencio.
@@ -49,6 +68,9 @@ export const CANDIDATOS = {
   // Numero confirmado pelo santinho impresso 7x10 da campanha (15/08/2026).
   'colinha2026.dreltonai.com.br': {
     nome: 'DULCE RITA', cargo: 7, numero: '44400', partido: 'UNIÃO', tema: 'dulce',
+    // Marcacao legal da propaganda, como na lateral do santinho impresso.
+    razao: 'ELEIÇÃO 2026 DULCE RITA CHAVES DE ANDRADE DABKIWIC',
+    cnpj: '68.283.179/0001-75',
     foto: 'dulce', rotulo: 'Deputada estadual', // flexao do cargo, so no campo dela
     // O verso do santinho dela ja vem com o federal (Dr. Elton, peca conjunta)
     // e o governador impressos. FIXO, nao sugestao: o eleitor nao muda nenhum

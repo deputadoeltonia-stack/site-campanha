@@ -15,11 +15,26 @@ const el = {
 let cargoAtivo = null
 let getDados = () => ({})
 let aoEscolher = () => {}
+// Quem abriu a gaveta: o foco volta para la ao fechar, senao o leitor de tela
+// (e o teclado) recomecam do topo da pagina a cada busca.
+let abriuComFoco = null
+
+// A gaveta se declara aria-modal, mas isso e so uma promessa ao leitor de
+// tela: sem inert o Tab continua passeando pelos campos ATRAS da cortina.
+// inert cobre teclado e leitor de tela de uma vez, e o browser sem suporte
+// cai no ciclo manual do keydown abaixo.
+function fundo() {
+  return Array.prototype.filter.call(document.body.children, (e) => e !== el.raiz)
+}
 
 function fechar() {
   el.raiz.hidden = true
   cargoAtivo = null
   document.body.classList.remove('sem-rolagem')
+  fundo().forEach((e) => e.removeAttribute('inert'))
+  const volta = abriuComFoco
+  abriuComFoco = null
+  volta?.focus()
 }
 
 function itemHTML(r) {
@@ -88,7 +103,16 @@ el.raiz.addEventListener('click', (ev) => {
   if (ev.target === el.raiz) fechar()
 })
 document.addEventListener('keydown', (ev) => {
-  if (ev.key === 'Escape' && !el.raiz.hidden) fechar()
+  if (el.raiz.hidden) return
+  if (ev.key === 'Escape') { fechar(); return }
+  if (ev.key !== 'Tab') return
+  // Ciclo de foco dentro do painel, para o browser que ignora inert.
+  const itens = el.raiz.querySelectorAll('button, input, [href]')
+  if (!itens.length) return
+  const primeiro = itens[0]
+  const ultimo = itens[itens.length - 1]
+  if (ev.shiftKey && document.activeElement === primeiro) { ev.preventDefault(); ultimo.focus() }
+  else if (!ev.shiftKey && document.activeElement === ultimo) { ev.preventDefault(); primeiro.focus() }
 })
 
 // getDados: () => dataset atual. aoEscolher: (cargo, {numero,nome,...}) => void
@@ -99,10 +123,12 @@ export function configurarBusca(opcoes) {
 
 export function abrirBusca(cargo) {
   cargoAtivo = cargo
+  abriuComFoco = document.activeElement
   el.titulo.textContent = `Buscar ${cargo.rotulo.toLowerCase()}`
   el.input.value = ''
   el.lista.innerHTML = ''
   el.raiz.hidden = false
+  fundo().forEach((e) => e.setAttribute('inert', ''))
   document.body.classList.add('sem-rolagem')
   // Espera o layout aplicar antes de focar, senao o teclado abre torto no iOS.
   requestAnimationFrame(() => el.input.focus())

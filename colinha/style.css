@@ -448,6 +448,14 @@ body[data-tema="elton"] .digito { font-size: 21.6cqw; }
 .acoes button:active { transform: scale(.985); }
 .acoes button[disabled] { opacity: .45; cursor: default; }
 
+/* Marcacao legal obrigatoria: menor e mais apagada que o rodape, como na
+   lateral do santinho impresso, sem competir com o aviso da urna. */
+.legal {
+  margin: .5rem 0 0; text-align: center;
+  font-size: .6rem; line-height: 1.35; letter-spacing: .01em;
+  color: var(--mut); opacity: .72; text-wrap: balance;
+}
+
 .rodape {
   margin: 1.25rem 0 0; text-align: center;
   font-size: .7rem; color: var(--mut);
@@ -486,8 +494,16 @@ body[data-tema="tozi"] .campo.travado:not(.proprio) .foto-travada {
 body:is([data-tema="tozi"], [data-tema="dulce"]) .selo { transform: none; }
 body[data-tema="tozi"] .selo { background: var(--acento); border-color: #fff; }
 body[data-tema="tozi"] .selo-numero { color: #fff; }
+/* Sem italico: a Geometos nao tem face italica (fonts/ so traz geometos.woff2
+   e geometos-black.woff2), entao o navegador sintetizava um oblique por skew.
+   O skew inclina o glifo mas nao mexe na largura de avanco, e o numero saia
+   encostado a direita dentro da caixa — era o mesmo defeito que o "fora de
+   centro". Upright resolve os dois. O text-indent zera a folga que o
+   letter-spacing do .selo-numero deixa depois do ultimo digito, que puxava o
+   texto centralizado meio passo para a esquerda. */
 body[data-tema="tozi"] .selo-numero,
-body[data-tema="tozi"] .digito { font-style: italic; }
+body[data-tema="tozi"] .digito { font-style: normal; }
+body[data-tema="tozi"] .selo-numero { text-indent: .04em; }
 /* Geometos não tem eixo de largura: o font-stretch do tema padrão viraria
    síntese e engorda a letra. */
 body:is([data-tema="tozi"], [data-tema="dulce"]) .marca,
@@ -543,9 +559,23 @@ body[data-tema="elton"] .topo { padding-top: 1.25rem; padding-bottom: 1.45rem; }
 body:is([data-tema="tozi"], [data-tema="dulce"]) .visto-marca { display: none; }
 /* Os passos da peça são numerados em azul, não no verde do Dr. Elton. O vão à
    direita é onde o rosto entra. */
+/* Bolinhas equidistantes SEM engordar o topo: os tres passos cabem em uma
+   linha cada, e af o vao entre bolinhas ja sai igual sozinho. O passo 1
+   ("Digite o numero do seu candidato") pedia 207px numa coluna de 188px e
+   quebrava em duas linhas, o que jogava os vaos para 38px e 22px. Os 19px
+   que faltavam vem de tres cortes pequenos em vez de um grande: tracking
+   negativo, a coluna da bolinha um tico menor e o vao do rosto ajustado a
+   TINTA dele, nao a caixa: medido no render, na altura do passo 1 o traco so
+   comeca 10,6px depois da borda da caixa do SVG (mais abaixo, na curva do
+   queixo, sobra 1,6px — mas os passos 2 e 3 tem 61px e 86px de folga e nunca
+   chegam la). A fonte cai so de .8 para .77rem; ir ate .72rem, que resolveria
+   sozinho, ficaria pequeno demais numa peca de apoio a voto. */
 body[data-tema="tozi"] .passos {
-  flex: 1; min-width: 0; padding-right: 4.2rem; font-size: .8rem;
+  flex: 1; min-width: 0; padding-right: 3.2rem; font-size: .77rem;
+  letter-spacing: -.018em;
 }
+body[data-tema="tozi"] .passos li { grid-template-columns: 1.05rem 1fr; gap: .3rem; }
+body[data-tema="tozi"] .passos li::before { width: 1.05rem; height: 1.05rem; }
 body[data-tema="tozi"] .passos li::before {
   background: var(--acento); color: #fff;
 }
@@ -565,9 +595,20 @@ body[data-tema="tozi"] .aviso { margin-right: 3.8rem; }
 body[data-tema="tozi"] .folha::before {
   content: "";
   position: absolute; z-index: 1; pointer-events: none;
-  right: -2rem; top: -4.9rem;
-  width: 5.6rem; height: 8.8rem;
-  background: url("marca/rosto.svg") center/contain no-repeat;
+  /* Sangria RESPONSIVA. A folha e width:100% com max-width:26rem e margin
+     auto: no desktop sobra margem dos dois lados e a arte cabe inteira ali,
+     como na peca. Num celular de 390px a folha ocupa a largura toda, a
+     margem e zero, e os -2rem fixos de antes iam para fora da tela — o
+     html { overflow-x: clip } segurava, mas o Safari anterior ao 16 ignora
+     clip e o dedo arrastava a pagina de lado.
+     (100vw - 100%) / 2 e exatamente a margem que sobra de cada lado, entao
+     o min() sangra os 2rem quando ha espaco e nada quando nao ha. A arte
+     mantem 5.6rem de largura e fica ancorada a esquerda: o que muda e so
+     quanto dela a caixa deixa aparecer. */
+  --sangra: min(2rem, max(0px, (100vw - 100%) / 2));
+  right: calc(-1 * var(--sangra)); top: -4.9rem;
+  width: calc(3.6rem + var(--sangra)); height: 8.8rem;
+  background: url("marca/rosto.svg") left center / 5.6rem 8.8rem no-repeat;
 }
 
 /* O selo (movido para cá pelo app.js) ocupa o vazio à direita dos senadores,
@@ -579,6 +620,9 @@ body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo > .
   position: absolute; z-index: 1;
   right: 0; top: -.3rem;
   width: 7rem;
+  /* Decoracao nao recebe toque: o .entrada transparente cobre a faixa inteira
+     das caixas, e sem isto o selo comeria os toques na metade direita dela. */
+  pointer-events: none;
 }
 /* No Dr. Elton o adesivo tambem desce para o ultimo campo (ver app.js), na
    faixa das caixas — o rotulo em cima fica livre para o nome do presidente.
@@ -598,8 +642,25 @@ body[data-tema="elton"] .acoes { margin-top: 4rem; }
    peca impressa (526px de 2204px). */
 body[data-tema="dulce"] .campo > .selo { top: 1.5rem; width: 6.2rem; }
 body[data-tema="dulce"] .acoes { margin-top: 3.6rem; }
+/* Mesmo arranjo no Tozi. Ele ficava nos senadores e, com o nome resolvido,
+   cobria "ANDRE DO PRADO" no 1o voto e encostava em "PETTER MAAHS" no 2o
+   (medido: 64px e 51px de nome tapados). O top desce o selo do rotulo para a
+   faixa das caixas; o respiro maior absorve o transbordo, como nos outros. */
+body[data-tema="tozi"] .campo > .selo { top: 1.3rem; }
+body[data-tema="tozi"] .acoes { margin-top: 3.9rem; }
 /* A mensagem de erro do campo que hospeda o selo quebraria por baixo dele. */
 body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo:has(> .selo) .erro {
+  padding-right: 7.4rem;
+}
+/* O NOME tambem. O selo desce para a faixa das caixas por um `top` fixo, mas
+   o rotulo acima dele cresce com o nome do candidato — e o topo do circulo
+   subia por cima da ultima palavra. Medido nas tres campanhas com o
+   presidente de nome mais longo do dataset ("VETERINARIO WILSON GRASSI"):
+   Tozi cobria 88px do nome, Dr. Elton 116px, Dulce 76px, sempre a sigla e o
+   fim do nome. Reservar a faixa faz o nome quebrar em duas linhas em vez de
+   sumir por baixo do adesivo — numa peca de conferencia de voto, ler o nome
+   inteiro vale mais que a linha unica. */
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo:has(> .selo) .rotulo {
   padding-right: 7.4rem;
 }
 /* A peça não tem o tique de conferido: o campo dele já vem preenchido. */
