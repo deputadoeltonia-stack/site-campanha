@@ -153,14 +153,15 @@ body[data-tema="elton"] {
   letter-spacing: -.01em; text-transform: uppercase;
 }
 
-/* O risco lima da identidade cruza POR CIMA da base do "OTA" de VOTAR, como
-   na foto da peca (e como ele sublinha "medico"/"compromisso" no manual).
-   Medidas em em, ancoradas na caixa do titulo: "COMO V" termina em 4,43em e
-   "COMO VOTA" em 6,52em (Geometos). */
+/* O risco lima da identidade cruza POR CIMA da base de "LINH", em COLINHA,
+   como ele sublinha "medico"/"compromisso" no manual. Medidas em em na caixa
+   do titulo (Geometos, medido no render): "FAÇA SUA " termina em 5,71em e a
+   palavra inteira em 10,75em, entao o risco de 2,1em comeca em 7,2em e morre
+   antes do A final. */
 .marca { position: relative; }
 .visto-marca {
   position: absolute; z-index: 1;
-  left: 4.15em; width: 2.1em;
+  left: 7.2em; width: 2.1em;
   bottom: -.77em; height: .98em;
   color: var(--lima);
   pointer-events: none;
@@ -930,6 +931,38 @@ body.sem-rolagem { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
   .busca-painel { animation: none; }
+}
+
+/* --- celular: cabecalho so com o titulo ---------------------------------- */
+/* Os tres passos ocupavam ~5rem no alto de uma tela de 667px e empurravam a
+   folha para fora da primeira dobra. O passo 1 ("Digite o numero do seu
+   candidato") ja e o placeholder da busca logo abaixo, e os passos 2 e 3
+   descrevem a urna, nao a pagina. De tablet pra cima (>40rem) sobra altura e
+   eles voltam, como na peca impressa. */
+@media (max-width: 40rem) {
+  .passos { display: none; }
+  .topo { padding-top: .7rem; padding-bottom: .8rem; }
+  /* O visto do Dr. Elton desce 0,77em abaixo da caixa do titulo: sem os
+     passos embaixo, quem segura esse transbordo e o padding do topo. */
+  body[data-tema="elton"] .topo { padding-top: .8rem; padding-bottom: 1.3rem; }
+  body[data-tema="elton"] .marca { margin-bottom: 0; }
+  body:is([data-tema="tozi"], [data-tema="dulce"]) .topo { padding-bottom: .9rem; }
+  /* O coracao da Dulce e ancorado nos passos (.passos::after) e sai com eles;
+     no lugar dele o padrao de pessoinhas do fundo fica maior na faixa baixa. */
+  body[data-tema="dulce"] .topo { background-size: auto 78%; }
+  /* Sem a coluna dos passos ao lado, o titulo volta ao corpo do layout
+     empilhado em vez do tamanho reduzido do arranjo lado a lado. */
+  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .marca { font-size: 1.25rem; }
+  body[data-tema="elton"] .marca { font-size: 1.35rem; }
+  /* O rosto do Tozi sobe 4,9rem para dentro do cabecalho; com o cabecalho de
+     150px para 55px ele passava por cima da busca. Encolhido em 30% ele volta
+     a caber na faixa navy e para antes do campo (proporcao preservada:
+     6.2 x 0.636 = 3.94). */
+  body[data-tema="tozi"] .folha::before {
+    top: -3.35rem; height: 6.2rem;
+    width: calc(2.5rem + var(--sangra));
+    background-size: 3.94rem 6.2rem;
+  }
 }
 
 @media print {
