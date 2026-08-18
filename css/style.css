@@ -104,19 +104,20 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 700; line-height: 1.0
 p { margin: 0 0 1rem; }
 
 .section-title { font-size: var(--step-3); }
-/* ---------- título que sobe letra a letra, atado ao scroll ----------
-   Efeito do ScrollFloat (React Bits) sem React nem GSAP. Quem move as letras
-   é o main.js (progresso calculado no scroll = o mesmo scrub); aqui fica só a
-   forma. Sem JS o título aparece inteiro e parado — nada some da página. */
+/* ---------- título que sobe letra a letra ----------
+   Efeito do ScrollFloat (React Bits) sem React nem GSAP: a cascata é daqui,
+   o main.js só decide a HORA (quando o título entra na tela). Sem JS o título
+   aparece inteiro e parado — nada some da página. */
 .titulo-float .word { display: inline-block; white-space: pre; } /* quebra entre palavras, nunca no meio de uma */
 .titulo-float .char { display: inline-block; transform-origin: 50% 0%; }
-/* .float-pronto só entra depois que o JS fatiou o texto: sem JS nada some.
-   O JS decide QUANDO (título entrou na tela); a cascata é toda daqui. */
+/* .float-pronto só entra depois que o JS fatiou o texto */
 .titulo-float.float-pronto .char { opacity: 0; }
+/* destravado = o observer não deu sinal a tempo; o título fica legível e
+   parado, sem gastar a animação (que ainda roda se ele entrar na tela) */
+.titulo-float.float-destravado .char { opacity: 1; }
 .titulo-float.revela .char {
-  animation: subirLetra .5s cubic-bezier(.68, -.55, .27, 1.55) backwards;
+  animation: subirLetra .5s cubic-bezier(.68, -.55, .27, 1.55) both;
   animation-delay: calc(var(--i, 0) * .022s);   /* stagger 0.02 do original */
-  animation-fill-mode: both;
 }
 @keyframes subirLetra {
   from { opacity: 0; transform: translateY(102%) scale(.75, 2.1); }

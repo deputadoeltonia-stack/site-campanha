@@ -123,21 +123,39 @@
   // scrub antigo dependia de quanto você rolava: passando rápido, ninguém via).
   // A cascata em si é CSS; aqui só decide a HORA. Uma vez revelado, fica.
   if (titulosFloat.length) {
-    var revelar = function (t) { t.el.classList.add("revela"); };
-    if ("IntersectionObserver" in window) {
-      var olho = new IntersectionObserver(function (entradas) {
-        entradas.forEach(function (e) {
-          if (!e.isIntersecting) return;
-          revelar({ el: e.target });
-          olho.unobserve(e.target);
-        });
-      }, { threshold: 0.25, rootMargin: "0px 0px -12% 0px" });
-      titulosFloat.forEach(function (t) { olho.observe(t.el); });
-      // failsafe: título nunca pode ficar invisível porque o observer falhou
-      setTimeout(function () { titulosFloat.forEach(revelar); }, 3000);
-    } else {
-      titulosFloat.forEach(revelar);
-    }
+    // Posição lida no scroll, não IntersectionObserver: é o mesmo mecanismo do
+    // indicador de seção logo abaixo, e roda em qualquer navegador. São 6
+    // títulos e cada um sai da lista assim que revela — custo desprezível.
+    var faltam = titulosFloat.map(function (t) { return t.el; });
+
+    var verTitulos = function () {
+      var gatilho = window.innerHeight * 0.88;   // revela pouco depois de entrar pela base
+      for (var i = faltam.length - 1; i >= 0; i--) {
+        var caixa = faltam[i].getBoundingClientRect();
+        if (caixa.top < gatilho && caixa.bottom > 0) {
+          faltam[i].classList.add("revela");
+          faltam.splice(i, 1);
+        }
+      }
+      return faltam.length;
+    };
+
+    var agendadoF = false;
+    window.addEventListener("scroll", function () {
+      if (agendadoF || !faltam.length) return;
+      agendadoF = true;
+      requestAnimationFrame(function () { agendadoF = false; verTitulos(); });
+    }, { passive: true });
+    window.addEventListener("resize", verTitulos);
+    verTitulos();
+
+    // Rede de segurança: NUNCA revelar em massa — marcar quem está longe queima
+    // a animação fora da tela, que foi o que fazia só os dois primeiros títulos
+    // aparecerem animados. Quem sobra fica legível e parado, e ainda anima se
+    // chegar na tela: a animação sobrescreve esta opacidade enquanto roda.
+    setTimeout(function () {
+      faltam.forEach(function (el) { el.classList.add("float-destravado"); });
+    }, 3000);
   }
 
   /* ---------- seção atual marcada no cabeçalho ----------
