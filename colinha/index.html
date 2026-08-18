@@ -52,6 +52,27 @@
 
 <main class="folha">
 
+  <!-- Busca do topo: um campo so, numero OU nome, varrendo todos os cargos
+       livres de uma vez. O resultado ja diz o cargo; um toque (ou o numero
+       completo) preenche o campo certo. Escondida ate os dados carregarem:
+       sem dataset nao ha o que buscar. -->
+  <div class="busca-geral" id="bg" hidden>
+    <div class="bg-caixa">
+      <svg class="bg-lupa" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/>
+        <path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+      </svg>
+      <input type="search" id="bg-input" class="bg-input"
+             placeholder="Digite o número do seu candidato"
+             autocomplete="off" enterkeyhint="search"
+             aria-label="Buscar candidato por número ou nome"
+             aria-describedby="bg-dica">
+      <button type="button" id="bg-limpar" class="bg-x" aria-label="Limpar busca" hidden>✕</button>
+    </div>
+    <p class="bg-dica" id="bg-dica">Pode ser o nome. O campo certo preenche sozinho.</p>
+    <ul id="bg-lista" class="bg-lista" hidden></ul>
+  </div>
+
   <p id="aviso" class="aviso" hidden>
     <span id="aviso-txt"></span>
     <button type="button" id="btn-limpar" class="recomecar">

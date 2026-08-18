@@ -1,6 +1,7 @@
 import {
   CARGOS, configPara, hostDeDev, criarEstado, lerURL, lerSalvo, paraSalvar,
   montarColinha, erroSenadores, estaCompleta, slotTravado, limpar, linkDeVolta,
+  buscarGlobal,
 } from './colinha-core.js'
 import { desenhar } from './imagem.js'
 import { configurarBusca, abrirBusca } from './busca.js'
@@ -447,6 +448,139 @@ configurarBusca({
   },
 })
 
+// --- busca geral do topo -----------------------------------------------
+// Um campo so, numero OU nome, varrendo todos os cargos livres. A logica de
+// quem casa com o que e buscarGlobal (colinha-core, testada); aqui e so DOM.
+
+const bg = {
+  raiz: document.getElementById('bg'),
+  input: document.getElementById('bg-input'),
+  lista: document.getElementById('bg-lista'),
+  limpar: document.getElementById('bg-limpar'),
+}
+
+function bgFechar() {
+  bg.lista.hidden = true
+  bg.lista.innerHTML = ''
+}
+
+function bgPreencher(r) {
+  let id = r.cargoId
+  // Senador tem dois votos: a busca sempre aponta o 1º, mas se ele ja tem
+  // OUTRO numero e o 2º esta vazio, este resultado e o segundo voto.
+  if (id === 'senador1' && estado.senador1 && estado.senador1 !== r.numero && !estado.senador2) {
+    id = 'senador2'
+  }
+  estado[id] = r.numero
+  salvar()
+  render()
+  bg.input.value = ''
+  bg.limpar.hidden = true
+  bgFechar()
+  // O toque foi la em cima; o resultado apareceu aqui embaixo. Levar o olho
+  // ate o campo e piscar ele e o que fecha o circuito.
+  const campo = document.getElementById(`campo-${id}`)
+  campo.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  campo.classList.remove('brilho')
+  void campo.offsetWidth // reinicia a animacao se o campo ja piscou antes
+  campo.classList.add('brilho')
+}
+
+function bgItem(r) {
+  const li = document.createElement('li')
+  const bt = document.createElement('button')
+  bt.type = 'button'
+  bt.className = 'busca-item' + (r.exato ? ' exato' : '')
+  bt.addEventListener('click', () => bgPreencher(r))
+
+  const foto = document.createElement('span')
+  foto.className = 'busca-foto'
+  const inicial = () => {
+    foto.textContent = r.nome.trim()[0] ?? ''
+    foto.classList.add('inicial')
+  }
+  if (r.foto) {
+    const img = document.createElement('img')
+    img.loading = 'lazy'
+    img.alt = ''
+    img.src = `fotos/${r.foto}.jpg`
+    img.onerror = inicial
+    foto.append(img)
+  } else {
+    inicial()
+  }
+
+  const txt = document.createElement('span')
+  txt.className = 'busca-txt'
+  const nome = document.createElement('span')
+  nome.className = 'busca-nome'
+  nome.textContent = r.nome
+  const meta = document.createElement('span')
+  meta.className = 'busca-meta'
+  meta.textContent = `${r.numero} · ${r.partido}`
+  txt.append(nome, meta)
+
+  const cargo = document.createElement('span')
+  cargo.className = 'bg-cargo'
+  cargo.textContent = r.rotulo
+
+  bt.append(foto, txt, cargo)
+  li.append(bt)
+  return li
+}
+
+function bgBuscar() {
+  const t = bg.input.value.trim()
+  bg.limpar.hidden = t === ''
+  if (t.length < 2) {
+    bgFechar()
+    return
+  }
+  const achados = buscarGlobal(dados, config, t, 8)
+  // Numero completo, achado, e SEM outro resultado possivel: preenche sem
+  // pedir toque. Com mais resultados na lista o numero pode ser o comeco de
+  // outro maior (444 e um senador, mas tambem o comeco do 44447) — ai quem
+  // decide e o eleitor.
+  if (achados.length === 1 && achados[0].exato) {
+    bgPreencher(achados[0])
+    return
+  }
+  bg.lista.innerHTML = ''
+  if (achados.length === 0) {
+    const li = document.createElement('li')
+    li.className = 'busca-dica'
+    li.textContent = /^\d+$/.test(t)
+      ? 'Número não encontrado. Confira na urna.'
+      : 'Nenhum candidato com esse nome.'
+    bg.lista.append(li)
+  } else {
+    for (const r of achados) bg.lista.append(bgItem(r))
+  }
+  bg.lista.hidden = false
+}
+
+bg.input.addEventListener('input', bgBuscar)
+bg.input.addEventListener('focus', bgBuscar)
+bg.input.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Escape') { bgFechar(); bg.input.blur() }
+  if (ev.key === 'Enter') {
+    // Enter pega o primeiro da lista — que a ordenacao ja poe como o mais
+    // provavel (exato > cargo do tamanho digitado).
+    ev.preventDefault()
+    bg.lista.querySelector('.busca-item')?.click()
+  }
+})
+bg.limpar.addEventListener('click', () => {
+  bg.input.value = ''
+  bg.limpar.hidden = true
+  bgFechar()
+  bg.input.focus()
+})
+// Toque fora fecha a lista; dentro do proprio bloco (input, X) nao.
+document.addEventListener('pointerdown', (ev) => {
+  if (!bg.raiz.contains(ev.target)) bgFechar()
+})
+
 async function iniciar() {
   try {
     const resp = await fetch('candidatos-sp.json', {
@@ -513,6 +647,7 @@ async function iniciar() {
   render()
   el.carregando.hidden = true
   el.form.hidden = false
+  bg.raiz.hidden = false
   el.acoes.hidden = false
 }
 

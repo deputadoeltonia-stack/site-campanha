@@ -263,6 +263,60 @@ export function buscarPorNome(dados, cargo, termo, limite = 40) {
   return achados.slice(0, limite).map(({ pos, ...r }) => r)
 }
 
+// Busca do topo da pagina: UM termo, procurado em todos os cargos LIVRES de
+// uma vez. Digitos casam por PREFIXO de numero; letras caem na busca por
+// nome. O eleitor nao precisa saber em qual cargo o numero se encaixa — o
+// tamanho do numero ja diz (4=federal, 5=estadual...), entao quem responde
+// isso e a colinha, nao ele.
+// Devolve {cargoId, rotulo, digitos, numero, nome, partido, foto, exato}.
+// exato = o numero completo de um cargo, achado no dataset. Os travados
+// (proprio candidato e aliados impressos) ficam de fora: nada os preenche.
+export function buscarGlobal(dados, config, termo, limite = 12) {
+  const travados = slotsTravados(config)
+  const livres = CARGOS.filter((c) => !travados.has(c.id))
+  const t = String(termo ?? '').trim()
+  if (t.length < 2) return []
+  const soDigitos = /^\d+$/.test(t)
+  const achados = []
+  const cargosVistos = new Set() // senador1/senador2 dividem o cargo 5: sem isto cada nome sairia em dobro
+  for (const c of livres) {
+    if (cargosVistos.has(c.cargo)) continue
+    cargosVistos.add(c.cargo)
+    // "Senador (1º voto)" no resultado confundiria: qual voto e decisao da
+    // hora do preenchimento (o primeiro vazio), nao da busca.
+    const rotulo = c.id.startsWith('senador') ? 'Senador' : c.rotulo
+    if (soDigitos) {
+      if (t.length > c.digitos) continue
+      for (const [numero, reg] of Object.entries(dados?.[String(c.cargo)] ?? {})) {
+        if (!numero.startsWith(t)) continue
+        achados.push({
+          cargoId: c.id, rotulo, digitos: c.digitos, numero,
+          nome: reg[0], partido: reg[1], foto: reg[2] || null,
+          exato: numero === t,
+        })
+      }
+    } else {
+      for (const r of buscarPorNome(dados, c.cargo, t, limite)) {
+        achados.push({ cargoId: c.id, rotulo, digitos: c.digitos, ...r, exato: false })
+      }
+    }
+  }
+  // Exato na frente; depois o cargo cujo tamanho bate com o que foi digitado
+  // (quem digitou 3 digitos quase sempre quer senador, nao um estadual que
+  // comeca igual); o resto na ordem da urna, e numero baixo primeiro.
+  const ordem = new Map(CARGOS.map((c, i) => [c.id, i]))
+  achados.sort((a, b) =>
+    (b.exato - a.exato) ||
+    ((b.digitos === t.length) - (a.digitos === t.length)) ||
+    (ordem.get(a.cargoId) - ordem.get(b.cargoId)) ||
+    // Numero baixo primeiro so na busca por digito. Na busca por nome a
+    // relevancia ja veio de buscarPorNome (comeca-com antes de contem) e o
+    // sort estavel a preserva.
+    (soDigitos ? a.numero.localeCompare(b.numero) : 0),
+  )
+  return achados.slice(0, limite)
+}
+
 export function erroSenadores(colinha) {
   const s1 = colinha.find((s) => s.id === 'senador1')
   const s2 = colinha.find((s) => s.id === 'senador2')
