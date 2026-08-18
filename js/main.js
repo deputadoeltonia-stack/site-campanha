@@ -605,20 +605,31 @@
         var caixa = t.el.getBoundingClientRect();
         if (caixa.bottom < -200 || caixa.top > alturaVis + 200) return;   // fora da tela: nem calcula
 
-        var y = noFim ? 99999 : Math.round(limiar - caixa.top);
+        /* --y é herdado, então cada escrita obriga o navegador a recalcular o
+           estilo de TODAS as palavras do parágrafo. Fora da faixa o resultado
+           já está saturado — apagado embaixo, aceso em cima — e continuar
+           escrevendo custaria esse recálculo por frame sem mudar um pixel.
+           Grampeando o valor nos extremos, escreve uma vez e para. */
+        var teto = Math.round(caixa.height + faixa);
+        var y = noFim ? teto : Math.round(limiar - caixa.top);
+        y = y < 0 ? 0 : (y > teto ? teto : y);
         if (y !== t.ultimo) {
+          var acesoAntes = t.ultimo === teto;
           t.ultimo = y;
           t.el.style.setProperty("--y", y);
           // tudo aceso: tira o filter do caminho do compositor
-          t.el.classList.toggle("pronto", y >= caixa.height + faixa);
+          if ((y === teto) !== acesoAntes) t.el.classList.toggle("pronto", y === teto);
         }
         if (semMovimento) return;
 
-        // rotação: o parágrafo entra 1deg torto e desentorta enquanto sobe
+        // Rotação: o parágrafo entra 1deg torto e desentorta enquanto sobe.
+        // transform inline, não custom property: --pr também é herdado e
+        // pagaria o mesmo recálculo de todas as palavras, por um giro que só
+        // afeta o parágrafo.
         var pr = Math.round(travaP((alturaVis - caixa.top) / Math.max(caixa.height, alturaVis * 0.3)) * 100) / 100;
         if (pr === t.ultimoR) return;
         t.ultimoR = pr;
-        t.el.style.setProperty("--pr", pr);
+        t.el.style.transform = pr === 1 ? "" : "rotate(" + ((1 - pr).toFixed(2)) + "deg)";
       });
     };
 
