@@ -377,9 +377,10 @@ function desenharTopo(ctx, t, simbolo, padrao) {
 
   ctx.font = fonte(t, 500, COND, 29, { texto: true })
   ctx.fillStyle = 'rgba(255,255,255,.93)'
-  // Uma linha so, no meio do espaco que as duas ocupavam (146 e 184). A data
-  // da eleicao saiu do cabecalho a pedido da campanha.
-  ctx.fillText('Confira o nome de cada candidato antes de votar.', MARGEM, 165)
+  // Uma linha so; a data da eleicao saiu do cabecalho a pedido da campanha.
+  // Base em 180 (TOPO e 210): fica logo acima da borda da faixa, afastada do
+  // titulo, como a segunda linha ficava antes.
+  ctx.fillText('Confira o nome de cada candidato antes de votar.', MARGEM, 180)
 }
 
 // Divide o nome em ate duas linhas, quebrando no espaco mais proximo do meio.
