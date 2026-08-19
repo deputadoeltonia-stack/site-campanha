@@ -1,5 +1,16 @@
 # Colinha Digital — Apache (HostGator)
 
+# http -> https preservando o caminho. O .htaccess anterior desta pasta
+# redirecionava para /colinha/ fixo, o que funcionava enquanto a colinha so
+# existia como subpasta de drelton4412.com.br e quebrava (404) no subdominio
+# proprio: quem digitasse o endereco sem https caia em erro. %{HTTP_HOST} e
+# %{REQUEST_URI} servem os dois casos sem hardcode.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
 # Sem isto o candidatos-sp.json vai cru: 125 KB em vez de ~35 KB, no 4G do eleitor.
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE application/json application/javascript text/javascript text/css text/html image/svg+xml
