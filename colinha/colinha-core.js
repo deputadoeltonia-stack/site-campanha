@@ -57,6 +57,12 @@ export const CANDIDATOS = {
   'www.proftozi44447.com.br': { alias: 'colinhavirtual.dreltonai.com.br' },
   'drelton4412.com.br': { alias: 'colinha.dreltonai.com.br' },
   'www.drelton4412.com.br': { alias: 'colinha.dreltonai.com.br' },
+  // Subdominio proprio da colinha no dominio de campanha. O plano de
+  // hospedagem so aceita um dominio, entao colinha.dreltonai.com.br (o do QR
+  // impresso em 07/2026) nao pode ser criado nessa conta — este e o link
+  // curto que vai no material novo.
+  'colinha.drelton4412.com.br': { alias: 'colinha.dreltonai.com.br' },
+  'www.colinha.drelton4412.com.br': { alias: 'colinha.dreltonai.com.br' },
   'dulcerita44400.com.br': { alias: 'colinha2026.dreltonai.com.br' },
   'www.dulcerita44400.com.br': { alias: 'colinha2026.dreltonai.com.br' },
   // Site da Dulce Rita (projeto Vercel "dulcesite") tambem embute /colinha/.

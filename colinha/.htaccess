@@ -1,0 +1,22 @@
+# Colinha Digital — Apache (HostGator)
+
+# Sem isto o candidatos-sp.json vai cru: 125 KB em vez de ~35 KB, no 4G do eleitor.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE application/json application/javascript text/javascript text/css text/html image/svg+xml
+</IfModule>
+
+# no-cache nao e "nao guarde": o navegador guarda e revalida por ETag (304, sem
+# baixar de novo). O que isto impede e o cache heuristico segurar app.js ou o
+# dataset por dias — um numero de urna corrigido em 13/09 precisa chegar em 14/09
+# a quem ja visitou o site.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|js|json)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  # Fontes e fotos sao imutaveis: nome fixo, conteudo que nao muda.
+  <FilesMatch "\.(woff2|jpg|png|svg)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
+
+DirectoryIndex index.html
