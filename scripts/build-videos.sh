@@ -18,8 +18,18 @@ SRC="$ROOT/assets-src/videos-src"
 OUT="$ROOT/public/assets/videos"
 mkdir -p "$OUT"
 
-for f in "$SRC"/*.mp4; do
-  [ -e "$f" ] || continue
+# Sem argumentos converte tudo; com nomes converte so eles (re-encodar os 11
+# antigos so pra publicar 1 novo custa meia hora de CPU e nao muda um byte).
+#   bash scripts/build-videos.sh casa-leo
+if [ $# -gt 0 ]; then
+  FILES=()
+  for n in "$@"; do FILES+=("$SRC/${n%.mp4}.mp4"); done
+else
+  FILES=("$SRC"/*.mp4)
+fi
+
+for f in "${FILES[@]}"; do
+  [ -e "$f" ] || { echo "ERRO: $f nao existe" >&2; exit 1; }
   name="$(basename "${f%.mp4}")"
   out_mp4="$OUT/$name.mp4"
   out_poster="$OUT/$name.webp"

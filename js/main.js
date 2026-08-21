@@ -481,31 +481,44 @@
      <dialog> nativo: Esc e foco já vêm de graça, zero biblioteca.          */
   var gimgs = document.querySelectorAll(".gphoto img");
   if (gimgs.length && window.HTMLDialogElement) {
+    var fotos = Array.prototype.slice.call(gimgs);
+    var atual = 0;
     // construído via DOM (sem innerHTML): nada de string de markup, zero risco de XSS
     var dlg = document.createElement("dialog");
     dlg.className = "lightbox";
-    var lbClose = document.createElement("button");
-    lbClose.type = "button";
-    lbClose.className = "lightbox-close";
-    lbClose.setAttribute("aria-label", "Fechar");
-    lbClose.textContent = "×";
+    var botao = function (cls, txt, rotulo) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = cls; b.textContent = txt;
+      b.setAttribute("aria-label", rotulo);
+      return b;
+    };
+    var lbClose = botao("lightbox-close", "\u00d7", "Fechar");
+    var lbPrev = botao("lightbox-nav lightbox-prev", "\u2039", "Foto anterior");
+    var lbNext = botao("lightbox-nav lightbox-next", "\u203a", "Pr\u00f3xima foto");
     var lbImg = document.createElement("img");
     lbImg.alt = "";
     var lbCap = document.createElement("p");
     lbCap.className = "lightbox-cap";
-    dlg.append(lbClose, lbImg, lbCap);
+    dlg.append(lbClose, lbPrev, lbNext, lbImg, lbCap);
     document.body.appendChild(dlg);
 
-    var abrir = function (img) {
+    // Índice circular: da última a seta "próxima" volta pra primeira, em vez de
+    // desabilitar o botão — quem está navegando não quer descobrir onde acaba.
+    var mostrar = function (i) {
+      atual = (i + fotos.length) % fotos.length;
+      var img = fotos[atual];
       var fig = img.closest("figure");
       var cap = fig && fig.querySelector("figcaption");
       lbImg.src = img.currentSrc || img.src;
       lbImg.alt = img.alt || "";
       lbCap.textContent = cap ? cap.textContent : "";
+    };
+    var abrir = function (img) {
+      mostrar(fotos.indexOf(img));
       dlg.showModal();
     };
 
-    gimgs.forEach(function (img) {
+    fotos.forEach(function (img) {
       img.setAttribute("tabindex", "0");
       img.setAttribute("role", "button");
       img.setAttribute("aria-label", "Ampliar foto: " + (img.alt || ""));
@@ -515,11 +528,92 @@
       });
     });
 
+    lbPrev.addEventListener("click", function () { mostrar(atual - 1); });
+    lbNext.addEventListener("click", function () { mostrar(atual + 1); });
+    // Esc já vem do <dialog>; as setas do teclado são o par natural dos botões
+    dlg.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") { e.preventDefault(); mostrar(atual - 1); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); mostrar(atual + 1); }
+    });
+    // arrasto no celular: 40px é o mínimo que não confunde com toque torto
+    var x0 = null;
+    dlg.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    dlg.addEventListener("touchend", function (e) {
+      if (x0 === null) return;
+      var d = e.changedTouches[0].clientX - x0;
+      x0 = null;
+      if (Math.abs(d) > 40) mostrar(atual + (d < 0 ? 1 : -1));
+    }, { passive: true });
+
     // fecha ao clicar no backdrop ou no X (pseudo não conta como alvo do dialog)
     dlg.addEventListener("click", function (e) {
       if (e.target === dlg || e.target.classList.contains("lightbox-close")) dlg.close();
     });
     dlg.addEventListener("close", function () { lbImg.removeAttribute("src"); });
+  }
+
+  /* ---------- vídeos: a capa inteira é o play, e o pôster chega tarde ----------
+     Dois problemas no mesmo lugar. (1) Com <video controls>, o único alvo que
+     toca é o botão nativo no meio do card — pequeno no desktop, ignorado no
+     celular, onde o dedo cai na foto. Aqui o controls sai do HTML e entra no
+     primeiro clique: até lá o card inteiro é o botão. O listener é one-shot de
+     propósito — mantê-lo faria o clique no "pausar" (que o navegador reentrega
+     ao <video>) voltar a tocar o vídeo.
+     (2) preload="none" segura os MB do vídeo, mas NÃO o pôster: os 13 .webp
+     (~740KB) saíam junto com o HTML, antes de alguém rolar até a seção. Agora
+     cada um entra quando o card se aproxima, e o que sobrar entra sozinho 3s
+     depois — nunca na abertura, que é onde o atraso aparece. */
+  var videos = Array.prototype.slice.call(document.querySelectorAll(".video-card video"));
+  if (videos.length) {
+    videos.forEach(function (v) {
+      var card = v.closest(".video-card");
+      // controls saem AQUI, nao no HTML: sem JS o video tem que continuar tocavel
+      v.controls = false;
+      v.setAttribute("tabindex", "0");
+      v.setAttribute("role", "button");
+      var legenda = card && card.querySelector("figcaption strong");
+      v.setAttribute("aria-label", "Reproduzir vídeo" + (legenda ? ": " + legenda.textContent : ""));
+      var tocar = function () {
+        v.removeEventListener("click", tocar);
+        v.removeAttribute("role");
+        v.removeAttribute("aria-label");
+        v.controls = true;
+        if (card) card.classList.add("tocando");
+        var p = v.play();
+        if (p && p.catch) p.catch(function () {});   // autoplay barrado: controls já estão lá
+      };
+      v.addEventListener("click", tocar);
+      v.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tocar(); }
+      });
+      // dois áudios ao mesmo tempo não é opção de ninguém
+      v.addEventListener("play", function () {
+        videos.forEach(function (o) { if (o !== v && !o.paused) o.pause(); });
+      });
+    });
+
+    var porPoster = function (v) {
+      if (!v.dataset.poster) return;
+      v.poster = v.dataset.poster;
+      delete v.dataset.poster;
+    };
+    if ("IntersectionObserver" in window) {
+      var ioP = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (e.isIntersecting) { porPoster(e.target); ioP.unobserve(e.target); }
+        });
+      }, { rootMargin: "600px 0px" });   // uma tela e meia de antecedência
+      videos.forEach(function (v) { ioP.observe(v); });
+    } else {
+      videos.forEach(porPoster);
+    }
+    // rede ociosa, depois da página pronta: o resto entra para o clique
+    // encontrar a capa já ali. requestIdleCallback só existe no Chrome/Firefox.
+    setTimeout(function () {
+      var resto = function () { videos.forEach(porPoster); };
+      if (window.requestIdleCallback) window.requestIdleCallback(resto, { timeout: 2000 });
+      else resto();
+    }, 3000);
   }
 
   /* ---------- texto que acende linha a linha, atado ao scroll ----------
