@@ -628,12 +628,21 @@
   var legendas = [];
   document.querySelectorAll(".video-card figcaption").forEach(function (cap) {
     var textos = Array.prototype.slice.call(cap.querySelectorAll("p.prose"));
-    if (!textos.length) return;
     var card = cap.closest(".video-card");
 
+    // Legenda sem paragrafo (hoje so o card do Destaque, que e titulo puro) nao
+    // ganha caixa. Reservar as 6 linhas nele abria um vao branco de ~200px
+    // debaixo do titulo, com cara de defeito. A altura travada existe para
+    // alinhar cards que dividem a MESMA fileira do grid; o Destaque esta sozinho
+    // no bloco dele, entao nao ha com o que alinhar. Sem caixa tambem nao ha
+    // corte nem botao, o que mantem o estado coerente.
+    if (!textos.length) return;
+
+    // appendChild em vez de insertBefore: os unicos filhos sao <strong> e os
+    // <p>, entao mover os paragrafos para dentro preserva a ordem.
     var caixa = document.createElement("div");
     caixa.className = "video-legenda";
-    cap.insertBefore(caixa, textos[0]);
+    cap.appendChild(caixa);
     textos.forEach(function (t) { caixa.appendChild(t); });
 
     var btn = document.createElement("button");
