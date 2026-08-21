@@ -17,7 +17,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 NOME   = "Dr. Elton"
 CARGO  = "DEPUTADO FEDERAL"
 NUMERO = "4412"
-FRASE  = "Trabalho sério, perto de você."
+FRASE  = "Pelas pessoas, sempre."
 
 ROOT   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FOTO   = os.path.join(ROOT, "public/assets/deputado.png")

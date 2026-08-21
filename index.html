@@ -10,10 +10,11 @@
   <meta property="og:description" content="Trabalho sério, perto de você. Conheça as propostas e participe da campanha." />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="pt_BR" />
-  <!-- APÓS O DEPLOY: troque por URL absoluta (https://seu-site.netlify.app/public/assets/og-image.png).
-       Facebook/WhatsApp resolvem relativo na maioria dos casos, absoluto é garantido.
-       Regerar o card depois de definir nome/número reais: python3 scripts/gen-og.py -->
-  <meta property="og:image" content="public/assets/og-image.png" />
+  <!-- og:image e og:url absolutos: o WhatsApp e o X nao resolvem caminho
+       relativo, e sem preview o link compartilhado vira so texto azul.
+       Regerar o card depois de mudar nome/numero/frase: python3 scripts/gen-og.py -->
+  <meta property="og:url" content="https://drelton4412.com.br/" />
+  <meta property="og:image" content="https://drelton4412.com.br/public/assets/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="Dr. Elton, candidato a Deputado Federal. Vote 4412" />
@@ -23,6 +24,7 @@
 
   <link rel="icon" href="public/assets/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="public/assets/apple-touch-icon.png" />
+  <link rel="canonical" href="https://drelton4412.com.br/" />
 
   <!-- preload do que pinta o hero primeiro: fonte do título, fonte do corpo, foto -->
   <link rel="preload" href="public/fonts/geometos.woff2" as="font" type="font/woff2" crossorigin />

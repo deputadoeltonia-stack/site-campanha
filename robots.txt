@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://drelton4412.com.br/sitemap.xml
