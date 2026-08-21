@@ -616,6 +616,67 @@
     }, 3000);
   }
 
+  /* ---------- legendas do mesmo tamanho, com "Ler mais" ----------
+     As legendas vao de uma linha a tres paragrafos, e o grid estica a fileira
+     inteira ate o card mais alto: uma legenda longa abria um vao embaixo dos
+     quatro cards vizinhos. A caixa e travada em 6 linhas pelo CSS; aqui so
+     nascem o embrulho e o botao.
+
+     Construido no JS, nao no HTML, por um motivo: quem esta sem JS nao teria
+     botao, e uma legenda cortada sem como abrir e conteudo escondido. Sem JS
+     nao ha .video-legenda, e o CSS do corte (todo sob .js) nunca se aplica. */
+  var legendas = [];
+  document.querySelectorAll(".video-card figcaption").forEach(function (cap) {
+    var textos = Array.prototype.slice.call(cap.querySelectorAll("p.prose"));
+    if (!textos.length) return;
+    var card = cap.closest(".video-card");
+
+    var caixa = document.createElement("div");
+    caixa.className = "video-legenda";
+    cap.insertBefore(caixa, textos[0]);
+    textos.forEach(function (t) { caixa.appendChild(t); });
+
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "legenda-mais";
+    btn.textContent = "Ler mais";
+    btn.setAttribute("aria-expanded", "false");
+    // fechado por padrao; o CSS esconde o botao ate a medida provar que ha corte
+    cap.appendChild(btn);
+
+    btn.addEventListener("click", function () {
+      var aberta = card.classList.toggle("legenda-aberta");
+      btn.textContent = aberta ? "Ler menos" : "Ler mais";
+      btn.setAttribute("aria-expanded", aberta ? "true" : "false");
+    });
+
+    legendas.push({ caixa: caixa, btn: btn, card: card });
+  });
+
+  if (legendas.length) {
+    // A medida marca o CARD, nao o botao: a faixa de degrade e o "Ler mais" leem
+    // a mesma classe, entao nao existe estado em que um aparece sem o outro.
+    // O +1 absorve o arredondamento subpixel que faz scrollHeight passar do
+    // clientHeight por uma fracao de pixel sem haver corte de verdade.
+    var medirLegendas = function () {
+      legendas.forEach(function (l) {
+        if (l.card.classList.contains("legenda-aberta")) return;   // aberta mede altura cheia
+        l.card.classList.toggle("legenda-cortada", l.caixa.scrollHeight > l.caixa.clientHeight + 1);
+      });
+    };
+    medirLegendas();
+    // a fonte real remexe a quebra: o que cabia em 6 linhas com a fallback pode nao caber
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(medirLegendas);
+    // so a LARGURA muda a quebra, e no mobile o resize dispara a cada mexida da barra de URL
+    var larguraL = window.innerWidth, remedirL;
+    window.addEventListener("resize", function () {
+      if (window.innerWidth === larguraL) return;
+      larguraL = window.innerWidth;
+      clearTimeout(remedirL);
+      remedirL = setTimeout(medirLegendas, 150);
+    });
+  }
+
   /* ---------- texto que acende linha a linha, atado ao scroll ----------
      Porte do ScrollReveal (React Bits) sem React/GSAP, com os parâmetros que
      você passou: baseOpacity .1, enableBlur, baseRotation 1, blurStrength 4.

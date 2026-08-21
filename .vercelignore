@@ -3,6 +3,7 @@ node_modules
 assets-src
 fonts-src
 scripts
+.claude
 .impeccable
 .claude-flow
 .env

@@ -427,7 +427,6 @@ p { margin: 0 0 1rem; }
 .video-block { margin-bottom: clamp(2.5rem, 5vw, 3.5rem); }
 .video-block:last-child { margin-bottom: 0; }
 .video-block-title { font-size: var(--step-1); margin-bottom: 1.1rem; }
-.video-empty { color: var(--ink-mut); font-family: var(--prose); }
 
 /* ---------- materiais ----------
    Card navy: a lima da placa/CTA só funciona em fundo escuro (regra da paleta). */
@@ -455,6 +454,56 @@ p { margin: 0 0 1rem; }
 .video-card figcaption span { font-family: var(--prose); color: var(--ink-mut); font-size: var(--step--1); }
 .video-card figcaption em { font-style: normal; opacity: .6; }
 .video-card figcaption p { font-family: var(--prose); color: var(--ink-mut); font-size: var(--step--1); line-height: 1.5; margin: 0; max-width: none; }
+
+/* ---------- legenda de altura travada, com "Ler mais" ----------
+   As legendas vao de uma linha (Casa do Leo) a tres paragrafos (Teca e
+   Geraldo). Como o grid estica a fileira ate o card mais alto, bastava uma
+   legenda longa para a fileira inteira ganhar um vao enorme embaixo dos cards
+   vizinhos. A caixa travada em 6 linhas iguala todos, e o "Ler mais" devolve o
+   texto inteiro de quem foi cortado.
+
+   Tudo sob .js de proposito: o botao e construido no main.js, entao sem JS nao
+   existe botao — e cortar texto sem dar como abrir seria esconder conteudo. */
+.js .video-legenda {
+  font-size: var(--step--1); line-height: 1.5;
+  height: calc(1.5em * 6); overflow: hidden; position: relative;
+  display: flex; flex-direction: column; gap: .5em;
+}
+.js .video-card.legenda-aberta .video-legenda { height: auto; }
+
+/* UM estado, .legenda-cortada no card, governa a faixa E o botao. Estavam em
+   condicoes separadas antes: a faixa saia em toda legenda e o botao so em quem
+   cortava, entao "Visita para a Lindoya e a Vera" — texto que cabe inteiro —
+   anunciava continuacao que nao existia e nao dava como abrir. Sinal de "tem
+   mais" e o meio de ver esse mais nascem da mesma medida ou nao nascem. */
+.js .video-card.legenda-cortada:not(.legenda-aberta) .video-legenda::after {
+  content: ""; position: absolute; inset: auto 0 0 0; height: 2.2em;
+  background: linear-gradient(to top, var(--surface), transparent);
+  pointer-events: none;
+}
+
+/* Titulo em duas linhas minimas: e a ultima fonte de desalinhamento depois que a
+   legenda travou (medido: 43px com uma linha, 51px com duas). min-height, nao
+   height — titulo de tres linhas tem que poder crescer, nao ser cortado.
+   line-height explicito porque o min-height depende dele: herdado do body, um
+   ajuste la reabriria o desalinhamento daqui sem aviso. */
+.js .video-card figcaption strong { line-height: 1.6; min-height: 3.2em; }
+
+/* O botao ocupa lugar sempre e some por visibility, nao por display: com
+   display:none o card encolhia e voltava a desalinhar justo nos que cabiam. */
+.js .legenda-mais {
+  align-self: flex-start; margin-top: .5rem; position: relative;
+  border: none; background: none; padding: 0;
+  font-family: var(--body); font-weight: 500; font-size: var(--step--1);
+  color: var(--blue); cursor: pointer; visibility: hidden;
+  text-decoration: underline; text-underline-offset: .25em;
+}
+.js .video-card.legenda-cortada .legenda-mais { visibility: visible; }
+.js .legenda-mais:hover { color: var(--ink); }
+/* Alvo de toque de 44px sem custar 44px de layout: o texto tem 16px de altura e
+   esticar a caixa empurraria todos os cards. A area invisivel resolve o dedo sem
+   mexer no alinhamento que acabamos de travar. */
+.js .legenda-mais::after { content: ""; position: absolute; inset: -14px -12px; }
 
 /* Capa do vídeo é o botão: o play nativo é um alvo de ~40px no meio de um card
    de 220px, e no celular quase todo mundo toca na foto. Sem JS o <video> volta
