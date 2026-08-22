@@ -87,6 +87,123 @@ export const CANDIDATOS = {
   },
 }
 
+// --- santinhos 9x5 ------------------------------------------------------
+// A peca 9x5 e a versao digital do verso impresso: o que ja vem impresso e
+// travado, o que vem em branco o eleitor completa. Em geral e uma peca
+// conjunta (parceiro estadual + Dr. Elton), mas o Dr. Elton tambem tem a
+// dele sozinho — por isso o registro nao se chama mais PARCEIROS.
+//
+// Cada santinho tem subdominio proprio, e a rota /c/<slug> vale de reserva.
+// O slug so ESCOLHE uma entrada daqui: nao carrega nome nem numero. A
+// garantia central continua a mesma do resto do produto — numero e nome saem
+// da config e so da config, e slot travado nao existe no objeto de estado.
+//
+// Todos os subdominios vivem em drelton4412.com.br, nunca em
+// dreltonai.com.br: o segundo resolve num VPS da Hostinger, e o eleitor que
+// aponta a camera bateria naquele servidor antes de chegar na colinha.
+export const SANTINHOS = {
+  leandro: {
+    nome: 'LEANDRO CÉSAR', cargo: 7, numero: '44012', partido: 'UNIÃO',
+    tema: 'santinho', rotulo: 'Deputado estadual',
+    // Cor das caixas e do disco da foto DELE. Na peca do Leandro e o mesmo
+    // lima do Dr. Elton; na do Rogerio, o ambar dele. E o unico eixo que muda
+    // de um santinho para o outro.
+    cor: '#cddc00',
+    // Foto do TSE (SQ_CANDIDATO 250002533739): mesma pessoa e mesmo terno da
+    // peca impressa. Nao ha arte de campanha separada para ele, entao nao ha
+    // arquivo proprio em fotos/ como o elton.jpg das outras tres.
+    foto: '250002533739',
+    // Subdominio proprio, como o do Rogerio: a raiz ja abre esta colinha, sem
+    // /c/ e sem parametro. Em drelton4412.com.br (HostGator dos nameservers
+    // ao IP), nunca em dreltonai.com.br, que passa pela Hostinger.
+    hosts: ['leandro.drelton4412.com.br', 'www.leandro.drelton4412.com.br'],
+    // Marcacao legal da propaganda (Lei 9.504/97, art. 38 §1o), da lateral do
+    // santinho. As outras tres campanhas montam a frase de razao + cnpj; aqui
+    // a peca traz os dois CNPJs, e sao eles que a lei pede.
+    //
+    // A tiragem ("30.000 unidades") fica de FORA: ela e a quantidade de
+    // exemplares do impresso, exigida do material grafico. Uma colinha na
+    // tela nao tem exemplar nem quantidade — copiada para ca a frase vira
+    // informacao falsa sobre o proprio meio em que esta sendo lida.
+    legal: [
+      'CNPJ Candidato: 68.283.009/0001-90',
+      'CNPJ Contratado: 10.386.377/0001-84',
+    ],
+    // O Dr. Elton vem impresso na peca: FIXO, nao sugestao. Governador e
+    // presidente ficam em branco no santinho, entao ficam livres aqui — ao
+    // contrario da peca do proprio Dr. Elton, que ja traz o governador.
+    fixos: { federal: '4412' },
+  },
+  rogerio: {
+    nome: 'ROGÉRIO FRANCO', cargo: 7, numero: '22999', partido: 'PL',
+    tema: 'santinho', rotulo: 'Deputado estadual',
+    cor: '#f4be38', // ambar da peca dele, medido na pagina 2 do PDF
+    foto: '250002536405',
+    // Subdominio proprio: a raiz dele ja abre esta colinha, sem /c/ e sem
+    // parametro, o que da o QR mais curto possivel para a peca impressa.
+    //
+    // Em drelton4412.com.br, NAO em dreltonai.com.br: o segundo tem DNS e IP
+    // na Hostinger (o reverso do 187.127.17.18 e srv1779079.hstgr.cloud) e o
+    // eleitor que aponta a camera bate naquele servidor antes de chegar na
+    // colinha. Este dominio e HostGator dos nameservers ao IP, e o
+    // subdominio nasce no proprio cPanel — nada fora dele no caminho.
+    hosts: ['rogerio.drelton4412.com.br', 'www.rogerio.drelton4412.com.br'],
+    // Os mesmos dois CNPJs da peca do Leandro, como impresso na lateral.
+    legal: [
+      'CNPJ Candidato: 68.283.009/0001-90',
+      'CNPJ Contratado: 10.386.377/0001-84',
+    ],
+    fixos: { federal: '4412' },
+  },
+  tozi: {
+    nome: 'PROFESSOR TOZI', cargo: 7, numero: '44447', partido: 'UNIÃO',
+    tema: 'santinho', rotulo: 'Deputado estadual',
+    cor: '#0057c3', // azul da peca dele, medido na pagina 2 do PDF
+    foto: 'tozi',
+    // Dominio DELE: a campanha do Tozi e outra conta de HostGator, noutro
+    // servidor (ns856, 192.185.131.84). Por isso o santinho dele nao mora em
+    // drelton4412.com.br como os outros — cada peca vive no dominio da
+    // campanha que a imprime.
+    hosts: ['santinho.proftozi44447.com.br', 'www.santinho.proftozi44447.com.br'],
+    legal: [
+      'CNPJ Candidato: 68.283.009/0001-90',
+      'CNPJ Contratado: 10.386.377/0001-84',
+    ],
+    fixos: { federal: '4412' },
+  },
+  dulce: {
+    nome: 'DULCE RITA', cargo: 7, numero: '44400', partido: 'UNIÃO',
+    tema: 'santinho', rotulo: 'Deputada estadual', // flexao do cargo, so no dela
+    cor: '#27d9c4', // mint da peca dela, medido na pagina 2 do PDF
+    foto: 'dulce',
+    // Terceira conta de HostGator, terceiro servidor (ns815, 50.116.87.219).
+    hosts: ['santinho.dulcerita44400.com.br', 'www.santinho.dulcerita44400.com.br'],
+    legal: [
+      'CNPJ Candidato: 68.283.009/0001-90',
+      'CNPJ Contratado: 10.386.377/0001-84',
+    ],
+    fixos: { federal: '4412' },
+  },
+  // A peca 9x5 do Dr. Elton SOZINHO. Nao e a colinha dele que ja existe em
+  // colinha.drelton4412.com.br: aquela e a peca antiga, de tema claro e com o
+  // governador travado no Tarcisio. Esta deixa TODOS os outros cargos em
+  // branco — inclusive o de governador —, e as duas convivem porque o QR
+  // impresso em julho aponta para a antiga.
+  elton: {
+    nome: 'DR. ELTON', cargo: 6, numero: '4412', partido: 'UNIÃO',
+    tema: 'santinho', rotulo: 'Deputado federal',
+    cor: '#cddc00',
+    foto: '250002532326',
+    hosts: ['santinho.drelton4412.com.br', 'www.santinho.drelton4412.com.br'],
+    legal: [
+      'CNPJ Candidato: 68.283.009/0001-90',
+      'CNPJ Contratado: 10.386.377/0001-84',
+    ],
+    // Sem `fixos`: nesta peca o Dr. Elton e o DONO, nao um aliado impresso, e
+    // nenhum outro cargo vem preenchido do papel.
+  },
+}
+
 const PADRAO = 'colinha.dreltonai.com.br'
 
 export function configPara(hostname) {
@@ -105,6 +222,30 @@ export function hostDeDev(hostname, busca) {
   const tema = new URLSearchParams(busca ?? '').get('campanha')
   const achado = Object.entries(CANDIDATOS).find(([, c]) => c.tema === tema)
   return achado ? achado[0] : PADRAO
+}
+
+// Ponto unico de resolucao da pagina: santinho de parceiro primeiro, senao a
+// campanha pelo hostname. O QR impresso aponta para /c/<slug>, que redireciona
+// para a raiz com ?p=<slug> — na raiz os caminhos relativos de fotos/, fonts/
+// e do dataset continuam valendo, o que nao seria verdade servindo o app de
+// dentro de /c/.
+//
+// Um ?p= desconhecido cai na resolucao normal, calada: o parametro escolhe
+// entre entradas aprovadas do registro, nunca inventa uma. E o mesmo motivo
+// pelo qual ?campanha= so vale em localhost.
+export function configDaRota(hostname, busca) {
+  // O hostname vem PRIMEIRO, e por isso o ?p= nao vale num subdominio de
+  // parceiro: senao rogerio.dreltonai.com.br/?p=leandro abriria a colinha do
+  // Leandro dentro do site do Rogerio. Mesmo motivo pelo qual ?campanha= so
+  // funciona em localhost — endereco proprio mostra o dono dele, e ponto.
+  const dono = Object.values(SANTINHOS).find((c) => c.hosts?.includes(hostname))
+  if (dono) return dono
+
+  const slug = new URLSearchParams(busca ?? '').get('p')
+  // hasOwn, nao SANTINHOS[slug]: ?p=__proto__ devolve Object.prototype, que e
+  // um objeto truthy — a pagina abriria sem nome, sem numero e sem tema.
+  if (slug && Object.hasOwn(SANTINHOS, slug)) return SANTINHOS[slug]
+  return configPara(hostDeDev(hostname, busca))
 }
 
 export function buscar(dados, cargo, numero) {

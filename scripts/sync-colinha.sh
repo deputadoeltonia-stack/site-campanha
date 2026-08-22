@@ -13,6 +13,7 @@ rsync -a --delete \
   --include='index.html' --include='style.css' \
   --include='app.js' --include='busca.js' --include='colinha-core.js' --include='imagem.js' \
   --include='candidatos-sp.json' \
+  --include='c/***' \
   --include='fonts/***' --include='marca/***' --include='fotos/***' \
   --exclude='*' \
   "$SRC/" "$DST/"

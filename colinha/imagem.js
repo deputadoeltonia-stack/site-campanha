@@ -65,6 +65,29 @@ export const TEMAS = {
     titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
     texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
   },
+  // Verso do santinho 9x5 conjunto (Dr. Elton + parceiro estadual): a peca
+  // inteira e escura, ao contrario das outras tres. Corpo navy com o chevron
+  // do manual, caixa preenchida em lima e algarismo BRANCO — nao navy, como
+  // nas pecas claras. Caixa vazia branca, exatamente como as do senador, do
+  // governador e do presidente que o eleitor recebe em branco no papel.
+  // Verso do santinho 9x5 conjunto (Dr. Elton + parceiro estadual). Layout
+  // proprio, em desenharSantinho() la embaixo: nenhuma das medidas das outras
+  // tres pecas vale aqui. Cores medidas na pagina 2 do PDF da peca.
+  santinho: {
+    santinho: true, // usa o renderizador proprio, nao o das tres campanhas
+    fundo: '#0a223e', chevClaro: '#0d294b',
+    caixa: '#ffffff',
+    txt: '#ffffff', rot: '#c3d3e8',
+    // Lima das caixas do Dr. Elton e dos cargos livres. O parceiro leva a cor
+    // dele, que vem da config (config.cor) — e o unico eixo que muda de uma
+    // peca para a outra.
+    destaque: '#cddc00',
+    tique: '#9dc23c', // os tiques soltos no fundo saem num lima mais fechado
+    semSelo: true, // a peca 9x5 nao tem adesivo redondo
+    legalDireita: true, // a marcacao legal virada fica na lateral direita
+    titulo: '"Geometos Neue", "Geometos", system-ui, sans-serif',
+    texto: '"Avenir LT Std", system-ui, -apple-system, sans-serif',
+  },
   dulce: {
     // Verso do santinho 7x10 em curvas (16/08), reproduzido a risca: painel
     // cinza chapado, rotulo cinza + nome/digito navy, selo petroleo-escuro,
@@ -408,7 +431,10 @@ const SELO_RAIO_TEXTO = 96
 
 // Raio do selo que sera desenhado — 0 quando o site nao tem candidato proprio.
 export function raioDoSelo(t, temSelo, temImagem) {
-  if (!temSelo) return 0
+  // semSelo: a peca simplesmente nao tem adesivo redondo (o santinho 9x5
+  // conjunto). Sem isto o tema cairia no selo montado com texto, que existe
+  // como ULTIMO recurso para campanha sem arte — nao como escolha de arte.
+  if (!temSelo || t.semSelo) return 0
   return temImagem ? (t.seloRaio ?? 148) : SELO_RAIO_TEXTO
 }
 
@@ -562,6 +588,34 @@ function desenharSelo(ctx, t, slot, imgSelo, raio, seloLogo, seloLogo2, seloTrio
   ctx.textAlign = 'left'
 }
 
+// Marcacao legal na margem, rodada 90deg — o lugar que o santinho impresso
+// usa. A faixa livre entre a borda e MARGEM nao disputa espaco com nada: as
+// fotos so comecam em MARGEM e as caixas terminam antes da outra borda.
+// Na peca 9x5 conjunta ela sai na margem DIREITA e em duas linhas, como
+// impresso; nas tres campanhas proprias, na esquerda e numa linha so.
+const ENTRELINHA_LEGAL = 21
+
+function desenharLegal(ctx, t, config, altura) {
+  const legal = config.legal
+    ?? (config.cnpj ? [`${config.razao} \u00b7 CNPJ ${config.cnpj}`] : null)
+  if (!legal?.length) return
+  ctx.save()
+  // Depois do rotate(-90) o +y local aponta para a DIREITA da peca. Na
+  // margem direita as linhas por isso comecam recuadas, para que a ultima
+  // (a mais longa, a do contratado) e nao a primeira encoste na borda.
+  const x = t.legalDireita
+    ? L - MARGEM * 0.62 - ENTRELINHA_LEGAL * (legal.length - 1)
+    : MARGEM * 0.62
+  ctx.translate(x, altura - 118)
+  ctx.rotate(-Math.PI / 2)
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'alphabetic'
+  ctx.fillStyle = t.rot
+  ctx.font = fonte(t, 500, COND, 17, { texto: true })
+  legal.forEach((linha, i) => ctx.fillText(linha, 0, i * ENTRELINHA_LEGAL))
+  ctx.restore()
+}
+
 export async function desenhar(colinha, config) {
   const t = TEMAS[config.tema] ?? TEMAS.elton
 
@@ -579,6 +633,11 @@ export async function desenhar(colinha, config) {
   // Fotos antes de qualquer traco: drawImage e sincrono, entao elas precisam
   // ja estar decodificadas quando o laco chegar em cada linha.
   const fotos = await carregarFotos(colinha)
+
+  // A peca 9x5 conjunta tem layout proprio (sem cabecalho, fundo escuro de
+  // ponta a ponta, lockup redondo por candidato travado). Sai daqui antes de
+  // carregar simbolo, rosto e selo: nenhum deles existe nela.
+  if (t.santinho) return desenharSantinho(colinha, config, t, fotos)
   // Simbolo, rosto e selo do manual, quando o tema tem. Falha vira null e o
   // desenho cai no risco geometrico — a imagem sai sem a marca, nunca quebrada.
   const [simbolo, rosto, padrao, imgSelo, seloLogo, seloLogo2, seloTrio, corpoPadrao, coracao, coracaoCorpo] = await Promise.all([
@@ -685,7 +744,9 @@ export async function desenhar(colinha, config) {
   // Raio do selo que sera desenhado — 0 quando nao ha selo. O laco das linhas
   // usa o MESMO numero para saber onde parar o nome.
   const seloRaio = raioDoSelo(t, Boolean(proprio), Boolean(imgSelo))
-  if (proprio) desenharSelo(ctx, t, proprio, imgSelo, seloRaio, seloLogo, seloLogo2, seloTrio)
+  // seloRaio, nao `proprio`: com raio 0 (tema semSelo) o circulo some mas o
+  // cargo, o nome e o numero continuavam sendo escritos por cima da peca.
+  if (seloRaio > 0) desenharSelo(ctx, t, proprio, imgSelo, seloRaio, seloLogo, seloLogo2, seloTrio)
 
   // Tamanho do algarismo tirado da peca: no santinho a tinta do digito mede
   // 0,82 da altura da caixa (176px numa caixa de 215). Mede-se a tinta do "4"
@@ -800,20 +861,7 @@ export async function desenhar(colinha, config) {
   ctx.font = fonte(t, 500, COND, 24, { texto: true })
   ctx.fillText('Confira sempre o n\u00famero do candidato na urna.', L / 2, A - 18)
 
-  // Marcacao legal na margem esquerda, rodada 90deg — o lugar que o santinho
-  // impresso usa para razao social e CNPJ. A faixa 0..MARGEM fica livre: as
-  // fotos so comecam em MARGEM, entao o texto nao disputa espaco com nada.
-  if (config.cnpj) {
-    ctx.save()
-    ctx.translate(MARGEM * 0.62, A - 118)
-    ctx.rotate(-Math.PI / 2)
-    ctx.textAlign = 'left'
-    ctx.textBaseline = 'alphabetic'
-    ctx.fillStyle = t.rot
-    ctx.font = fonte(t, 500, COND, 17, { texto: true })
-    ctx.fillText(`${config.razao} \u00b7 CNPJ ${config.cnpj}`, 0, 0)
-    ctx.restore()
-  }
+  desenharLegal(ctx, t, config, A)
 
   if (FAIXA) {
     // A faixa lima fecha a peca com o MESMO pattern oficial do topo, na
@@ -822,6 +870,271 @@ export async function desenhar(colinha, config) {
     ctx.fillRect(0, A, L, FAIXA)
     if (t.faixaFita) desenharPadraoOficial(ctx, A, FAIXA, t.faixaFita, 0.048)
   }
+
+  return new Promise((resolve) => cv.toBlob(resolve, 'image/png'))
+}
+
+// --- santinho 9x5 conjunto ---------------------------------------------
+// A peca conjunta nao e uma variacao da colinha das tres campanhas: nao tem
+// cabecalho, o fundo escuro vai de ponta a ponta e cada candidato travado
+// ocupa DUAS alturas (o lockup com a foto redonda em cima, a fila de caixas
+// embaixo). Encaixar isso na mesma funcao pediria uma duzia de flags novas
+// dentro do laco que desenha as pecas ja aprovadas — o risco mora ali, nao
+// no codigo a mais.
+//
+// Todas as medidas daqui para baixo estao em pixels da PAGINA 2 do PDF da
+// peca (578x1031, o render a 4x), convertidas por SANT(). Assim qualquer
+// numero deste arquivo pode ser conferido na peca com uma regua, sem refazer
+// conta nenhuma.
+const REF_L = 578
+const REF_A = 1031
+const SANT = (v) => Math.round((v * L) / REF_L)
+
+// Colunas do chevron: periodo horizontal medido em 78px na peca.
+const CHEV_COL = 78 / REF_L
+
+const S = {
+  margem: 66,
+  caixaL: 85.5, caixaA: 83, passo: 90, gap: 4.5,
+  circD: 111,
+  // travado: o circulo centra 55,5 abaixo do topo da faixa, as caixas
+  // comecam em +121 e a proxima faixa em +220.
+  travadoCirc: 55.5, travadoCaixas: 121, travadoAltura: 220,
+  // livre: BASELINE do rotulo em +8 (o texto sobe acima dela, para dentro da
+  // folga da faixa anterior), caixas em +15, proxima faixa em +119.
+  livreRotulo: 8, livreCaixas: 15, livreAltura: 119,
+  y0: 66,
+}
+
+// Quebra o nome em ate duas linhas que caibam na largura, encolhendo o corpo
+// se nem assim couber. Sem isto "ROGÉRIO FRANCO" (que na peca sai em duas
+// linhas) ou um nome de urna comprido sangraria por cima da margem.
+function nomeEmLinhas(ctx, t, nome, largura, corpo) {
+  for (let px = corpo; px >= corpo * 0.62; px -= 2) {
+    ctx.font = fonte(t, 900, SEMI, px)
+    if (ctx.measureText(nome).width <= largura) return { px, linhas: [nome] }
+    const palavras = nome.split(' ')
+    if (palavras.length < 2) continue
+    for (let corte = palavras.length - 1; corte >= 1; corte--) {
+      const a = palavras.slice(0, corte).join(' ')
+      const b = palavras.slice(corte).join(' ')
+      if (ctx.measureText(a).width <= largura && ctx.measureText(b).width <= largura) {
+        return { px, linhas: [a, b] }
+      }
+    }
+  }
+  const px = Math.round(corpo * 0.62)
+  ctx.font = fonte(t, 900, SEMI, px)
+  return { px, linhas: [cortar(ctx, nome, largura)] }
+}
+
+// Corpo do algarismo pela TINTA, nao pela caixa de linha: mede o "4" (de topo
+// reto) num corpo de referencia e reescala para a fracao pedida da caixa.
+function corpoDoDigito(ctx, t, alturaCaixa, fracao) {
+  ctx.font = fonte(t, 900, SEMI, 100)
+  const m = ctx.measureText('4')
+  const tinta = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent
+  return tinta > 0 ? Math.round((100 * alturaCaixa * fracao) / tinta) : Math.round(alturaCaixa * 0.7)
+}
+
+function caixasDoSlot(ctx, t, slot, y, cor) {
+  // O numero do DONO da peca ocupa a largura inteira do conteudo; os outros
+  // cargos ficam na caixa de tamanho fixo, alinhados a esquerda. Nas pecas
+  // conjuntas isso nao aparece — o parceiro tem 5 digitos, que e justamente
+  // o que preenche a largura no tamanho fixo. Na peca do Dr. Elton sozinho,
+  // os 4 digitos dele esticam de 85 para 107 (medido na pagina 2).
+  const largura = REF_L - 2 * S.margem
+  const passoRef = slot.proprio
+    ? (largura + S.gap) / slot.digitos
+    : S.passo
+  const L_CX = SANT(passoRef - S.gap)
+  const A_CX = slot.proprio ? SANT((passoRef - S.gap) * (S.caixaA / S.caixaL)) : SANT(S.caixaA)
+  const passo = SANT(passoRef)
+  const corpo = corpoDoDigito(ctx, t, A_CX, 0.72)
+  for (let i = 0; i < slot.digitos; i++) {
+    const x = SANT(S.margem) + i * passo
+    const digito = (slot.numero ?? '')[i] ?? ''
+    retanguloArredondado(ctx, x, y, L_CX, A_CX, SANT(6))
+    // Caixa vazia e branca na peca — é ali que o eleitor escreve à caneta.
+    ctx.fillStyle = digito ? cor : t.caixa
+    ctx.fill()
+    if (digito) {
+      ctx.fillStyle = '#ffffff'
+      ctx.font = fonte(t, 900, SEMI, corpo)
+      const md = ctx.measureText(digito)
+      const meio = (md.actualBoundingBoxAscent - md.actualBoundingBoxDescent) / 2
+      ctx.textAlign = 'center'
+      ctx.fillText(digito, x + L_CX / 2, y + A_CX / 2 + meio)
+      ctx.textAlign = 'left'
+    }
+  }
+  return y + A_CX
+}
+
+// Foto redonda do candidato travado, dentro do disco na cor dele.
+//
+// Com o RECORTE (fotos/recorte-<nome>.png, gerado por build/recortar_fotos.py)
+// o disco aparece atras da pessoa, como na peca. Sem ele — clone novo, foto
+// em que a Vision nao achou ninguem — entra a foto quadrada do acervo, que
+// cobre o disco com o proprio fundo e deixa so o anel colorido. Mais pobre,
+// nunca quebrada.
+function fotoRedonda(ctx, foto, recorte, cx, cy, raio, cor) {
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(cx, cy, raio, 0, Math.PI * 2)
+  ctx.fillStyle = cor
+  ctx.fill()
+  ctx.clip()
+  const img = recorte ?? foto
+  if (img) {
+    // A foto do acervo e 3/4 (ombros para cima) e o rosto mora no terco de
+    // cima. Encaixar pela ALTURA do circulo deixaria a cabeca minuscula: a
+    // imagem entra maior que o disco e sobe, para o rosto cair no meio dele.
+    const l = raio * (recorte ? 2.05 : 1.9)
+    const a = l * (img.height / img.width)
+    ctx.drawImage(img, cx - l / 2, cy - raio - a * 0.06, l, a)
+  }
+  ctx.restore()
+}
+
+// O tique da identidade solto no fundo, como na peca: alguns passam por tras
+// das caixas, e e isso que os faz ler como fundo e nao como adesivo colado.
+// Mesmo poligono oficial do visto (ID 26 ELTON p.7), proporcao 170.7x79.3.
+const VISTO = [[170.7, 0], [93.3, 25], [46.5, 40.1], [0, 25.1], [0, 64.3],
+  [6, 66.2], [46.5, 79.3], [154.6, 44.4], [170.7, 39.2]]
+
+function tique(ctx, cor, x, y, larg) {
+  const alt = larg * (79.3 / 170.7)
+  ctx.fillStyle = cor
+  ctx.beginPath()
+  VISTO.forEach(([vx, vy], i) => {
+    const px = x + (vx / 170.7) * larg
+    const py = y + (vy / 79.3) * alt
+    i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)
+  })
+  ctx.closePath()
+  ctx.fill()
+}
+
+// Cargo em cima, nome embaixo, o conjunto centrado na altura do circulo —
+// como cada lockup da peca.
+function lockup(ctx, t, slot, x, cy) {
+  const largura = L - SANT(S.margem) - x
+  const corpoRotulo = SANT(15)
+  const { px, linhas } = nomeEmLinhas(ctx, t, slot.nome.toUpperCase(), largura, SANT(42))
+  const entrelinha = Math.round(px * 0.94)
+  const alturaTotal = corpoRotulo + SANT(6) + linhas.length * entrelinha
+  let y = cy - alturaTotal / 2 + corpoRotulo
+
+  ctx.textAlign = 'left'
+  ctx.fillStyle = '#ffffff'
+  ctx.font = fonte(t, 800, COND, corpoRotulo, { texto: true })
+  // O rotulo da peca e bem espacado; onde o canvas nao suporta letterSpacing
+  // (Safari antigo) ele so sai mais junto, sem quebrar nada.
+  const espaco = ctx.letterSpacing
+  if (espaco !== undefined) ctx.letterSpacing = `${SANT(2.4)}px`
+  ctx.fillText((slot.rotulo ?? '').toUpperCase(), x, y)
+  if (espaco !== undefined) ctx.letterSpacing = espaco
+
+  y += SANT(6)
+  ctx.font = fonte(t, 900, SEMI, px)
+  for (const linha of linhas) {
+    y += entrelinha
+    ctx.fillText(linha, x, y)
+  }
+}
+
+// Cargo livre: so o rotulo, como na peca em branco. Resolvido o numero, o
+// nome entra na MESMA linha — a peca impressa nao tem onde por um nome que
+// ela nao conhece, e o eleitor precisa dele para conferir na urna.
+// `base` e a LINHA DE BASE do rotulo, nao o topo: o texto sobe a partir dela,
+// para dentro da folga que a faixa anterior deixou. Medir pelo topo colocava
+// o rotulo por cima das proprias caixas.
+function rotuloLivre(ctx, t, slot, x, base) {
+  ctx.textAlign = 'left'
+  ctx.fillStyle = '#ffffff'
+  const corpo = SANT(21)
+  ctx.font = fonte(t, 900, SEMI, corpo)
+  const rotulo = (slot.rotulo ?? '').toUpperCase()
+  ctx.fillText(rotulo, x, base)
+  if (!slot.nome) return
+  const cursor = x + ctx.measureText(`${rotulo} `).width
+  const sobra = L - SANT(S.margem) - cursor
+  ctx.font = fonte(t, 800, COND, Math.round(corpo * 0.86), { texto: true })
+  ctx.fillStyle = t.rot
+  ctx.fillText(cortar(ctx, `| ${slot.nome.toUpperCase()}`, sobra), cursor, base)
+}
+
+async function desenharSantinho(colinha, config, t, fotos) {
+  const A_S = SANT(REF_A)
+  const cv = document.createElement('canvas')
+  cv.width = L
+  cv.height = A_S
+  const ctx = cv.getContext('2d')
+  ctx.textBaseline = 'alphabetic'
+
+  // Recortes das fotos dos travados, se existirem no disco. Ausencia vira
+  // null e fotoRedonda cai na foto quadrada.
+  const recortes = new Map(await Promise.all(
+    colinha
+      .filter((s) => s.travado && s.foto)
+      .map(async (s) => [s.id, await carregarArquivo(`fotos/recorte-${s.foto}.png`)]),
+  ))
+
+  ctx.fillStyle = t.fundo
+  ctx.fillRect(0, 0, L, A_S)
+  desenharPadraoOficial(ctx, 0, A_S, t.chevClaro, CHEV_COL)
+  // Posicoes dos tiques medidas na peca. O de baixo dela cai onde vai o QR
+  // impresso; aqui esse canto e o rodape, entao ele sobe para a folga entre
+  // o governador e o presidente.
+  //
+  // Borrados, como na peca: ampliada, a borda leva ~15px (dos 578 da pagina)
+  // de cada lado para sair do lima e chegar no navy — o tique quase nao tem
+  // aresta, so um nucleo saturado que se desfaz. Sem o blur eles viram tres
+  // setas chapadas coladas por cima do fundo, que foi o que denunciou que a
+  // imagem nao era a peca. Navegador sem ctx.filter (Safari velho) desenha
+  // nitido: perde o efeito, nao a imagem.
+  ctx.save()
+  if (typeof ctx.filter === 'string') ctx.filter = `blur(${SANT(15)}px)`
+  for (const [x, y, larg] of [[352, 520, 170], [296, 742, 120], [330, 855, 180]]) {
+    tique(ctx, t.tique ?? t.lima, SANT(x), SANT(y), SANT(larg))
+  }
+  ctx.restore()
+
+  // O candidato dono da peca leva a cor DELE; o Dr. Elton e os cargos livres
+  // ficam no lima da campanha. E o unico eixo que muda de um parceiro para o
+  // outro — por isso vive na config, nao no tema.
+  const cor = (slot) => (slot.proprio ? (config.cor ?? t.destaque) : t.destaque)
+
+  let y = SANT(S.y0)
+  for (const slot of colinha) {
+    if (slot.travado) {
+      const raio = SANT(S.circD) / 2
+      const cx = SANT(S.margem) + raio
+      const cy = y + SANT(S.travadoCirc)
+      fotoRedonda(ctx, fotos.get(slot.id), recortes.get(slot.id), cx, cy, raio, cor(slot))
+      lockup(ctx, t, slot, cx + raio + SANT(18), cy)
+      const fimCaixas = caixasDoSlot(ctx, t, slot, y + SANT(S.travadoCaixas), cor(slot))
+      // A faixa acompanha a caixa: na peca do Dr. Elton sozinho ela e mais
+      // alta (4 digitos esticados), e a altura fixa jogaria o proximo rotulo
+      // por cima dela.
+      y = Math.max(y + SANT(S.travadoAltura), fimCaixas + SANT(21))
+    } else {
+      rotuloLivre(ctx, t, slot, SANT(S.margem), y + SANT(S.livreRotulo))
+      caixasDoSlot(ctx, t, slot, y + SANT(S.livreCaixas), t.destaque)
+      y += SANT(S.livreAltura)
+    }
+  }
+
+  ctx.textAlign = 'center'
+  ctx.fillStyle = t.rot
+  ctx.font = fonte(t, 700, COND, SANT(15), { texto: true })
+  ctx.fillText(location.hostname, L / 2, A_S - SANT(28))
+  ctx.font = fonte(t, 500, COND, SANT(14), { texto: true })
+  ctx.fillText('Confira sempre o número do candidato na urna.', L / 2, A_S - SANT(11))
+  ctx.textAlign = 'left'
+
+  desenharLegal(ctx, t, config, A_S)
 
   return new Promise((resolve) => cv.toBlob(resolve, 'image/png'))
 }

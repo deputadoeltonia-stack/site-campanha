@@ -10,3 +10,12 @@ scripts
 .env.local
 .env*
 .DS_Store
+
+# Rascunho de dev nunca vai pro ar. O _probe.html ficou dias publico em
+# producao porque esta lista so tinha nomes literais: cada arquivo novo
+# dependia de alguem lembrar de apaga-lo. O glob resolve na origem.
+#
+# Ordem importa: filtro de rclone vale para os DOIS lados, entao um _*
+# aqui faz o sync deixar de enxergar (e de apagar) o que ja esta no
+# destino. Rascunho que ja subiu se limpa ANTES de entrar nesta lista.
+_*

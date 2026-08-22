@@ -264,9 +264,14 @@ body[data-tema="elton"] .selo { filter: drop-shadow(0 3px 7px rgba(14, 31, 58, .
   flex: none; height: calc(2.5rem + env(safe-area-inset-bottom));
   background-color: #a2d600;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 135.6 71'%3E%3Crect width='135.6' height='71' fill='%23a2d600'/%3E%3Cpath d='M135.6 0 L135.6 35.8 L111.7 43.5 L92.3 49.8 L71.4 56.5 L37 67.7 L23.9 63.4 L0 55.7 L0 19.9 L37 31.9 Z' fill='%23bdff00'/%3E%3C/svg%3E");
-  /* Na peca a faixa e bem mais miuda que o topo: ~20 colunas na largura
-     (coluna = 5% dela) — 1.2rem numa tela de 375px. */
-  background-size: 1.15rem auto;
+  /* Mesma escala de coluna do topo (2.8rem): a faixa e a mesma fita do
+     cabecalho fechando a peca, e na miudeza de antes (1.15rem) o chevron
+     virava textura sem desenho — de longe lia como um degrade verde. */
+  background-size: 2.8rem auto;
+  /* Um chevron inteiro de altura: a coluna e 135,6 x 71 no vetor, entao a
+     fita completa mede 0,524 da largura da coluna. Cortada no meio, a quebra
+     do desenho nao fecha com a do fundo. */
+  min-height: calc(2.8rem * 71 / 135.6);
 }
 body:is([data-tema="tozi"], [data-tema="dulce"]) .faixa { display: none; }
 
@@ -455,6 +460,7 @@ body[data-tema="elton"] .digito { font-size: 21.6cqw; }
    contraste para 2,8:1 e o CNPJ e justamente o texto que precisa ser
    legivel quando alguem vai conferir quem pagou a peca. Sem ela, o
    proprio --mut ja da 4,5:1 nos tres temas. */
+.legal-item { white-space: nowrap; }
 .legal {
   margin: .5rem 0 0; text-align: center;
   font-size: .64rem; line-height: 1.35; letter-spacing: .01em;
@@ -590,8 +596,8 @@ body[data-tema="tozi"] .topo {
   background-size: cover, 42% auto, 42% auto;
   padding-bottom: 1.4rem;
 }
-body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .topo-int { align-items: flex-start; }
-body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .marca {
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"], [data-tema="santinho"]) .topo-int { align-items: flex-start; }
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"], [data-tema="santinho"]) .marca {
   flex: none; font-size: 1.25rem; line-height: 1; white-space: nowrap;
 }
 /* Título ao lado dos passos é o arranjo da peça, mas ela é bem mais larga em
@@ -601,19 +607,19 @@ body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .marca {
    logo abaixo e ficariam riscados por ele. O respiro extra so existe no
    layout empilhado — de 26rem pra cima o titulo fica ao lado dos passos e a
    regra do breakpoint zera a margem de novo. */
-body[data-tema="elton"] .marca { margin-bottom: 1.4rem; }
+body:is([data-tema="elton"], [data-tema="santinho"]) .marca { margin-bottom: 1.4rem; }
 @media (min-width: 26rem) {
-  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .topo-txt {
+  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"], [data-tema="santinho"]) .topo-txt {
     display: flex; align-items: center; gap: .8rem;
   }
-  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .marca { font-size: 1.08rem; margin: 0; }
+  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"], [data-tema="santinho"]) .marca { font-size: 1.08rem; margin: 0; }
   /* Na arte o COMO VOTAR e maior que nos aliados; o pincel encolhe junto. */
-  body[data-tema="elton"] .marca { font-size: 1.3rem; }
+  body:is([data-tema="elton"], [data-tema="santinho"]) .marca { font-size: 1.3rem; }
 }
 /* (o tamanho e a posicao do pincel saem da regra base, em em: eles seguem o
    corpo do titulo sozinhos, sem override por tema) */
 /* A faixa navy da arte respira mais que o topo compacto dos aliados. */
-body[data-tema="elton"] .topo { padding-top: 1.25rem; padding-bottom: 1.45rem; }
+body:is([data-tema="elton"], [data-tema="santinho"]) .topo { padding-top: 1.25rem; padding-bottom: 1.45rem; }
 /* Na peça o "COMO VOTAR" vem sozinho — o tique é assinatura do Dr. Elton. */
 body:is([data-tema="tozi"], [data-tema="dulce"]) .visto-marca { display: none; }
 /* Os passos da peça são numerados em azul, não no verde do Dr. Elton. O vão à
@@ -629,6 +635,31 @@ body:is([data-tema="tozi"], [data-tema="dulce"]) .visto-marca { display: none; }
    queixo, sobra 1,6px — mas os passos 2 e 3 tem 61px e 86px de folga e nunca
    chegam la). A fonte cai so de .8 para .77rem; ir ate .72rem, que resolveria
    sozinho, ficaria pequeno demais numa peca de apoio a voto. */
+/* Bolinhas equidistantes na peca do Dr. Elton (e no santinho, que herda o
+   cabecalho dela) pelo MESMO motivo do Tozi logo abaixo: o passo 1 pedia
+   207px numa coluna de 159px, quebrava em duas linhas e os vaos entre as
+   bolinhas iam para 38px e 22px. O que fecha os 48px que faltam: o titulo
+   cede um corpo (o "FAÇA SUA COLINHA" e o item mais largo do topo), os
+   passos caem de .84 para .78rem com tracking negativo, e a coluna da
+   bolinha encolhe um tico. O topo inteiro sai mais baixo de brinde. */
+@media (min-width: 26rem) {
+  body:is([data-tema="elton"], [data-tema="santinho"]) .marca { font-size: 1.12rem; }
+  body:is([data-tema="elton"], [data-tema="santinho"]) .topo-txt { gap: .6rem; }
+  body:is([data-tema="elton"], [data-tema="santinho"]) .passos {
+    flex: 1; min-width: 0;
+    font-size: .78rem; letter-spacing: -.015em;
+  }
+  /* O corpo vai no li, nao so no .passos: a regra base ja declara
+     `.passos li { font-size: .84rem }` e ela ganharia do pai por ser direta —
+     o tracking em em encolhia, o texto nao. */
+  body:is([data-tema="elton"], [data-tema="santinho"]) .passos li {
+    grid-template-columns: 1.05rem 1fr; gap: .3rem; font-size: .78rem;
+  }
+  body:is([data-tema="elton"], [data-tema="santinho"]) .passos li::before {
+    width: 1.05rem; height: 1.05rem;
+  }
+}
+
 body[data-tema="tozi"] .passos {
   flex: 1; min-width: 0; padding-right: 3.2rem; font-size: .77rem;
   letter-spacing: -.018em;
@@ -640,7 +671,7 @@ body[data-tema="tozi"] .passos li::before {
 }
 
 /* O rosto em traço invade o corpo pelo canto direito, como na peça. */
-body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .folha {
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"], [data-tema="santinho"]) .folha {
   position: relative;
   padding-top: 1.6rem;
 }
@@ -674,8 +705,8 @@ body[data-tema="tozi"] .folha::before {
    que só têm 3 dígitos — o mesmo lugar que ele tem na peça. */
 /* O selo vive dentro do campo do senador (1º voto) e transborda sobre o de
    baixo — ancorado ali, desce junto quando um aviso empurra o formulário. */
-body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo { position: relative; }
-body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo > .selo {
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"], [data-tema="santinho"]) .campo { position: relative; }
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"], [data-tema="santinho"]) .campo > .selo {
   position: absolute; z-index: 1;
   right: 0; top: -.3rem;
   width: 7rem;
@@ -708,7 +739,7 @@ body[data-tema="dulce"] .acoes { margin-top: 3.6rem; }
 body[data-tema="tozi"] .campo > .selo { top: 1.3rem; }
 body[data-tema="tozi"] .acoes { margin-top: 3.9rem; }
 /* A mensagem de erro do campo que hospeda o selo quebraria por baixo dele. */
-body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo:has(> .selo) .erro {
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"], [data-tema="santinho"]) .campo:has(> .selo) .erro {
   padding-right: 7.4rem;
 }
 /* O NOME tambem. O selo desce para a faixa das caixas por um `top` fixo, mas
@@ -719,11 +750,11 @@ body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo:has
    fim do nome. Reservar a faixa faz o nome quebrar em duas linhas em vez de
    sumir por baixo do adesivo — numa peca de conferencia de voto, ler o nome
    inteiro vale mais que a linha unica. */
-body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo:has(> .selo) .rotulo {
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"], [data-tema="santinho"]) .campo:has(> .selo) .rotulo {
   padding-right: 7.4rem;
 }
 /* A peça não tem o tique de conferido: o campo dele já vem preenchido. */
-body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .rotulo { font-size: .82rem; }
+body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"], [data-tema="santinho"]) .rotulo { font-size: .82rem; }
 /* Na peca o campo travado sai sem a sigla do partido ("DEPUTADO FEDERAL |
    DR. ELTON", nada de UNIÃO) — e sem ela o rotulo cabe numa linha so. */
 body:is([data-tema="elton"], [data-tema="dulce"]) .campo.travado .partido { display: none; }
@@ -948,16 +979,27 @@ body.sem-rolagem { overflow: hidden; }
   .topo { padding-top: .7rem; padding-bottom: .8rem; }
   /* O visto do Dr. Elton desce 0,77em abaixo da caixa do titulo: sem os
      passos embaixo, quem segura esse transbordo e o padding do topo. */
-  body[data-tema="elton"] .topo { padding-top: .8rem; padding-bottom: 1.3rem; }
-  body[data-tema="elton"] .marca { margin-bottom: 0; }
+  body:is([data-tema="elton"], [data-tema="santinho"]) .topo { padding-top: .8rem; padding-bottom: 1.3rem; }
+  body:is([data-tema="elton"], [data-tema="santinho"]) .marca { margin-bottom: 0; }
+  /* No santinho o celular mostra so o titulo (os passos ficam escondidos),
+     entao ele fica sozinho na faixa e centrado. width:fit-content + margem
+     auto, NAO justify-content: o tique lima e absoluto em left:7.2em contado
+     da borda da .marca — com a caixa esticada na largura toda ele descolaria
+     do "COLINH". Aqui a caixa encolhe ate o texto e os dois andam juntos.
+     O respiro que sobrava embaixo era do tique, que desce .77em: 1rem de
+     padding ja o cobre, e o topo cai de 86 para ~57px. */
+  body[data-tema="santinho"] .marca { width: fit-content; margin-inline: auto; }
+  body[data-tema="santinho"] .topo { padding-top: .55rem; padding-bottom: 1rem; }
+  /* O vao antes da busca vinha do topo E da folha somados. */
+  body[data-tema="santinho"] .folha { padding-top: .9rem; }
   body:is([data-tema="tozi"], [data-tema="dulce"]) .topo { padding-bottom: .9rem; }
   /* O coracao da Dulce e ancorado nos passos (.passos::after) e sai com eles;
      no lugar dele o padrao de pessoinhas do fundo fica maior na faixa baixa. */
   body[data-tema="dulce"] .topo { background-size: auto 78%; }
   /* Sem a coluna dos passos ao lado, o titulo volta ao corpo do layout
      empilhado em vez do tamanho reduzido do arranjo lado a lado. */
-  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .marca { font-size: 1.25rem; }
-  body[data-tema="elton"] .marca { font-size: 1.35rem; }
+  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"], [data-tema="santinho"]) .marca { font-size: 1.25rem; }
+  body:is([data-tema="elton"], [data-tema="santinho"]) .marca { font-size: 1.35rem; }
   /* O rosto do Tozi sobe para dentro do cabecalho. Com o cabecalho de 150px
      para ~74px ele nao cabe mais no tamanho da peca: passava por cima da
      busca, e identidade por cima de campo e justamente o que o produto nao
@@ -1011,16 +1053,114 @@ body.sem-rolagem { overflow: hidden; }
      transbordar, e o respiro dos botoes volta ao 1,25rem do resto da folha.
      O vao a direita de um cargo de 2 digitos e permanente, entao ele continua
      no lugar da peca, sem chegar perto das caixas. */
-  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .campo > .selo {
+  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"], [data-tema="santinho"]) .campo > .selo {
     top: auto; bottom: 0;
   }
   body[data-tema="elton"] .campo > .selo { width: 5.9rem; }
   body[data-tema="tozi"] .campo > .selo { width: 5.6rem; }
   body[data-tema="dulce"] .campo > .selo { width: 5.2rem; }
-  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"]) .acoes { margin-top: 1.25rem; }
+  body:is([data-tema="elton"], [data-tema="tozi"], [data-tema="dulce"], [data-tema="santinho"]) .acoes { margin-top: 1.25rem; }
   .rodape { margin-top: .8rem; }
   /* A faixa fecha a peca; no celular ela so precisa registrar a cor. */
   .faixa { height: calc(1.5rem + env(safe-area-inset-bottom)); }
+}
+
+/* --- santinho 9x5 conjunto (Dr. Elton + parceiro estadual) ------------- */
+/* A unica peca escura das quatro: o corpo nao e o painel prata das outras, e
+   a continuacao do cabecalho. So o FUNDO troca de lado — caixa, busca e
+   gaveta continuam brancas, entao --surface e --txt ficam como estao e a
+   folha inteira nao precisa ser reescrita. O que muda e (a) a cor do que
+   assenta DIRETO no navy e (b) o algarismo dentro do lima, que na peca sai
+   branco, nao navy. */
+body[data-tema="santinho"] {
+  /* Lima da peca 9x5 — mais amarelo que o das outras tres (#84bf41), medido
+     na pagina 2 do PDF. */
+  --limao: #cddc00;
+  --lima: #cddc00;
+  --marca: var(--lima);
+  --marca-txt: #0a223e;
+  /* Caixa do Dr. Elton e dos cargos livres: lima. A do candidato DONO do
+     santinho leva a cor dele (--cor-parceiro, posta pela config em app.js) —
+     na peca do Leandro e o mesmo lima, na do Rogerio e ambar. */
+  --cx-travado: var(--limao);
+  --cx-travado-txt: #ffffff;
+  color: #fff;
+  background-color: #0a223e;
+  /* O MESMO pattern oficial do topo (manual ID 26 ELTON p.21), na versao
+     navy sobre navy. Aqui ele cobre a folha INTEIRA, atras dos numeros — no
+     cabecalho a fita clara e #0a3983 e aparece; nesta escala e nesse tamanho
+     ela viraria ruido sob os campos, entao o tom sobe so o suficiente para o
+     chevron se ler (#152c58). Rola junto com o conteudo: fixo, o padrao
+     deslizava por baixo dos campos enquanto o eleitor descia a pagina. */
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 135.6 71'%3E%3Crect width='135.6' height='71' fill='%230a223e'/%3E%3Cpath d='M135.6 0 L135.6 35.8 L111.7 43.5 L92.3 49.8 L71.4 56.5 L37 67.7 L23.9 63.4 L0 55.7 L0 19.9 L37 31.9 Z' fill='%230d294b'/%3E%3C/svg%3E");
+  /* 13.5% e a coluna do chevron na peca: 78px de periodo numa pagina de 578.
+     Em % (nao em rem) ela acompanha a largura da tela como acompanha a da
+     peca — a mesma proporcao em qualquer celular. */
+  background-size: 13.5% auto;
+  background-attachment: scroll;
+}
+
+/* Texto que assenta direto no navy. Nao mexe em --rot/--mut de proposito:
+   os dois tambem pintam coisas DENTRO das caixas brancas (a silhueta da
+   foto, o placeholder da busca), que continuam precisando ser escuras. */
+body[data-tema="santinho"] :is(.rotulo, .partido),
+body[data-tema="santinho"] .rotulo > span:first-child::after { color: #c3d3e8; }
+body[data-tema="santinho"] .nome { color: #fff; }
+body[data-tema="santinho"] :is(.rodape, .legal, .carregando) { color: #b4c6de; }
+
+/* Algarismo branco dentro do lima, como no impresso. */
+body[data-tema="santinho"] .digito.preenchido { color: #fff; }
+/* O estado de erro pinta a caixa de rosa claro: ali o branco sumiria. */
+body[data-tema="santinho"] .campo.tem-erro .digito.preenchido { color: var(--erro); }
+
+/* A pill do aviso e branca; --marca virou lima e a lupa da busca mora dentro
+   da caixa branca — os dois voltam para o navy da marca. */
+body[data-tema="santinho"] .aviso { color: var(--mut); }
+body[data-tema="santinho"] .bg-lupa { color: var(--marinho); }
+body[data-tema="santinho"] .link { color: var(--lima); }
+
+/* O vermelho de erro das pecas claras (#a32d2d) da 2,2:1 sobre o navy. Sobre
+   fundo escuro a mensagem e o nome do campo com erro vao no tom claro; DENTRO
+   da caixa (que fica rosa clara no erro) o escuro continua valendo. */
+body[data-tema="santinho"] :is(.erro, .campo.tem-erro .nome) { color: #ffa3a3; }
+
+/* A peca nao tem adesivo redondo: o candidato dono do santinho ja aparece na
+   propria linha dele. Mesmo motivo do semSelo em imagem.js — tela e PNG
+   mudam juntos. */
+body[data-tema="santinho"] .selo { display: none; }
+
+/* Na peca o numero do DONO ocupa a largura inteira; os outros cargos ficam na
+   caixa de tamanho fixo. Nas pecas conjuntas nao se nota — o parceiro tem 5
+   digitos, que ja e o que enche a largura. Na do Dr. Elton sozinho, os 4
+   digitos dele esticam. flex:1 divide a sobra por igual sem precisar saber
+   quantos digitos sao; o aspect-ratio da regra base faz a altura acompanhar. */
+body[data-tema="santinho"] .campo.travado.proprio .digito {
+  flex: 1; width: auto;
+}
+
+/* No santinho quem manda na escala e o fundo do CORPO (4.5rem), nao o do
+   cabecalho: os dois aparecem na mesma tela e a quebra do chevron precisa
+   ter a mesma dimensao nos dois. A altura acompanha — uma fita inteira. */
+body[data-tema="santinho"] .faixa {
+  /* A ESCALA do chevron continua a do fundo (13.5%) — e a "linha de quebra"
+     que precisa medir igual nos dois. O que encolhe e a ALTURA da faixa: em
+     uma fita inteira (o .5236 da coluna) ela pesava demais no pe da tela,
+     entao mostra 3/4 dela. O desenho segue do mesmo tamanho, so aparece
+     menos dele. */
+  background-size: 13.5% auto;
+  height: calc(13.5vw * 71 / 135.6 * .75 + env(safe-area-inset-bottom));
+}
+
+/* A caixa e a moldura da foto do candidato DONO do santinho saem na cor
+   dele; o Dr. Elton e os cargos livres ficam no lima. Sem a config (parceiro
+   sem cor declarada) cai no lima e nada quebra. */
+body[data-tema="santinho"] .campo.travado.proprio .digito.preenchido {
+  background: var(--cor-parceiro, var(--limao));
+  border-color: var(--cor-parceiro, var(--limao));
+}
+body[data-tema="santinho"] .campo.travado.proprio .foto-travada {
+  border-color: var(--cor-parceiro, var(--limao));
 }
 
 @media print {

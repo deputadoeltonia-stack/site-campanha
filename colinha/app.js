@@ -1,5 +1,5 @@
 import {
-  CARGOS, configPara, hostDeDev, criarEstado, lerURL, lerSalvo, paraSalvar,
+  CARGOS, configDaRota, criarEstado, lerURL, lerSalvo, paraSalvar,
   montarColinha, erroSenadores, estaCompleta, slotTravado, limpar, linkDeVolta,
   buscarGlobal,
 } from './colinha-core.js'
@@ -15,7 +15,7 @@ const BADGE = {
   dulce: 'marca/selo-dulce.png', // adesivo do santinho 7x10, ja com o 44400
 }
 
-const config = configPara(hostDeDev(location.hostname, location.search))
+const config = configDaRota(location.hostname, location.search)
 let dados = {}
 let estado = criarEstado(config)
 
@@ -31,12 +31,31 @@ const el = {
 
 document.body.dataset.tema = config.tema
 
+// Cor do candidato dono do santinho (as caixas e a moldura da foto DELE). E
+// o unico eixo que muda de um parceiro para o outro, entao vem da config e
+// nao do tema — o CSS cai no lima da campanha quando ela nao existe.
+if (config.cor) document.body.style.setProperty('--cor-parceiro', config.cor)
+
 // Marcacao legal da propaganda: razao social e CNPJ da campanha. Le da config
 // e so da config, como o selo e o campo travado — nunca do dataset do TSE.
-if (config.cnpj) {
-  const legal = document.getElementById('legal')
-  legal.textContent = `${config.razao} · CNPJ ${config.cnpj}`
-  legal.hidden = false
+// config.legal (santinho de parceiro) traz o texto ja pronto, linha por
+// linha, como impresso na lateral da peca; as campanhas proprias montam a
+// frase de razao social + CNPJ.
+{
+  const linhas = config.legal ?? (config.cnpj ? [`${config.razao} · CNPJ ${config.cnpj}`] : null)
+  if (linhas) {
+    const legal = document.getElementById('legal')
+    // Uma linha por span, cada um sem quebra interna: em 390px o texto
+    // corrido partia dentro do proprio CNPJ ("...0001-" / "90"), que e o
+    // numero que alguem vai conferir. Entre spans a linha quebra normal.
+    legal.replaceChildren(...linhas.flatMap((linha, i) => {
+      const span = document.createElement('span')
+      span.className = 'legal-item'
+      span.textContent = linha
+      return i ? [' · ', span] : [span]
+    }))
+    legal.hidden = false
+  }
 }
 
 // Embutida num site, a pagina ganha o link de volta para a raiz dele.
