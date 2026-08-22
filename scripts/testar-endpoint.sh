@@ -3,7 +3,9 @@
 #   bash scripts/testar-endpoint.sh https://script.google.com/macros/s/XXXX/exec
 #
 # Manda 3 requisições: uma válida, uma inválida e a mesma válida de novo.
-# O esperado é: ok:true / ok:false / "duplicado ignorado".
+# O esperado é: ok:true / ok:false / ok:true.
+# O repetido responde igual ao aceito de propósito — quem não pode distinguir os
+# dois é o bot. A prova do dedupe está na planilha, não na resposta.
 set -euo pipefail
 
 URL="${1:-}"
@@ -40,9 +42,10 @@ post "{\"nome\":\"Teste Automatizado\",\"telefone\":\"$TEL\",\"consentimento_lgp
 echo "== 2. lead inválido, sem consentimento (esperado: ok:false) =="
 post '{"nome":"Teste Automatizado","telefone":"11999999999","consentimento_lgpd":false,"origem":"teste-cli"}'
 
-echo "== 3. repetido do nº 1 (esperado: duplicado ignorado) =="
+echo "== 3. repetido do nº 1 (esperado: ok:true, idêntico ao nº 1) =="
 post "{\"nome\":\"Teste Automatizado\",\"telefone\":\"$TEL\",\"consentimento_lgpd\":true,\"origem\":\"teste-cli\"}"
 
 echo
 echo "Confira a aba Leads: deve ter UMA linha nova (telefone $TEL), não duas."
+echo "É aí que o dedupe aparece: a resposta do nº 3 é igual à do nº 1 de propósito."
 echo "Apague as linhas de teste antes de divulgar o site."

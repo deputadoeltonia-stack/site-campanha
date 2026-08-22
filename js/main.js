@@ -388,9 +388,9 @@
       telefone: leadForm.telefone.value,
       lgpd: leadForm.lgpd.checked
     };
-    var hp = leadForm.site.value.trim() !== "";
+    var hp = leadForm.site.value.trim();
 
-    var errs = validate(data, hp);
+    var errs = validate(data, hp !== "");
 
     if (errs._bot) { fakeSuccess(); return; } // não dá pista pro bot
 
@@ -407,6 +407,9 @@
       telefone: digits(data.telefone),
       consentimento_lgpd: true,
       origem: "site-campanha",
+      // honeypot vai junto: a checagem do navegador é só UX, quem posta direto
+      // no endpoint pula ela. Quem decide de verdade é o doPost.
+      site: hp,
       data: new Date().toISOString()
     };
 

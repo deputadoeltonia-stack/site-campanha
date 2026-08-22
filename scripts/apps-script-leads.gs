@@ -16,8 +16,11 @@
  *  7. Teste sem abrir o navegador:  bash scripts/testar-endpoint.sh <URL>
  *
  * REIMPLANTAR: toda vez que editar este arquivo, Implantar > Gerenciar
- * implantações > lápis > Versão: Nova > Implantar. Sem isso a URL continua
- * servindo o código velho — é a pegadinha nº 1 do Apps Script.
+ * implantações > EDITE A IMPLANTAÇÃO QUE JÁ EXISTE (lápis) > Versão: Nova >
+ * Implantar. Sem isso a URL continua servindo o código velho — é a pegadinha
+ * nº 1 do Apps Script. E nunca clique em "Nova implantação": ela nasce com
+ * outra URL /exec e os três sites (campanha, tozi, dulcerita) param de entregar
+ * lead sem dar erro nenhum.
  *
  * IMPORTANTE: a validação do navegador é só UX. Ela é refeita aqui porque
  * qualquer um pode postar direto no endpoint.
@@ -71,6 +74,21 @@ function seguro_(v) {
   return /^[=+\-@\t\r]/.test(s) ? "'" + s : s;
 }
 
+/**
+ * `origem` vem solta no corpo do POST: vira parte da chave de dedupe e vai
+ * parar numa célula da planilha. Antes, uma origem gigante estourava sozinha o
+ * limite de 250 caracteres da chave do CacheService e o pedido morria ali; com
+ * a chave virando HMAC de tamanho fixo esse freio acidental some. Daí o corte
+ * explícito: 60 caracteres sobram pra qualquer slug de campanha
+ * ('site-campanha', 'site-tozi', 'site-dulcerita', 'teste-cli') e limitam o que
+ * um POST anônimo consegue escrever na planilha. É normalização, não recusa —
+ * origem esquisita continua virando lead, só que aparada.
+ */
+function origemSegura_(v) {
+  var s = String(v == null ? '' : v).trim().replace(/[^\p{L}\p{N}_-]/gu, '-');
+  return s.slice(0, 60) || 'site';
+}
+
 function soDigitos_(v) {
   return String(v == null ? '' : v).replace(/\D/g, '');
 }
@@ -90,6 +108,27 @@ function validar_(d) {
   return { erros: erros, nome: nome, telefone: tel };
 }
 
+/**
+ * A chave do cache carregava o telefone em texto puro, e o cache é o mesmo pro
+ * script inteiro. HMAC troca isso por uma chave de tamanho fixo sem o número
+ * dentro. O segredo mora nas Propriedades do Script — passo manual, uma vez:
+ * Apps Script > engrenagem (Configurações do projeto) > Propriedades do script
+ * > Adicionar:  DEDUPE_SEGREDO = um texto aleatório longo.
+ * Sem a propriedade (ou se o PropertiesService reclamar) cai na chave antiga:
+ * dedupe funcionando vale mais que chave bonita.
+ */
+function chaveDedupe_(origem, telefone) {
+  var cru = origem + '_' + telefone;
+  try {
+    var segredo = PropertiesService.getScriptProperties().getProperty('DEDUPE_SEGREDO');
+    if (segredo) {
+      return 'lead_' + Utilities.base64EncodeWebSafe(
+        Utilities.computeHmacSha256Signature(cru, segredo));
+    }
+  } catch (err) { /* sem propriedades disponíveis: segue com a chave crua */ }
+  return 'lead_' + cru;
+}
+
 function resposta_(ok, msg) {
   return ContentService
     .createTextOutput(JSON.stringify({ ok: ok, msg: msg || '' }))
@@ -104,17 +143,30 @@ function doPost(e) {
     try { d = JSON.parse(e.postData.contents); }
     catch (err) { return resposta_(false, 'json invalido'); }
 
+    // honeypot: campo escondido no formulário, invisível pra gente e irresistível
+    // pra bot. AUSENTE = aceita: os sites tozi/dulcerita ainda não mandam o campo,
+    // e exigir ele mataria a captação deles. Só rejeita quem mandou preenchido.
+    //
+    // A resposta é a MESMA do lead aceito — a linha é que não vai pra planilha.
+    // Dizer 'invalido: bot' entregaria qual campo é a armadilha, e o robô
+    // mandaria ele vazio na próxima. É a mesma razão do fakeSuccess() no
+    // main.js: quem cai na armadilha não pode saber que caiu.
+    if (String(d.site || '').trim() !== '') return resposta_(true, 'ok');
+
     var v = validar_(d);
     if (v.erros.length) return resposta_(false, 'invalido: ' + v.erros.join(','));
 
-    var origem = String(d.origem || 'site');
+    var origem = origemSegura_(d.origem);
 
     // anti duplicata: mesmo telefone em menos de 2 min é reenvio/bot.
     // A chave inclui a origem: a mesma pessoa pode se cadastrar nos dois
     // sites em seguida, e isso são dois leads legítimos, não repetição.
+    // A resposta do duplicado é igualzinha à do lead aceito de propósito: se
+    // fosse diferente, qualquer um postaria um telefone alheio pra descobrir se
+    // aquela pessoa acabou de se cadastrar. A linha é que não vai pra planilha.
     var cache = CacheService.getScriptCache();
-    var chave = 'lead_' + origem + '_' + v.telefone;
-    if (cache.get(chave)) return resposta_(true, 'duplicado ignorado');
+    var chave = chaveDedupe_(origem, v.telefone);
+    if (cache.get(chave)) return resposta_(true, 'ok');
     cache.put(chave, '1', 120);
 
     // appendRow sem lock pode sobrescrever linha em envios simultâneos
