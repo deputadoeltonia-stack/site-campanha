@@ -31,7 +31,7 @@
   <link rel="preload" href="public/fonts/avenir-400.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="public/assets/deputado.webp" as="image" type="image/webp" fetchpriority="high" />
 
-  <link rel="stylesheet" href="css/style.css?v=67" />
+  <link rel="stylesheet" href="css/style.css?v=85" />
   <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
@@ -74,6 +74,9 @@
   <main>
 
     <!-- ============ 1. HERO ============ -->
+    <!-- .capa-trilho define por quanto tempo a capa fica presa (sticky) antes
+         de soltar — ver comentário em css/style.css (bloco CAPA + FOLHA). -->
+    <div class="capa">
     <section class="hero" id="hero">
       <span class="hero-backnum" aria-hidden="true">4412</span>
       <div class="wrap hero-grid">
@@ -106,6 +109,12 @@
         </div>
       </div>
     </section>
+    <div class="capa-trilho" aria-hidden="true"></div>
+    </div><!-- /capa -->
+
+    <!-- A FOLHA: o site inteiro depois da capa, deslizando por cima dela
+         no scroll. Ver bloco CAPA + FOLHA em css/style.css. -->
+    <div class="folha">
 
     <!-- ============ 2. QUEM SOU EU ============ -->
     <section class="section" id="quem-sou">
@@ -270,23 +279,9 @@
           <h2 class="section-title">Vejam o que falam<br />nas minhas redes.</h2>
         </div>
 
+        <!-- ordem por tamanho do depoimento (menor -> maior): o card final
+             (o único que não encolhe na animação) fecha com o mais forte. -->
         <div class="quotes">
-          <figure class="quote reveal">
-            <blockquote class="prose">Eu também lhe agradeço. Num dia em que eu estava com forte crise de depressão, como trabalhava no hospital, fui ao pronto-socorro e foi você que me atendeu, me levou ao repouso, me medicou e orou por mim. Nunca esqueci — são os pequenos detalhes que fazem uma grande diferença.</blockquote>
-            <figcaption><strong>Edna Silva Rodrigues</strong><span data-rede="facebook">Facebook</span></figcaption>
-          </figure>
-          <figure class="quote reveal">
-            <blockquote class="prose">Muitíssimo obrigada mais uma vez por sua atenção, e aproveito para mencionar minha admiração pelo profissional e político.</blockquote>
-            <figcaption><strong>Ana Claudia Magalhães</strong><span data-rede="instagram">Instagram · @anaclaudia_20ac</span></figcaption>
-          </figure>
-          <figure class="quote reveal">
-            <blockquote class="prose">Amém, Deus o abençoe! O senhor Dr. Elton e toda sua equipe foram responsáveis pela cura da minha filha, que estava puérpera há seis dias — eu, com a neta nos meus braços, à espera de um milagre. Mas Deus iluminou vocês e me honrou: hoje seguem as duas com muita saúde, vivas para contar esse milagre. Amém.</blockquote>
-            <figcaption><strong>Adriana Pedrosa Barbosa</strong><span data-rede="facebook">Facebook</span></figcaption>
-          </figure>
-          <figure class="quote reveal">
-            <blockquote class="prose">Por mais médicos assim! Humanos que amam pessoas! Que Deus continue te abençoando, Dr. E que o senhor continue sendo esse médico tão humano e humilde!</blockquote>
-            <figcaption><strong>Vera Lucia Araújo</strong><span data-rede="instagram">Instagram · @veraluciaaraujo1974</span></figcaption>
-          </figure>
           <figure class="quote reveal">
             <blockquote class="prose">Dr. Elton, o senhor é muito especial… cuidou da minha mãe, nunca esquecerei.</blockquote>
             <figcaption><strong>Mary Bernardes</strong><span data-rede="instagram">Instagram · @_marybernardes</span></figcaption>
@@ -294,6 +289,22 @@
           <figure class="quote reveal">
             <blockquote class="prose">Obrigado por nos representar. O senhor é a esperança de políticas públicas que ajudem milhares de pessoas diabéticas.</blockquote>
             <figcaption><strong>Rafael Couto</strong><span data-rede="instagram">Instagram · @rafaelribeirocouto</span></figcaption>
+          </figure>
+          <figure class="quote reveal">
+            <blockquote class="prose">Muitíssimo obrigada mais uma vez por sua atenção, e aproveito para mencionar minha admiração pelo profissional e político.</blockquote>
+            <figcaption><strong>Ana Claudia Magalhães</strong><span data-rede="instagram">Instagram · @anaclaudia_20ac</span></figcaption>
+          </figure>
+          <figure class="quote reveal">
+            <blockquote class="prose">Por mais médicos assim! Humanos que amam pessoas! Que Deus continue te abençoando, Dr. E que o senhor continue sendo esse médico tão humano e humilde!</blockquote>
+            <figcaption><strong>Vera Lucia Araújo</strong><span data-rede="instagram">Instagram · @veraluciaaraujo1974</span></figcaption>
+          </figure>
+          <figure class="quote reveal">
+            <blockquote class="prose">Eu também lhe agradeço. Num dia em que eu estava com forte crise de depressão, como trabalhava no hospital, fui ao pronto-socorro e foi você que me atendeu, me levou ao repouso, me medicou e orou por mim. Nunca esqueci — são os pequenos detalhes que fazem uma grande diferença.</blockquote>
+            <figcaption><strong>Edna Silva Rodrigues</strong><span data-rede="facebook">Facebook</span></figcaption>
+          </figure>
+          <figure class="quote reveal">
+            <blockquote class="prose">Amém, Deus o abençoe! O senhor Dr. Elton e toda sua equipe foram responsáveis pela cura da minha filha, que estava puérpera há seis dias — eu, com a neta nos meus braços, à espera de um milagre. Mas Deus iluminou vocês e me honrou: hoje seguem as duas com muita saúde, vivas para contar esse milagre. Amém.</blockquote>
+            <figcaption><strong>Adriana Pedrosa Barbosa</strong><span data-rede="facebook">Facebook</span></figcaption>
           </figure>
         </div>
 
@@ -335,13 +346,21 @@
 
         <div class="video-block">
           <h3 class="video-block-title">Destaque</h3>
-          <div class="video-grid">
+          <div class="video-grid video-grid-sempre-aberto">
             <figure class="video-card reveal">
               <video controls preload="none" data-poster="public/assets/videos/destaque-campanha.webp?v=2" playsinline>
                 <source src="public/assets/videos/destaque-campanha.mp4?v=2" type="video/mp4" />
               </video>
               <figcaption>
                 <strong>Porque quero ser deputado federal</strong>
+              </figcaption>
+            </figure>
+            <figure class="video-card reveal">
+              <video controls preload="none" data-poster="public/assets/videos/historia-missao.webp?v=2" playsinline>
+                <source src="public/assets/videos/historia-missao.mp4?v=2" type="video/mp4" />
+              </video>
+              <figcaption>
+                <strong>Minha história fez a minha missão.</strong>
               </figcaption>
             </figure>
           </div>
@@ -470,7 +489,7 @@
 
         <div class="video-block">
           <h3 class="video-block-title">Depoimentos</h3>
-          <div class="video-grid">
+          <div class="video-grid video-grid-sempre-aberto">
             <figure class="video-card reveal">
               <video controls preload="none" data-poster="public/assets/videos/depoimento-glicemia.webp?v=2" playsinline>
                 <source src="public/assets/videos/depoimento-glicemia.mp4?v=2" type="video/mp4" />
@@ -478,6 +497,15 @@
               <figcaption>
                 <strong>Sensores de glicemia pelo SUS</strong>
                 <p class="prose">Por isso luto diariamente pela distribuição dos sensores de glicemia pelo SUS. A transformação de vida com ele é grande.</p>
+              </figcaption>
+            </figure>
+            <figure class="video-card reveal">
+              <video controls preload="none" data-poster="public/assets/videos/depoimento-cartilhas.webp?v=2" playsinline>
+                <source src="public/assets/videos/depoimento-cartilhas.mp4?v=2" type="video/mp4" />
+              </video>
+              <figcaption>
+                <strong>As cartilhas que levam informação à população</strong>
+                <p class="prose">Gratificante ver informação e transformação serem levadas para toda a população por meio das minhas cartilhas. Quando a criei, há alguns anos atrás, quis ajudar as pessoas a saberem como lidar com essa doença.</p>
               </figcaption>
             </figure>
           </div>
@@ -492,17 +520,43 @@
           <h2 class="section-title">Materiais</h2>
         </div>
 
-        <a class="material-card reveal" href="colinha/">
-          <div class="material-copy">
-            <h3>Colinha Digital de Voto</h3>
-            <p class="prose">Monte a sua colinha, salve a imagem no celular e leve com você no dia da votação. Funciona direto do navegador, sem precisar instalar nada.</p>
-            <span class="btn btn-gold">Abrir a Colinha Digital</span>
-          </div>
-          <p class="material-ballot" aria-hidden="true">
-            <span class="plate-label">Deputado Federal</span>
-            <span class="ballot-plate">4412</span>
-          </p>
-        </a>
+        <div class="materiais-grid">
+          <a class="material-card reveal" href="colinha/">
+            <div class="material-copy">
+              <h3>Colinha Digital de Voto</h3>
+              <p class="prose">Monte a sua colinha, salve a imagem no celular e leve com você no dia da votação. Funciona direto do navegador, sem precisar instalar nada.</p>
+              <span class="btn btn-gold">Abrir a Colinha Digital</span>
+            </div>
+            <p class="material-ballot" aria-hidden="true">
+              <span class="plate-label">Deputado Federal</span>
+              <span class="ballot-plate">4412</span>
+            </p>
+          </a>
+
+          <a class="material-card reveal" href="cartilhas/diabetes/">
+            <div class="material-copy">
+              <h3>Cartilha do Diabetes</h3>
+              <p class="prose">Descobri que tenho Diabetes, e agora? O que é a doença, cuidados no dia a dia e os projetos do Dr. Elton para quem convive com ela.</p>
+              <span class="btn btn-gold">Ler a cartilha</span>
+            </div>
+          </a>
+
+          <a class="material-card reveal" href="cartilhas/saude-mental/">
+            <div class="material-copy">
+              <h3>Cartilha de Saúde Mental</h3>
+              <p class="prose">Informação pode salvar vidas. Dados sobre suicídio, sinais de alerta e como ajudar — com o contato do CVV, 188.</p>
+              <span class="btn btn-gold">Ler a cartilha</span>
+            </div>
+          </a>
+
+          <a class="material-card reveal" href="emendas/">
+            <div class="material-copy">
+              <h3>Emendas Parlamentares</h3>
+              <p class="prose">Recursos que o Dr. Elton destinou pra saúde e educação no Vale do Paraíba e em São Paulo.</p>
+              <span class="btn btn-gold">Ver as emendas</span>
+            </div>
+          </a>
+        </div>
       </div>
     </section>
 
@@ -555,6 +609,8 @@
       </div>
     </section>
 
+    </div><!-- /folha -->
+
   </main>
 
   <!-- ============ RODAPÉ ============ -->
@@ -601,6 +657,6 @@
 
   <a href="#participar" class="sticky-cta" aria-label="Quero participar">Quero participar</a>
 
-  <script src="js/main.js?v=24" defer></script>
+  <script src="js/main.js?v=39" defer></script>
 </body>
 </html>

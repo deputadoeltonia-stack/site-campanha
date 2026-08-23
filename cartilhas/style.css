@@ -1,0 +1,203 @@
+/* =========================================================
+   Cartilhas — leitor de PDF-como-imagem (Dr. Elton)
+   Arquivo próprio, não herda css/style.css: só o essencial da
+   identidade (cores, fontes) é repetido aqui — ver css/style.css
+   para os valores de origem.
+   ========================================================= */
+
+@font-face { font-family:"Geometos"; src:url("/public/fonts/geometos.woff2") format("woff2"); font-weight:100 900; font-display:swap; }
+@font-face { font-family:"Avenir LT Std"; src:url("/public/fonts/avenir-400.woff2") format("woff2"); font-weight:400; font-style:normal; font-display:swap; }
+@font-face { font-family:"Avenir LT Std"; src:url("/public/fonts/avenir-500.woff2") format("woff2"); font-weight:500 800; font-display:swap; }
+
+:root {
+  --ink:      #171E31;
+  --ink-deep: #0E1424;
+  --bg:       #F5F5F5;
+  --surface:  #FFFFFF;
+  --gold:     #CCFF00;
+  --blue:     #0B3984;
+  --ink-txt:  #16233A;
+  --ink-mut:  #465468;
+  --line:     rgba(14, 32, 56, .14);
+  --line-lt:  rgba(236, 239, 243, .16);
+  --display:  "Geometos", "Arial Narrow", sans-serif;
+  --body:     "Avenir LT Std", "Avenir Next", system-ui, sans-serif;
+  --ease:      cubic-bezier(.16, 1, .3, 1);
+  --ease-virar: cubic-bezier(.22, 1, .36, 1);   /* ease-out-quint — vira a página sem quicar */
+  --radius:   16px;
+}
+
+* { box-sizing: border-box; }
+/* [hidden] empata em especificidade com .btn (ambos 0,0,1,0) — sem isto o
+   author .btn{display:inline-flex} vence o [hidden] do UA e o botão
+   "Compartilhar" (hidden por padrão, só o JS libera) aparece sem JS. */
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-height: 100dvh;
+  font-family: var(--body); color: var(--ink-txt); background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+/* height:auto na regra base, não só no índice: o height="" do HTML (pro
+   navegador reservar espaço) vira hint de apresentação com valor fixo em
+   px — sem isto QUALQUER img que a CSS só estreita em largura (max-width,
+   flex) fica esticada, porque a altura não acompanha. Foi o que esticou as
+   páginas do leitor: largura cabia no card, altura ficava travada nos 1328px
+   nativos. */
+img { max-width: 100%; height: auto; display: block; }
+button { font: inherit; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+:where(a, button, input, [tabindex]):focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
+
+/* ---------- botão (subconjunto do .btn do site principal) ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5em;
+  font-family: var(--body); font-weight: 500; font-size: .95rem; line-height: 1;
+  text-decoration: none; padding: .75em 1.3em; border-radius: 999px; border: 2px solid transparent;
+  background: var(--ink); color: var(--surface); cursor: pointer;
+  transition: transform .18s var(--ease), background .2s, border-color .2s, color .2s;
+  white-space: nowrap;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn-gold { background: var(--gold); color: #241703; }
+.btn-ghost { background: transparent; border-color: var(--line-lt); color: var(--surface); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ---------- topo ---------- */
+.leitor-topo {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .85rem clamp(1rem, 4vw, 2rem);
+  background: var(--ink); color: var(--surface);
+}
+.leitor-voltar {
+  display: inline-flex; align-items: center; gap: .5em;
+  color: var(--surface); text-decoration: none; font-weight: 500; font-size: .92rem;
+  opacity: .88; transition: opacity .18s var(--ease);
+}
+.leitor-voltar:hover { opacity: 1; }
+.leitor-voltar svg { width: 9px; height: 14px; flex: none; }
+.leitor-topo-acoes { display: flex; gap: .6rem; align-items: center; }
+.leitor-topo-acoes .btn { padding: .6em 1.1em; font-size: .85rem; }
+
+/* ---------- corpo do leitor ---------- */
+.leitor {
+  max-width: 1180px; margin: 0 auto;
+  padding: clamp(1.25rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2rem) 1.5rem;
+}
+/* só com JS: encaixa a página na tela. height (não min-height) + flex
+   column, pro palco virar o "flex:1" do meio e herder uma altura DEFINIDA
+   da tela — com min-height o container cresce junto do conteúdo (altura
+   "auto" pra fins de %), sobra zero de espaço livre e o flex-grow não tem o
+   que distribuir; a imagem nunca encolhe. Escopado a .js porque sem JS as
+   páginas ficam todas empilhadas (não é 1 por vez) — travar a altura do
+   .leitor ali cortaria/sobreporia a pilha inteira. 61px = altura fixa do
+   .leitor-topo (padding vertical não é clamped, só o horizontal). */
+.js .leitor {
+  height: calc(100svh - 61px);
+  display: flex; flex-direction: column;
+}
+.leitor-titulo {
+  font-family: var(--display); font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+  margin: 0 0 1.25rem; text-wrap: balance; color: var(--ink);
+}
+
+/* sem JS: pilha simples, rolável — cada página é uma imagem de verdade,
+   sem nada escondido. É o "no mínimo mostra as páginas empilhadas". */
+.leitor-paginas { display: flex; flex-direction: column; gap: 1.5rem; align-items: center; }
+.pagina { margin: 0; }
+.pagina img { border-radius: 8px; box-shadow: 0 2px 10px rgba(14,20,36,.1); }
+
+/* com JS: vira álbum paginado — só a(s) página(s) ativa(s) ficam no fluxo.
+   display:none tira do a11y tree E da ordem de tab, de propósito: aqui é
+   paginação de verdade (como abas), não um recorte visual como no ?ver mais?
+   dos vídeos — só a página aberta deve existir pra quem usa leitor de tela. */
+.js .leitor-paginas {
+  flex-direction: row; flex-wrap: nowrap; justify-content: center; align-items: flex-start;
+  gap: clamp(.75rem, 2vw, 1.5rem);
+  height: 100%;
+}
+.js .pagina { display: none; }
+/* height:100% herdada do palco (via .leitor-paginas) + flex centraliza a
+   imagem: é o que deixa a página "encaixada" na tela em vez de exigir
+   scroll pra ver ela inteira. */
+.js .pagina.ativa {
+  display: flex; align-items: center; justify-content: center;
+  flex: 1 1 0; min-width: 0; max-width: min(46%, 560px);
+  height: 100%;
+}
+.js .leitor-paginas:not(.duas) .pagina.ativa { max-width: min(100%, 620px); }
+.js .pagina.ativa img { max-height: 100%; width: auto; height: auto; max-width: 100%; }
+
+/* vira-página: entra deslizando do lado por onde "puxou", sombra sobe e
+   desce — nada de curvatura 3D, só translação + sombra, então nunca engasga. */
+.js .pagina.ativa img { transition: box-shadow .32s var(--ease-virar); }
+.js .pagina.entrando-dir img { animation: virar-dir .32s var(--ease-virar); }
+.js .pagina.entrando-esq img { animation: virar-esq .32s var(--ease-virar); }
+@keyframes virar-dir {
+  from { transform: translateX(28px); opacity: .35; box-shadow: -18px 0 26px -18px rgba(14,20,36,.45); }
+  to   { transform: none; opacity: 1; box-shadow: 0 2px 10px rgba(14,20,36,.1); }
+}
+@keyframes virar-esq {
+  from { transform: translateX(-28px); opacity: .35; box-shadow: 18px 0 26px -18px rgba(14,20,36,.45); }
+  to   { transform: none; opacity: 1; box-shadow: 0 2px 10px rgba(14,20,36,.1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .js .pagina.entrando-dir img, .js .pagina.entrando-esq img { animation: none; }
+}
+
+/* ---------- palco: imagem(ns) + setas ---------- */
+/* palco na largura cheia (não fit-content): as setas são ancoradas nas
+   bordas DELE, então precisam de uma largura estável — senão pulavam de
+   lugar toda vez que o modo mudava entre 1 página (capa) e 2 (spread),
+   já que cada um tem uma largura de conteúdo diferente. */
+.leitor-palco { position: relative; touch-action: pan-y; flex: 1 1 auto; min-height: 160px; }
+.leitor-seta {
+  display: none;
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 46px; height: 46px; border-radius: 50%; border: none;
+  background: rgba(23, 30, 49, .78); color: var(--surface);
+  font-size: 1.5rem; line-height: 1; cursor: pointer;
+  align-items: center; justify-content: center;
+  transition: background .18s var(--ease), opacity .18s var(--ease);
+  z-index: 5;
+}
+.js .leitor-seta { display: flex; }
+.leitor-seta:hover { background: var(--ink); }
+.leitor-seta:disabled { opacity: .3; cursor: default; }
+.leitor-seta-prev { left: clamp(-14px, -4vw, -2px); }
+.leitor-seta-next { right: clamp(-14px, -4vw, -2px); }
+@media (min-width: 700px) {
+  .leitor-seta { width: 52px; height: 52px; }
+  .leitor-seta-prev { left: -34px; }
+  .leitor-seta-next { right: -34px; }
+}
+
+.leitor-indicador {
+  text-align: center; margin: 1.25rem 0 0; font-size: .9rem; color: var(--ink-mut);
+}
+
+/* ---------- índice (cartilhas/index.html) ---------- */
+.indice { max-width: 1000px; margin: 0 auto; padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem) 4rem; }
+.indice-head { text-align: center; margin-bottom: clamp(2rem, 5vw, 3rem); }
+.indice-head h1 { font-family: var(--display); font-size: clamp(1.8rem, 4vw, 2.6rem); color: var(--ink); margin: 0 0 .5rem; }
+.indice-head p { color: var(--ink-mut); max-width: 46ch; margin: 0 auto; }
+.indice-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.indice-card {
+  display: block; text-decoration: none; color: inherit;
+  background: var(--surface); border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--line); box-shadow: 0 2px 10px rgba(14,20,36,.06);
+  transition: transform .18s var(--ease), box-shadow .25s var(--ease);
+}
+.indice-card:hover { transform: translateY(-4px); box-shadow: 0 18px 34px -18px rgba(14,20,36,.35); }
+/* height:auto é o que faz o aspect-ratio valer: os atributos width/height do
+   HTML (pro navegador reservar espaço sem isso, no <img> do leitor) viram
+   hint de apresentação com um height fixo — sem isto aqui o aspect-ratio é
+   ignorado e a capa aparece inteira, sem cortar em 3/4. */
+.indice-card img { width: 100%; height: auto; aspect-ratio: 3/4; object-fit: cover; background: var(--ink); }
+.indice-card-copy { padding: 1.1rem 1.2rem 1.35rem; }
+.indice-card-copy h2 { font-family: var(--display); font-size: 1.15rem; margin: 0 0 .4rem; color: var(--ink); }
+.indice-card-copy p { margin: 0; color: var(--ink-mut); font-size: .88rem; line-height: 1.5; }

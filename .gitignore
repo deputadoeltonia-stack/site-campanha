@@ -6,5 +6,6 @@ fonts-src/
 .claude-flow/
 .impeccable/
 assets-src/videos-src/
+assets-src/cartilhas-src/
 .vercel
 .env*

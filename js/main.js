@@ -17,6 +17,12 @@
   // senão esta URL continua servindo o código velho.
   var LEAD_ENDPOINT = "https://script.google.com/macros/s/AKfycbyBdY45weHbgTSWLBt0ymfRSHPmz4vHVGdEiu13T3o3yGejT36JiGPauMrxmv-vRz-j/exec";
 
+  // Bot do WhatsApp que continua a conversa e cadastra o lead (várias origens
+  // caem no mesmo número). O site só precisa confirmar que registrou na
+  // planilha ANTES de mandar pro WhatsApp — é o jeito de saber quem veio daqui.
+  var WHATSAPP_BOT = "5512988604385";
+  var WHATSAPP_MSG = "Quero começar nessa jornada!";
+
   /* ---------- page-load orquestrado (dispara animações .load/.hero-photo) ---------- */
   var root = document.documentElement;
   requestAnimationFrame(function () {
@@ -421,13 +427,18 @@
     if (btn) { btn.disabled = state; btn.textContent = state ? "Enviando…" : "Confirmar participação"; }
   }
 
+  function paraWhatsApp() {
+    location.href = "https://wa.me/" + WHATSAPP_BOT + "?text=" + encodeURIComponent(WHATSAPP_MSG);
+  }
+
   function ok(nome) {
     lock(false);
     leadForm.reset();
     if (statusEl) {
       statusEl.className = "form-status ok";
-      statusEl.textContent = "Recebido, " + nome.split(" ")[0] + "! Sua participação foi registrada. 💛";
+      statusEl.textContent = "Recebido, " + nome.split(" ")[0] + "! Te levando pro WhatsApp…";
     }
+    paraWhatsApp();
   }
   function fail() {
     lock(false);
@@ -456,11 +467,23 @@
       return;
     }
 
-    // Modo real: POST pro endpoint configurado.
+    var corpo = JSON.stringify(payload);
+
+    // sendBeacon primeiro: o clique já vai mandar pro WhatsApp em seguida, e
+    // um fetch normal corre risco de ser abortado pelo navegador no meio da
+    // troca de página. sendBeacon é feito pra isso — sobrevive à navegação.
+    // Corpo string = Content-Type text/plain por padrão, igual ao fetch abaixo.
+    if (navigator.sendBeacon && navigator.sendBeacon(LEAD_ENDPOINT, corpo)) {
+      ok(payload.nome);
+      return;
+    }
+
+    // sem sendBeacon (ou recusou o payload): só redireciona depois da
+    // resposta, senão arrisca perder o registro na troca de página.
     fetch(LEAD_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" }, // evita preflight no Apps Script
-      body: JSON.stringify(payload)
+      body: corpo
     })
       .then(function (r) {
         if (!r.ok) throw new Error("HTTP " + r.status);
@@ -686,6 +709,137 @@
       larguraL = window.innerWidth;
       clearTimeout(remedirL);
       remedirL = setTimeout(medirLegendas, 150);
+    });
+  }
+
+  /* ---------- vídeos: "ver mais" com espiada em gradiente ----------
+     O grid usa auto-fill (minmax 220px), então o número de colunas muda com a
+     largura — não dá pra travar o corte num breakpoint fixo no CSS. Mede a
+     coluna e a altura real da fileira depois do layout, e clipa o grid em
+     max-height (não hidden/display:none): o conteúdo continua no fluxo e
+     acessível a leitor de tela, só fica clipado visualmente com uma espiada
+     da 2ª fileira esmaecendo em gradiente até a cor de fundo da seção.
+     Botão e corte só nascem aqui: sem JS não há classe nem max-height, então
+     nada fica escondido — o bloco aparece inteiro.
+     .video-grid-sempre-aberto (o Destaque) fica de fora: são só 1-2 vídeos
+     curados, esconder atrás de botão no mobile não faz sentido pra "destaque". */
+  var gradesVideo = Array.prototype.slice.call(document.querySelectorAll(".video-grid:not(.video-grid-sempre-aberto)"));
+  if (gradesVideo.length) {
+    var FILEIRAS_VISIVEIS = 1;
+    var ESPIA_PX = 40;   // só uma tira da fileira seguinte, não ela quase inteira
+    var BOTAO_FOLGA = 24;   // espaço reservado abaixo do gradiente, só pro botão descer mais
+    var semMovimentoVideo = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var ajustarGrade = function (grade) {
+      // filtra o botão de fora: ele mora DENTRO do grid (pra empilhar sobre o
+      // gradiente), mas não é card e não pode entrar na contagem de fileiras
+      var cards = Array.prototype.slice.call(grade.children).filter(function (el) {
+        return !el.classList.contains("video-ver-mais");
+      });
+      if (cards.length < 2) return;
+      var estilo = window.getComputedStyle(grade);
+      var colunas = estilo.gridTemplateColumns.split(" ").length;
+      var limite = colunas * FILEIRAS_VISIVEIS;
+      var precisaBotao = cards.length > limite;
+      var btn = grade.querySelector(".video-ver-mais");
+      var botaoJaExistia = !!btn;   // distingue "1ª carga" de "fechando de verdade" mais abaixo
+
+      if (!precisaBotao) {
+        grade.classList.remove("video-grid-recolhido", "video-grid-expandido");
+        grade.style.maxHeight = "";
+        if (btn) btn.hidden = true;
+        return;
+      }
+      // o(s) card(s) que ficam por baixo do gradiente só mostram uma tira —
+      // curta demais pra sustentar o fade/slide do reveal sem parecer quebrado.
+      // Sem a classe "reveal" eles nascem visíveis, junto com os de cima.
+      cards.forEach(function (card, i) { if (i >= limite) card.classList.remove("reveal"); });
+
+      var expandido = grade.classList.contains("video-grid-expandido");
+      if (!btn) {
+        if (!grade.id) grade.id = "video-grid-" + Math.random().toString(36).slice(2);
+        btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn video-ver-mais";
+        btn.setAttribute("aria-expanded", "false");
+        btn.setAttribute("aria-controls", grade.id);
+        btn.addEventListener("click", function () {
+          grade.classList.toggle("video-grid-expandido");
+          ajustarGrade(grade);
+        });
+        grade.appendChild(btn);   // dentro do grid: em .video-grid-recolhido vira
+                                  // position:absolute (CSS) e some do fluxo/colunas
+        // ao abrir, o max-height fica travado no valor calculado até a transição
+        // acabar — só então solta pro fluxo livre, senão uma legenda que cresce
+        // depois (o "Ler mais" dela) ficaria cortada por um max-height velho
+        grade.addEventListener("transitionend", function (e) {
+          if (e.target === grade && e.propertyName === "max-height" &&
+              grade.classList.contains("video-grid-expandido")) {
+            grade.classList.remove("video-grid-recolhido");
+            grade.style.maxHeight = "";
+            // o grid cresce pra BAIXO da tela — sem rolar atrás, o clique em
+            // "Veja mais" parece não ter feito nada (nada do que apareceu
+            // ficou visível). Só depois que a transição termina, porque
+            // antes disso o botão ainda está na posição velha (a altura só
+            // "pega" de verdade quadro a quadro, não no instante do clique).
+            btn.scrollIntoView({ block: "end", behavior: semMovimentoVideo ? "auto" : "smooth" });
+          }
+        });
+      }
+
+      if (expandido) {
+        // já tá aberto e solto (sem clip): não há o que animar de novo aqui,
+        // isso só dispara na abertura em si (ver o click acima)
+        if (grade.classList.contains("video-grid-recolhido")) {
+          // força o navegador a "fixar" o estado atual (classe .video-grid-expandido
+          // já aplicada, max-height ainda no valor recolhido) antes de mudar o
+          // valor — sem isso as duas mudanças caem no mesmo frame e não anima,
+          // pula direto pro final
+          grade.offsetHeight;
+          grade.style.maxHeight = grade.scrollHeight + "px";
+        }
+      } else {
+        // altura real da fileira, não valor chutado: cards de blocos diferentes
+        // têm alturas diferentes (com/sem legenda), e o grid não é sempre o mesmo
+        var alturaFileira = cards[0].getBoundingClientRect().height;
+        var espacoLinhas = parseFloat(estilo.rowGap) || 0;
+        var alturaRecolhida = alturaFileira * FILEIRAS_VISIVEIS + espacoLinhas * FILEIRAS_VISIVEIS + ESPIA_PX + BOTAO_FOLGA;
+        // fechando de um "Veja mais" de verdade (não a 1ª carga da página):
+        // trava a altura ATUAL antes de religar o clip, senão a transição
+        // não tem de onde partir e pula direto pro final — mesmo truque do
+        // abrir, só que o reflow vem DEPOIS de ligar a classe (lá vem antes)
+        // porque aqui é a CLASSE que muda no meio do caminho, não só o valor.
+        if (botaoJaExistia && !grade.classList.contains("video-grid-recolhido")) {
+          grade.style.maxHeight = grade.scrollHeight + "px";
+          grade.classList.add("video-grid-recolhido");
+          grade.offsetHeight;
+        } else {
+          grade.classList.add("video-grid-recolhido");
+        }
+        grade.style.maxHeight = alturaRecolhida + "px";
+        // o gradiente cobre a espiada INTEIRA até o corte de verdade (senão
+        // sobra fatia crua, sem esmaecer, entre o fim dele e o botão) — mas
+        // fica sólido (--espia-solido) já na METADE do botão pra cima, não
+        // só no pixel final: assim a "borda branca" cruza o meio do botão
+        // em vez de nascer coladinha nele.
+        var totalEspia = ESPIA_PX + BOTAO_FOLGA;
+        var alturaBotao = btn.getBoundingClientRect().height;
+        grade.style.setProperty("--espia-altura", totalEspia + "px");
+        grade.style.setProperty("--espia-solido", (totalEspia - alturaBotao / 2) + "px");
+      }
+
+      btn.hidden = false;
+      btn.setAttribute("aria-expanded", expandido ? "true" : "false");
+      btn.textContent = expandido ? "Ver menos" : "Veja mais";
+    };
+    gradesVideo.forEach(ajustarGrade);
+    // só a LARGURA muda a coluna do grid, e no mobile o resize dispara a cada
+    // mexida da barra de URL (mesmo tratamento das legendas, acima)
+    var larguraV = window.innerWidth, remedirV;
+    window.addEventListener("resize", function () {
+      if (window.innerWidth === larguraV) return;
+      larguraV = window.innerWidth;
+      clearTimeout(remedirV);
+      remedirV = setTimeout(function () { gradesVideo.forEach(ajustarGrade); }, 150);
     });
   }
 

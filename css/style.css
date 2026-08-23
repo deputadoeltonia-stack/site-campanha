@@ -92,6 +92,11 @@ body {
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* clip, nunca hidden: hidden viraria scroll container e quebraria o
+     position:sticky da capa (ver bloco CAPA + FOLHA) — mesma armadilha já
+     resolvida no site do Tozi. */
+  overflow-x: hidden; /* fallback navegador antigo sem suporte a clip */
+  overflow-x: clip;
 }
 
 img, svg { max-width: 100%; display: block; }
@@ -213,8 +218,52 @@ p { margin: 0 0 1rem; }
 .mobile-menu a { text-decoration: none; font-weight: 600; color: var(--ink); padding: .8rem 0; border-bottom: 1px solid var(--line); }
 .mobile-menu a:last-child { border: none; margin-top: .7rem; color: #241703; }
 
+/* ---------- CAPA + FOLHA (capa fica presa, o site desliza por cima) ----------
+   Porte do mesmo efeito do site do Tozi. A capa (hero) gruda no topo e o
+   resto do site é uma folha opaca que sobe por cima dela: abrir o site =
+   só a capa; rolar = a folha cobre a capa e entrega as seções.
+
+   .capa (hero + trilho) existe só pra LIMITAR o container do sticky — sem
+   ele, o sticky duraria o <main> inteiro (a capa virava fundo fixo atrás
+   de tudo, nunca soltava). Com o trilho definindo a altura extra, a capa
+   solta assim que a folha termina de cobrir.
+
+   Degrada sozinho: sem position:sticky, tudo volta ao fluxo normal de
+   sempre (capa em cima, seções embaixo) — nenhum estado quebrado. */
+.capa-trilho {
+  height: 140vh;
+  height: 140svh;   /* svh: barra do navegador no celular não mexe no trilho */
+}
+.folha {
+  position: relative; z-index: 1;
+  margin-top: -140vh;
+  margin-top: -140svh;
+  background: var(--bg);
+  border-radius: 26px 26px 0 0;
+  box-shadow: 0 -20px 52px rgba(14, 20, 36, .35);
+}
+
 /* ---------- hero ---------- */
-.hero { position: relative; background: var(--ink); color: var(--surface); overflow: clip; padding-top: clamp(1.5rem, 5vw, 3rem); isolation: isolate; } /* clip, não hidden: hidden criaria scroll container e sequestraria scroll()/sticky */
+/* min-height cheia em QUALQUER largura (não só mobile): sem isto o hero no
+   desktop só tem a altura do próprio conteúdo (~780px) — bem menor que uma
+   tela — e a folha cobria a capa quase de imediato, sem o momento de "tela
+   cheia" que dá o efeito de capa de verdade (mesma lógica do --palco no
+   site do Tozi). flex + hero-grid com margin-top:auto empurra o conteúdo
+   pro rodapé da seção, preenchendo o resto com o fundo escuro. */
+.hero { position: sticky; top: 0; z-index: 0; background: var(--ink); color: var(--surface); overflow: clip; padding-top: clamp(1.5rem, 5vw, 3rem); isolation: isolate; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; } /* clip, não hidden: hidden criaria scroll container e sequestraria scroll()/sticky */
+/* véu: a capa escurece conforme a folha a cobre, pra ela recuar em vez de só
+   "sumir atrás". Sem gate de reduced-motion: opacidade ligada 1:1 ao gesto de
+   rolagem, não é movimento autônomo (mesma regra da régua de leitura, "B"). */
+@supports (animation-timeline: scroll()) {
+  .hero::before {
+    content: ""; position: absolute; inset: 0; z-index: 2;
+    background: var(--ink-deep); opacity: 0; pointer-events: none;
+    animation: capaRecua linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 82vh;
+  }
+  @keyframes capaRecua { to { opacity: .58; } }
+}
 .hero::after { /* brilho âmbar */
   content: ""; position: absolute; z-index: -1; inset: auto -10% -30% 25%; height: 460px;
   background: radial-gradient(closest-side, rgba(204, 255, 0,.26), transparent 72%); pointer-events: none;
@@ -225,13 +274,14 @@ p { margin: 0 0 1rem; }
   color: transparent; -webkit-text-stroke: 1.5px rgba(204, 255, 0,.055); /* recuou: a placa acesa é o número agora, o fantasma vira só textura */
   letter-spacing: -.04em; pointer-events: none; user-select: none;
 }
-.hero-grid { display: grid; gap: clamp(1rem, 4vw, 3rem); align-items: end; }
+.hero-grid { display: grid; gap: clamp(1rem, 4vw, 3rem); align-items: end; margin-top: auto; }
 /* celular (empilhado, <940px): a seção ocupa a tela toda na abertura e a
    foto fica encostada no rodapé da viewport — sem depender de altura de
    dispositivo específico. svh = viewport "pequena" (com a barra do
    navegador visível), que é o estado real na primeira pintura. */
 @media (max-width: 939px) {
-  .hero { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; }
+  /* min-height/flex do .hero já são a regra base agora (ver CAPA + FOLHA) —
+     aqui só o que ainda é específico do celular empilhado. */
   /* align-items/align-self:end do layout grid original viram propriedade
      flex de verdade aqui (eixo cruzado = horizontal numa coluna) — sem
      resetar pra stretch, a foto encolhe e vai pra direita. */
@@ -396,9 +446,56 @@ p { margin: 0 0 1rem; }
 .pledge-quote { font-family: var(--prose); font-style: italic; color: var(--blue); margin: 0; font-size: var(--step-0); line-height: 1.42; }
 .pledge-body .prose { color: var(--ink-mut); margin: 0; max-width: 62ch; }
 
-/* ---------- depoimentos ---------- */
-.quotes { display: grid; gap: 1.1rem; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
-.quote { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.4rem, 3vw, 2rem); display: flex; flex-direction: column; gap: 1.1rem; }
+/* ---------- depoimentos: cards empilhando um a um (scroll-driven) ----------
+   Mesmo efeito do site do Tozi em Propostas — só que lá foi REMOVIDO: 7
+   propostas reais escondendo atrás de cards não fazia sentido, a pessoa
+   precisa LER cada uma (ver comentário perto de .pledge, seção Propostas).
+   Aqui é diferente: depoimento curto, prova social — não é informação que
+   o eleitor precisa avaliar pra decidir o voto. Cabe.
+
+   Coluna única de propósito (não os 2-a-2 de antes): "um a um" empilhando
+   só faz sentido lendo um card de cada vez, cobrindo o de trás — 2 lado a
+   lado não tem o que "empilhar" entre si. */
+.quotes {
+  --numcards: 6;
+  --stack-top: 96px;   /* header + folga — mesmo valor do .col-label sticky */
+  --stack-step: 10px;
+  max-width: 900px; margin-inline: auto; margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  view-timeline-name: --quotes-scroll;
+}
+.quote {
+  --index0: calc(var(--index, 1) - 1);
+  --reverse-index: calc(var(--numcards) - var(--index0));
+  position: sticky;
+  top: calc(var(--stack-top) + var(--index0) * var(--stack-step));
+  margin: 0 0 1.1rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.4rem, 3vw, 2rem); display: flex; flex-direction: column; gap: 1.1rem;
+}
+.quote:last-child { margin-bottom: 0; }
+.quote:nth-child(1) { --index: 1; }
+.quote:nth-child(2) { --index: 2; }
+.quote:nth-child(3) { --index: 3; }
+.quote:nth-child(4) { --index: 4; }
+.quote:nth-child(5) { --index: 5; }
+.quote:nth-child(6) { --index: 6; }
+
+/* encolhe levemente conforme o próximo card cobre — view-timeline na
+   PRÓPRIA .quotes, cada card anima na sua fatia da fase de saída. Fator
+   pequeno (0.03): 6 cards a 0.05 (o do Tozi) encolheria o 1º demais. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .quote {
+      --start-range: calc(var(--index0) / var(--numcards) * 100%);
+      --end-range: calc(var(--index, 1) / var(--numcards) * 100%);
+      transform-origin: 50% 0%;
+      animation: linear quoteScale forwards;
+      animation-timeline: --quotes-scroll;
+      animation-range: exit-crossing var(--start-range) exit-crossing var(--end-range);
+    }
+    @keyframes quoteScale {
+      to { transform: scale(calc(1.04 - (0.03 * var(--reverse-index)))); }
+    }
+  }
+}
 .quote blockquote { margin: 0; font-family: var(--prose); font-size: var(--step-1); line-height: 1.5; color: var(--ink-txt); position: relative; }
 .quote blockquote::before { content: "\201C"; font-family: var(--prose); font-size: 2.4em; line-height: 0; color: var(--blue); vertical-align: -.35em; margin-right: .08em; }
 .quote figcaption { display: flex; flex-direction: column; margin-top: auto; }
@@ -430,6 +527,11 @@ p { margin: 0 0 1rem; }
 
 /* ---------- materiais ----------
    Card navy: a lima da placa/CTA só funciona em fundo escuro (regra da paleta). */
+/* uma coluna, cards empilhados — cada .material-card fica largo o bastante
+   pro layout horizontal dele (grid-template-columns 1.2fr auto lá embaixo)
+   valer, igual a Colinha sempre foi. Lado a lado eles ficavam estreitos
+   demais pra esse layout fazer sentido. */
+.materiais-grid { display: grid; gap: clamp(1.25rem, 3vw, 2rem); }
 .material-card {
   display: grid; gap: clamp(1.5rem, 4vw, 3rem); align-items: center;
   background: var(--ink); color: var(--surface);
@@ -521,6 +623,57 @@ p { margin: 0 0 1rem; }
 .js .video-card:hover::after { background-color: rgba(14, 20, 36, .16); }
 .js .video-card.tocando::after { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .js .video-card::after { transition: none; } }
+
+/* ---------- "ver mais" com espiada em gradiente ----------
+   O botão e o corte só nascem no main.js quando sobra card além de 1 fileira
+   — medida pelas colunas reais do grid, que mudam com a largura (auto-fill).
+   Sem JS não há classe .video-grid-recolhido nem max-height: o bloco aparece
+   inteiro, sem nada escondido do leitor de tela.
+
+   max-height (não hidden/display:none) é proposital: o conteúdo continua no
+   fluxo e acessível, só fica clipado visualmente. --espia-altura é escrita
+   pelo JS por grid (depende da altura real da fileira ali).
+
+   Anima abrir E fechar: o JS sempre manda um max-height calculado de
+   verdade (scrollHeight real, nunca "auto") antes de mudar o valor — é
+   esse valor conhecido, não esta classe, que faz a transição existir.
+   Por isso a transition mora aqui embaixo, sem depender de .video-grid-
+   -expandido: fechar também precisa dela. */
+.video-grid-recolhido { position: relative; overflow: hidden; }
+/* --ease (usado nos botões) é ease-out forte — ótimo pra CTA que "pula" na
+   tela, mas aqui a fileira toda já aparecia quase pronta nos primeiros 15% do
+   tempo e o resto sumia num rastro imperceptível. cubic-bezier(.4,0,.2,1)
+   (o "standard easing" do Material) reparte o crescimento por igual — dá
+   pra ver a fileira abrindo/fechando de verdade, mesmo rápido. */
+.video-grid-recolhido { transition: max-height .28s cubic-bezier(.4, 0, .2, 1); }
+.video-grid-recolhido::after {
+  content: "";
+  /* bottom:0 sempre — o gradiente tem que ir até o corte de verdade. Deixar
+     de fora a folga do botão (bottom:folga) sobrava uma tira de conteúdo cru,
+     sem esmaecer, entre o fim do gradiente e o corte — aparecia a borda dura
+     do card ali. --espia-altura já vem maior (ESPIA_PX + folga do JS) pra
+     cobrir a distância toda: mesmo esmaecimento, só que mais comprido. */
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
+  height: var(--espia-altura, 5rem);
+  /* --espia-solido: onde o degradê já chega 100% sólido (meio do botão, não
+     o pixel final) — dali pra baixo é só cor chapada até o corte de verdade. */
+  background: linear-gradient(to bottom, transparent, var(--bg) var(--espia-solido, 100%));
+  pointer-events: none;
+  transition: opacity .2s var(--ease);
+}
+.video-grid-recolhido.video-grid-expandido::after { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .video-grid-recolhido, .video-grid-recolhido::after { transition: none; }
+}
+/* botão vive DENTRO do grid (o main.js dá appendChild nele): em fileira única
+   ele é só mais um item de grid, span de todas as colunas, embaixo dos cards.
+   Recolhido, o :absolute tira ele do fluxo de colunas e empilha por CIMA do
+   gradiente — z-index maior que o ::after acima. */
+.video-ver-mais { grid-column: 1 / -1; justify-self: center; margin: 1.3rem 0 0; }
+.video-grid-recolhido .video-ver-mais {
+  position: absolute; left: 50%; bottom: 0; z-index: 2;
+  transform: translateX(-50%); margin: 0;
+}
 
 /* ---------- lightbox da galeria (clique na foto abre) ---------- */
 .lightbox { border: none; padding: 0; background: transparent; max-width: 94vw; max-height: 94vh; overflow: visible; }
@@ -697,14 +850,6 @@ p { margin: 0 0 1rem; }
    ========================================================= */
 @media (min-width: 680px) {
   .gallery { grid-template-columns: repeat(3, 1fr); }
-  .quotes { grid-template-columns: repeat(2, 1fr); }
-  /* mesmo truque do .pledges: se sobrar um ímpar sozinho na última linha,
-     centraliza em vez de deixar encostado à esquerda com buraco ao lado. */
-  .quotes > .quote:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
-    justify-self: center;
-    width: calc((100% - 1.1rem) / 2); /* mesma largura de uma coluna (gap: 1.1rem) */
-  }
   .footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1.7fr; }
   .two-col { grid-template-columns: .9fr 1.3fr; align-items: start; }
   .col-label { position: sticky; top: 96px; }
@@ -719,10 +864,6 @@ p { margin: 0 0 1rem; }
     justify-self: center;
     width: calc((100% - 1rem) / 2); /* mesma largura de uma coluna (gap: 1rem) */
   }
-}
-
-@media (min-width: 720px) {
-  .quotes { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (min-width: 940px) {
@@ -888,3 +1029,63 @@ p { margin: 0 0 1rem; }
   z-index: -1;
 }
 @keyframes luxSpin { to { --lux-angle: 360deg; } }
+
+/* ---------- G) HERO: FUNDO SE ATRASA (parallax de abertura) — TESTE ----------
+   backnum "4412" fantasma e o glow âmbar recuam mais devagar que o resto da
+   tela nos primeiros 70vh — só eles têm transform aqui, o conteúdo em
+   primeiro plano (foto, texto) não ganha nada. A diferença de velocidade
+   entre as duas camadas É o parallax. Só decoração (pointer-events:none,
+   z-index:-1, sem texto): nada de informação se move. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-backnum {
+      animation: heroBacknumParallax linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 70vh;
+    }
+    @keyframes heroBacknumParallax { to { transform: translateY(3%); } }
+
+    .hero::after {
+      animation: heroGlowParallax linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 70vh;
+    }
+    @keyframes heroGlowParallax { to { transform: translateY(6%); opacity: .5; } }
+  }
+}
+
+/* ---------- H) HERO: FOTO DÁ UM PASSO À FRENTE — TESTE ----------
+   Mesma técnica do site do Tozi (.hero-img, animation-range 0-70vh): a
+   <img> ganha profundidade sozinha, o texto ao lado fica parado. Anima a
+   <img>, NÃO o wrapper .hero-photo — o wrapper já tem a animação de ENTRADA
+   (heroPhoto, no load); duas animações na mesma propriedade do MESMO
+   elemento brigam, em elementos diferentes cada uma corre livre. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-photo img {
+      animation: heroFotoParallax linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 70vh;
+    }
+    @keyframes heroFotoParallax { to { transform: scale(1.045) translateY(-1.2%); } }
+  }
+}
+
+/* ---------- I) "UMA VIDA DEDICADA": TÍTULO ASSENTA AO SOLTAR — TESTE ----------
+   .col-label já fica sticky (≥680px, ver responsivo) enquanto .col-body rola
+   do lado — isso já É o parallax, só faltava acabamento. view-timeline no
+   PRÓPRIO .col-body mede quanto do texto já passou; o título perde um pouco
+   de escala/opacidade conforme se aproxima de soltar, como se assentasse. */
+@media (min-width: 680px) {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .col-body { view-timeline-name: --quemsou-scroll; view-timeline-axis: block; }
+      .col-label {
+        animation: colLabelAssenta linear both;
+        animation-timeline: --quemsou-scroll;
+        animation-range: cover 40% cover 90%;
+      }
+      @keyframes colLabelAssenta { to { transform: scale(.97); opacity: .82; } }
+    }
+  }
+}
