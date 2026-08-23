@@ -19,3 +19,13 @@ scripts
 # aqui faz o sync deixar de enxergar (e de apagar) o que ja esta no
 # destino. Rascunho que ja subiu se limpa ANTES de entrar nesta lista.
 _*
+
+# Saida de auditoria (claude-security), nunca e site.
+CLAUDE-SECURITY-*
+
+# colinha/c/anistaldo e a foto recorte-250002545138.png existem em producao
+# mas nao na copia local (nunca foram versionados) — sem isto o rclone sync
+# --delete apagaria os dois so por estarem ausentes daqui. Ver CLAUDE.md:
+# "sync-colinha.sh tem allowlist", mesma armadilha bilateral.
+colinha/c/anistaldo
+colinha/fotos/recorte-250002545138.png
