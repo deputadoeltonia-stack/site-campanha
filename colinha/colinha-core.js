@@ -25,10 +25,7 @@ export const CANDIDATOS = {
     razao: 'ELEIÇÃO 2026 ELTON ALVES RIBEIRO DE CARVALHO JUNIOR DEPUTADO FEDERAL',
     cnpj: '68.237.359/0001-10',
     foto: 'elton', // fotos/elton.jpg — foto oficial da campanha, nao vem do TSE
-    // A peca impressa dele ja traz o governador (Tarcisio, 10). Fixo, como na
-    // colinha da Dulce: o slot nao existe no estado, entao nao ha caminho de
-    // escrita por URL nem por localStorage. Nome e foto seguem do TSE.
-    fixos: { governador: '10' },
+    // Sem `fixos`: governador destravado, o eleitor escolhe.
   },
   // Numero confirmado pelo santinho impresso 7x10 da campanha (15/08/2026).
   'colinhavirtual.dreltonai.com.br': {
@@ -185,10 +182,9 @@ export const SANTINHOS = {
     fixos: { federal: '4412' },
   },
   // A peca 9x5 do Dr. Elton SOZINHO. Nao e a colinha dele que ja existe em
-  // colinha.drelton4412.com.br: aquela e a peca antiga, de tema claro e com o
-  // governador travado no Tarcisio. Esta deixa TODOS os outros cargos em
-  // branco — inclusive o de governador —, e as duas convivem porque o QR
-  // impresso em julho aponta para a antiga.
+  // colinha.drelton4412.com.br: aquela e a peca antiga, de tema claro. Esta
+  // deixa TODOS os cargos em branco, e as duas convivem porque o QR impresso
+  // em julho aponta para a antiga.
   elton: {
     nome: 'DR. ELTON', cargo: 6, numero: '4412', partido: 'UNIÃO',
     tema: 'santinho', rotulo: 'Deputado federal',
