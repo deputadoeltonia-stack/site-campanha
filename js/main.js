@@ -217,17 +217,17 @@
 
   /* Trajetória: 100% CSS scroll-driven (view-timeline por li) — sem JS.  */
 
-  /* ---------- CTA fixo (mobile): aparece após o hero, some no form ---------- */
+  /* ---------- CTA fixo (mobile): aparece 3s depois de abrir, some no form ----------
+     Era "depois que passa do hero" — trocado por um tempo fixo (a CSS já
+     esconde isto inteiro em desktop, min-width:940px, então só existe aqui
+     no mobile mesmo). */
   var sticky = document.querySelector(".sticky-cta");
-  var hero = document.getElementById("hero");
   var form = document.getElementById("participar");
-  if (sticky && hero && "IntersectionObserver" in window) {
-    var pastHero = false, atForm = false;
-    var update = function () { sticky.classList.toggle("show", pastHero && !atForm); };
-    new IntersectionObserver(function (es) {
-      pastHero = !es[0].isIntersecting; update();
-    }, { threshold: 0 }).observe(hero);
-    if (form) {
+  if (sticky) {
+    var passou3s = false, atForm = false;
+    var update = function () { sticky.classList.toggle("show", passou3s && !atForm); };
+    setTimeout(function () { passou3s = true; update(); }, 3000);
+    if (form && "IntersectionObserver" in window) {
       new IntersectionObserver(function (es) {
         atForm = es[0].isIntersecting; update();
       }, { threshold: 0.1 }).observe(form);
@@ -729,6 +729,27 @@
     var ESPIA_PX = 40;   // só uma tira da fileira seguinte, não ela quase inteira
     var BOTAO_FOLGA = 24;   // espaço reservado abaixo do gradiente, só pro botão descer mais
     var semMovimentoVideo = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // mantém "el" no MESMO pixel da tela enquanto algo ao redor dele muda de
+    // tamanho — usado só ao FECHAR. Sem isto: ou o scroll não se mexe e o
+    // fim da transição solta a pessoa em outro lugar da página (às vezes
+    // literalmente o fim do site, se o scroll antigo não cabe mais no
+    // documento encolhido), ou só corrige no FIM da transição, o que dá um
+    // vai-e-volta visível (desce, espera, volta). Compensando quadro a
+    // quadro, o botão nunca sai do lugar — nem durante, nem depois.
+    var ancorarDurante = function (el, duracaoMs) {
+      var y0 = el.getBoundingClientRect().top;
+      var inicio = null;
+      var passo = function (agora) {
+        if (inicio === null) inicio = agora;
+        var y1 = el.getBoundingClientRect().top;
+        if (y1 !== y0) {
+          window.scrollBy(0, y1 - y0);
+          y0 = el.getBoundingClientRect().top;
+        }
+        if (agora - inicio < duracaoMs) requestAnimationFrame(passo);
+      };
+      requestAnimationFrame(passo);
+    };
     var ajustarGrade = function (grade) {
       // filtra o botão de fora: ele mora DENTRO do grid (pra empilhar sobre o
       // gradiente), mas não é card e não pode entrar na contagem de fileiras
@@ -763,8 +784,12 @@
         btn.setAttribute("aria-expanded", "false");
         btn.setAttribute("aria-controls", grade.id);
         btn.addEventListener("click", function () {
+          var vaiFechar = grade.classList.contains("video-grid-expandido");
           grade.classList.toggle("video-grid-expandido");
           ajustarGrade(grade);
+          // só ao fechar: abrir já se resolve sozinho no transitionend, lá
+          // embaixo (o scrollIntoView de sempre, que a pessoa gostou).
+          if (vaiFechar) ancorarDurante(btn, semMovimentoVideo ? 0 : 340);
         });
         grade.appendChild(btn);   // dentro do grid: em .video-grid-recolhido vira
                                   // position:absolute (CSS) e some do fluxo/colunas

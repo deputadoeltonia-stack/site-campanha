@@ -242,6 +242,19 @@ p { margin: 0 0 1rem; }
   border-radius: 26px 26px 0 0;
   box-shadow: 0 -20px 52px rgba(14, 20, 36, .35);
 }
+/* no celular o hero empilhado (texto + foto) facilmente passa de 1000px —
+   mais alto que a tela. Preso (sticky), só a fatia que cabe na viewport
+   aparece, e o resto da foto fica cortado PRA SEMPRE (não é questão de dar
+   mais tempo de rolagem: testado, a fatia visível não muda nem rolando
+   bastante antes da folha cobrir — ela trava assim que o sticky prende).
+   Sem sticky nesta largura, o efeito de capa não roda no celular (some
+   junto o trilho e a margem que cobriam a capa), mas em compensação a foto
+   fica inteira: o hero volta a ser uma seção comum, que passa quando você
+   rola, como o "degrada sozinho" já previa lá em cima. */
+@media (max-width: 939px) {
+  .capa-trilho { height: 0; }
+  .folha { margin-top: 0; }
+}
 
 /* ---------- hero ---------- */
 /* min-height cheia em QUALQUER largura (não só mobile): sem isto o hero no
@@ -251,6 +264,18 @@ p { margin: 0 0 1rem; }
    site do Tozi). flex + hero-grid com margin-top:auto empurra o conteúdo
    pro rodapé da seção, preenchendo o resto com o fundo escuro. */
 .hero { position: sticky; top: 0; z-index: 0; background: var(--ink); color: var(--surface); overflow: clip; padding-top: clamp(1.5rem, 5vw, 3rem); isolation: isolate; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; } /* clip, não hidden: hidden criaria scroll container e sequestraria scroll()/sticky */
+/* sem sticky aqui: o texto empilhado já quase lota a tela sozinho, então
+   travar a foto junto sempre corta ela — sticky só faz sentido quando o
+   conteúdo cabe (ou quase) numa tela só. Section normal, overflow:clip
+   continua (não é overflow:hidden, então os scroll(root) acima de mim não
+   quebram) — ver comentário do CAPA+FOLHA logo acima. relative, não static:
+   o véu (::before), o brilho (::after) e o número gigante de fundo são
+   absolute e contam com o .hero pra se ancorar — static tira essa
+   referência e eles vazam pro ancestral posicionado seguinte, cobrindo só
+   um pedaço torto do hero (a "linha" escura no meio da foto). */
+@media (max-width: 939px) {
+  .hero { position: relative; }
+}
 /* véu: a capa escurece conforme a folha a cobre, pra ela recuar em vez de só
    "sumir atrás". Sem gate de reduced-motion: opacidade ligada 1:1 ao gesto de
    rolagem, não é movimento autônomo (mesma regra da régua de leitura, "B"). */
@@ -548,7 +573,10 @@ p { margin: 0 0 1rem; }
   .material-card { grid-template-columns: 1.2fr auto; }
   .material-ballot { align-items: flex-end; }
 }
-.video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+/* overflow-anchor:none evita o navegador "compensar" a rolagem sozinho
+   enquanto o max-height anima (scroll anchoring) — sem isso o fechar dava
+   um tranco antes de acomodar no lugar certo. */
+.video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; overflow-anchor: none; }
 .video-card { margin: 0; border-radius: 14px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
 .video-card video { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: var(--ink); }
 .video-card figcaption { padding: .75rem .95rem .9rem; display: flex; flex-direction: column; gap: .35rem; }
@@ -794,8 +822,8 @@ p { margin: 0 0 1rem; }
 }
 
 /* ---------- CTA fixo (mobile) ---------- */
-.sticky-cta { position: fixed; left: max(1rem, env(safe-area-inset-left)); right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); z-index: var(--z-cta); display: flex; align-items: center; justify-content: center; padding: 1rem; border-radius: 14px; background: var(--gold); color: #241703; font-family: var(--body); font-weight: 500; text-decoration: none; box-shadow: 0 14px 34px -10px rgba(204, 255, 0,.75); transform: translateY(150%); transition: transform .4s var(--ease); }
-.sticky-cta.show { transform: translateY(0); }
+.sticky-cta { position: fixed; left: max(1rem, env(safe-area-inset-left)); right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); z-index: var(--z-cta); display: flex; align-items: center; justify-content: center; padding: 1rem; border-radius: 14px; background: var(--gold); color: #241703; font-family: var(--body); font-weight: 500; text-decoration: none; box-shadow: 0 14px 34px -10px rgba(204, 255, 0,.75); transform: translateY(150%) scale(.92); opacity: 0; transition: transform .5s var(--ease), opacity .4s var(--ease); }
+.sticky-cta.show { transform: translateY(0) scale(1); opacity: 1; }
 
 /* =========================================================
    MOTION — gated por .js (sem JS/headless: tudo visível)

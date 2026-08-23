@@ -198,6 +198,54 @@ button { font: inherit; }
    hint de apresentação com um height fixo — sem isto aqui o aspect-ratio é
    ignorado e a capa aparece inteira, sem cortar em 3/4. */
 .indice-card img { width: 100%; height: auto; aspect-ratio: 3/4; object-fit: cover; background: var(--ink); }
+/* recorte 3:4 mostrando o topo da pagina (cabecalho do PDF), nao o centro —
+   so onde o preview e de um documento (Emendas), sem mexer no tamanho. */
+.indice-card img.topo { object-position: top; }
 .indice-card-copy { padding: 1.1rem 1.2rem 1.35rem; }
 .indice-card-copy h2 { font-family: var(--display); font-size: 1.15rem; margin: 0 0 .4rem; color: var(--ink); }
 .indice-card-copy p { margin: 0; color: var(--ink-mut); font-size: .88rem; line-height: 1.5; }
+
+/* ---------- índice que cabe na tela (emendas/index.html) ---------- */
+/* No celular: lista horizontal compacta, cada linha dividindo igualmente a
+   altura que sobra do cabecalho. Em telas largas (≥700px): os 3 cards viram
+   colunas lado a lado, cada uma com a imagem esticando (flex) pra preencher
+   a altura da coluna. Os dois casos usam a mesma ideia — height (nao
+   min-height) na .indice-encaixa, senao o flex:1 dos filhos nao tem espaco
+   livre pra distribuir e nada encolhe (mesma razao do .leitor). */
+.indice-encaixa {
+  height: calc(100svh - 61px);
+  display: flex; flex-direction: column;
+  padding: 1.25rem clamp(1rem, 4vw, 2rem) 1rem;
+}
+.indice-encaixa .indice-head { flex: none; margin-bottom: 1rem; }
+.indice-encaixa .indice-head h1 { font-size: clamp(1.4rem, 5vw, 1.8rem); }
+.indice-encaixa .indice-grid {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; flex-direction: column;
+  gap: .6rem;
+}
+.indice-encaixa .indice-card {
+  flex: 1 1 0; min-height: 0;
+  display: flex; flex-direction: row; align-items: stretch;
+}
+.indice-encaixa .indice-card img { width: 30%; max-width: 140px; height: 100%; flex: none; aspect-ratio: auto; }
+.indice-encaixa .indice-card-copy {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: .6rem 1rem;
+}
+.indice-encaixa .indice-card-copy h2 { font-size: .98rem; margin-bottom: .25rem; }
+.indice-encaixa .indice-card-copy p { font-size: .8rem; line-height: 1.35; }
+@media (min-width: 700px) {
+  .indice-encaixa { padding: 1.5rem clamp(1rem, 4vw, 2rem) 1.25rem; }
+  .indice-encaixa .indice-head { margin-bottom: 1.5rem; }
+  .indice-encaixa .indice-head h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
+  .indice-encaixa .indice-grid { flex-direction: row; gap: 1.5rem; }
+  .indice-encaixa .indice-card { flex-direction: column; }
+  /* imagem estica (flex, sem aspect-ratio fixo) pra preencher o que sobrar
+     da coluna depois do texto — e o texto que dita a altura dele mesmo. */
+  .indice-encaixa .indice-card img { width: 100%; max-width: none; height: auto; flex: 1 1 auto; min-height: 0; aspect-ratio: auto; }
+  .indice-encaixa .indice-card-copy { flex: none; padding: 1rem 1.2rem 1.35rem; }
+  .indice-encaixa .indice-card-copy h2 { font-size: 1.1rem; margin-bottom: .35rem; }
+  .indice-encaixa .indice-card-copy p { font-size: .85rem; line-height: 1.45; }
+}
