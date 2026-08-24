@@ -1,0 +1,62 @@
+ESTE ARQUIVO NAO E DEPLOYADO. E para copiar e colar a mao.
+
+Por que: o .htaccess da raiz do public_html e escrito pelo cPanel (regras de PHP,
+redirect de dominio, backups .htaccess.phpupgrader.*). Por isso deploy-hostgator.sh
+o exclui de proposito — sync nele apagaria o que o painel escreveu. Ver o bloco de
+filtros do script.
+
+COMO APLICAR
+  cPanel > Gerenciador de arquivos > public_html > .htaccess > Editar
+  Cola o bloco abaixo NO FIM do arquivo, sem apagar o que ja existe. Salva.
+
+DEPOIS DE APLICAR, CONFERIR
+  curl -sI https://drelton4412.com.br/ | grep -i "content-security\|x-frame\|referrer\|x-content"
+
+  E abre o site no Chrome com o console aberto (F12 > Console). Violacao de CSP
+  aparece la. Em Report-Only ela SO relata, nao bloqueia — e esse o objetivo da
+  primeira semana.
+
+VIRAR BLOQUEIO DE VERDADE
+  Depois de alguns dias sem violacao no console, troca a linha
+  Content-Security-Policy-Report-Only  por  Content-Security-Policy
+  e sobe o max-age do HSTS de 300 para 15552000 (6 meses).
+
+  Nao inverta a ordem: HSTS com max-age longo trava o dominio em HTTPS pelo
+  periodo inteiro. Se o certificado quebrar nesse meio tempo, o site fica
+  inacessivel e nao ha o que fazer do lado do servidor — o navegador do visitante
+  e que se recusa a conectar.
+
+--------------------------------------------------------------------------------
+# ============ SEGURANCA — headers (adicionado 23/08/2026) ============
+<IfModule mod_headers.c>
+
+  # Impede que o site seja embutido em iframe de terceiro (clickjacking).
+  Header always set X-Frame-Options "DENY"
+
+  # Impede o navegador de "adivinhar" tipo de arquivo diferente do declarado.
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Nao vaza o caminho completo da pagina de origem para sites externos.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # O site nao usa camera, microfone nem localizacao. Negar explicitamente
+  # impede que script de terceiro peca por voce.
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+
+  # HSTS com max-age CURTO de proposito (5 min). Ver "VIRAR BLOQUEIO" acima.
+  Header always set Strict-Transport-Security "max-age=300"
+
+  # CSP em Report-Only: relata violacao no console do navegador, nao bloqueia.
+  #
+  #   script-src   'self' + hash do unico script inline do site
+  #                (document.documentElement.classList.add('js'), identico nas
+  #                tres paginas). Sem 'unsafe-inline': script injetado nao roda.
+  #   style-src    precisa de 'unsafe-inline' porque ha atributos style= no HTML.
+  #                Tirar isso exigiria refatorar o markup; nao vale hoje.
+  #   connect-src  script.google.com e o endpoint de leads (Apps Script).
+  #   img-src      data: porque a Colinha gera a imagem do santinho em canvas.
+  #   object-src   'none' e seguro: cartilhas/ e emendas/ renderizam webp
+  #                pre-renderizado, nao <embed> de PDF.
+  Header always set Content-Security-Policy-Report-Only "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'sha256-/x7W7R75k8Roq0WaVRQX9blP4OufE5xbAdzklGxsgpw='; connect-src 'self' https://script.google.com; form-action 'self'; upgrade-insecure-requests"
+
+</IfModule>

@@ -30,4 +30,19 @@
   </FilesMatch>
 </IfModule>
 
+# As 2.565 fotos de fotos/ vem do TSE e sao de candidatos de todos os partidos.
+# O <meta name="robots" content="noindex"> do index.html cobre SO aquele
+# documento: arquivo servido direto (fotos/250002530091.jpg) nao passa por HTML
+# nenhum, entao so o cabecalho HTTP alcanca. Sem isto, foto de adversario fica
+# elegivel para o Google Imagens sob o dominio da campanha, em ano eleitoral.
+#
+# noindex e nao Disallow no robots.txt de proposito: Disallow impediria o
+# proprio Google de LER este noindex, e URL bloqueada por robots pode acabar
+# indexada assim mesmo se alguem apontar link para ela.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(jpg|jpeg|png|webp)$">
+    Header set X-Robots-Tag "noindex"
+  </FilesMatch>
+</IfModule>
+
 DirectoryIndex index.html

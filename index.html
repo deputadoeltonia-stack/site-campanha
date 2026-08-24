@@ -33,6 +33,43 @@
 
   <link rel="stylesheet" href="css/style.css?v=91" />
   <script>document.documentElement.classList.add('js');</script>
+
+  <!-- Dados estruturados. "Dr. Elton" e nome ambiguo: ha outros medicos e
+       politicos com ele. O sameAs amarra este dominio aos perfis que ja tem
+       historico e seguidor, e e assim que o Google entende que sao a mesma
+       pessoa. Para o circuito fechar, os perfis precisam apontar de volta para
+       o site: link de saida sozinho nao prova nada. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://drelton4412.com.br/#pessoa",
+        "name": "Dr. Elton",
+        "jobTitle": "Deputado Estadual de São Paulo",
+        "description": "Médico e deputado estadual de São Paulo, candidato a Deputado Federal pelo número 4412.",
+        "url": "https://drelton4412.com.br/",
+        "image": "https://drelton4412.com.br/public/assets/og-image.png?v=2",
+        "affiliation": { "@type": "Organization", "name": "União Progressista" },
+        "sameAs": [
+          "https://www.instagram.com/dreltonjr",
+          "https://www.facebook.com/dreltonjr/",
+          "https://www.youtube.com/dreltonjr"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://drelton4412.com.br/#site",
+        "url": "https://drelton4412.com.br/",
+        "name": "Dr. Elton — Deputado Federal 4412",
+        "inLanguage": "pt-BR",
+        "about": { "@id": "https://drelton4412.com.br/#pessoa" },
+        "publisher": { "@id": "https://drelton4412.com.br/#pessoa" }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
