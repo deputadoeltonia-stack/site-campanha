@@ -27,7 +27,11 @@
  */
 
 var ABA = 'Leads';   // destino padrão (site do Dr. Elton)
-var CABECALHO = ['Data', 'Nome', 'Telefone', 'Consentimento LGPD', 'Origem'];
+// "Versao do consentimento" e a ultima coluna de proposito: as abas que ja
+// existem tem 5 colunas, e acrescentar no fim deixa as linhas antigas intactas
+// (celula F vazia = lead anterior a 23/08/2026). Inserir no meio embaralharia
+// tudo o que ja foi coletado.
+var CABECALHO = ['Data', 'Nome', 'Telefone', 'Consentimento LGPD', 'Origem', 'Versao do consentimento'];
 
 /**
  * Uma planilha atende mais de um site: o campo `origem` do lead decide a aba.
@@ -45,8 +49,24 @@ function setup() {
   for (var i = 0; i < abas.length; i++) {
     var sh = planilhaPorNome_(abas[i]);
     if (sh.getLastRow() === 0) sh.appendRow(CABECALHO);
+    else corrigirCabecalho_(sh);   // aba antiga: completa as colunas novas
     sh.setFrozenRows(1);
   }
+}
+
+/**
+ * As abas criadas antes de 23/08/2026 tem 5 colunas. Sem isto, a coluna F
+ * receberia dado com o titulo em branco. Mexe SO na linha 1 — nenhum lead ja
+ * gravado e tocado. Rodar `setup` de novo depois de publicar e seguro e e o
+ * que aplica esta correcao.
+ */
+function corrigirCabecalho_(sh) {
+  var atual = sh.getRange(1, 1, 1, sh.getMaxColumns()).getValues()[0];
+  var precisa = false;
+  for (var i = 0; i < CABECALHO.length; i++) {
+    if (String(atual[i] || '') !== CABECALHO[i]) { precisa = true; break; }
+  }
+  if (precisa) sh.getRange(1, 1, 1, CABECALHO.length).setValues([CABECALHO]);
 }
 
 function planilhaPorNome_(nome) {
@@ -178,7 +198,12 @@ function doPost(e) {
         seguro_(v.nome),
         "'" + v.telefone,   // apóstrofo: senão o Sheets come o zero do DDD
         'SIM',              // validar_ já rejeita quem não consentiu
-        seguro_(origem)
+        seguro_(origem),
+        // Versão do texto que a pessoa marcou. Vazio = lead de site que ainda
+        // não manda o campo (Tozi e Dulce até publicarem), ou anterior a
+        // 23/08/2026. Não exigir o campo é deliberado: exigi-lo mataria a
+        // captação dos outros dois sites, mesma razão do honeypot.
+        seguro_(String(d.politica_versao || '').slice(0, 40))
       ]);
     } finally {
       lock.releaseLock();

@@ -23,6 +23,17 @@ _*
 # Saida de auditoria (claude-security), nunca e site.
 CLAUDE-SECURITY-*
 
+# Documentacao interna. Ficou publica em drelton4412.com.br/CLAUDE.md por um
+# dia: nao vazou credencial, mas entregava o usuario do cPanel, como o deploy
+# funciona, que os tres sites dividem o mesmo endpoint de lead e que o
+# formulario nao tem protecao contra bot alem do honeypot — roteiro pronto para
+# quem quisesse atacar.
+#
+# Apagado do servidor A MAO antes de entrar nesta lista: o filtro vale para os
+# dois lados, entao adiciona-lo primeiro faria o sync deixar de enxergar (e de
+# apagar) o que ja estava no destino. Mesma armadilha do _probe.html.
+CLAUDE.md
+
 # colinha/c/anistaldo e a foto recorte-250002545138.png existem em producao
 # mas nao na copia local (nunca foram versionados) — sem isto o rclone sync
 # --delete apagaria os dois so por estarem ausentes daqui. Ver CLAUDE.md:

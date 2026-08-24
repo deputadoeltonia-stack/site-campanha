@@ -23,6 +23,12 @@
   var WHATSAPP_BOT = "5512988604385";
   var WHATSAPP_MSG = "Quero começar nessa jornada!";
 
+  // Versão do texto de consentimento que a pessoa marca no formulário. Vai
+  // gravada junto com o lead: sem ela a planilha diz "SIM" sem dizer sim a
+  // quê, e uma mudança no texto apaga a prova do que foi aceito.
+  // TROQUE ESTA DATA sempre que mexer no texto do checkbox ou na Política.
+  var POLITICA_VERSAO = "2026-08-23";
+
   /* ---------- page-load orquestrado (dispara animações .load/.hero-photo) ---------- */
   var root = document.documentElement;
   requestAnimationFrame(function () {
@@ -416,6 +422,7 @@
       // honeypot vai junto: a checagem do navegador é só UX, quem posta direto
       // no endpoint pula ela. Quem decide de verdade é o doPost.
       site: hp,
+      politica_versao: POLITICA_VERSAO,
       data: new Date().toISOString()
     };
 
