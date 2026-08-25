@@ -204,6 +204,11 @@ button { font: inherit; }
 .indice-card-copy { padding: 1.1rem 1.2rem 1.35rem; }
 .indice-card-copy h2 { font-family: var(--display); font-size: 1.15rem; margin: 0 0 .4rem; color: var(--ink); }
 .indice-card-copy p { margin: 0; color: var(--ink-mut); font-size: .88rem; line-height: 1.5; }
+/* card fora do ar, temporário: sem imagem (é a própria página com o
+   problema) e sem link — só o rótulo "Em breve". */
+.indice-card-em-breve { opacity: .62; cursor: default; }
+.indice-card-em-breve:hover { transform: none; box-shadow: none; }
+.indice-card-em-breve .indice-card-copy { padding: 1.75rem 1.2rem; }
 
 /* ---------- índice que cabe na tela (emendas/index.html) ---------- */
 /* No celular: lista horizontal compacta, cada linha dividindo igualmente a

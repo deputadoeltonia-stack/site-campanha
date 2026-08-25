@@ -565,6 +565,11 @@ p { margin: 0 0 1rem; }
   transition: transform .18s var(--ease), box-shadow .25s var(--ease);
 }
 .material-card:hover { transform: translateY(-3px); box-shadow: 0 22px 44px -20px rgba(14,20,36,.6); }
+/* card fora do ar, temporário: mesma vitrine, sem link — opacidade reduzida
+   avisa "não clica" antes mesmo de tentar. */
+.material-card-em-breve { opacity: .62; }
+.material-card-em-breve:hover { transform: none; box-shadow: none; }
+.material-card-em-breve .btn { pointer-events: none; }
 .material-card h3 { font-family: var(--display); font-size: var(--step-2); margin: 0 0 .6rem; }
 .material-card .prose { color: var(--paper-txt); max-width: 46ch; margin-bottom: 1.4rem; }
 .material-ballot { display: flex; flex-direction: column; gap: .5rem; align-items: flex-start; margin: 0; }
