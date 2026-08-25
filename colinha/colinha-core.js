@@ -34,9 +34,9 @@ export const CANDIDATOS = {
     razao: 'ELEIÇÃO 2026 LUIZ ANTONIO TOZI DEPUTADO ESTADUAL',
     cnpj: '68.283.009/0001-90',
     foto: 'tozi',
-    // A peca conjunta dele traz o Dr. Elton e o governador impressos, igual a
-    // da Dulce — e fixos pelo mesmo motivo: o eleitor nao muda nenhum dos dois.
-    fixos: { federal: '4412', governador: '10' },
+    // A peca conjunta dele traz o Dr. Elton impresso — fixo pelo mesmo
+    // motivo da Dulce, o eleitor nao muda esse. Governador destravado.
+    fixos: { federal: '4412' },
   },
   // O site do Tozi embute a colinha em /colinha/ (site-tozi, deploy Vercel).
   // Sem estes aliases o hostname dele cairia no PADRAO e abriria a colinha
