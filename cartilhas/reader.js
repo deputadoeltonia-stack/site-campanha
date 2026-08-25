@@ -19,6 +19,7 @@
   var btnNext = document.getElementById("btn-next");
   var indicador = document.getElementById("indicador");
   var btnCompartilhar = document.getElementById("btn-compartilhar");
+  var btnTelaCheia = document.getElementById("btn-tela-cheia");
   var status = document.getElementById("status");
 
   var reduzMovimento = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -176,6 +177,36 @@
 
   if (btnPrev) btnPrev.hidden = false;
   if (btnNext) btnNext.hidden = false;
+
+  /* ---------- tela cheia ----------
+     Fullscreen só no .leitor-palco (imagem + setas): a navegação (clique,
+     teclado, swipe) já está ligada nele/no document, então continua
+     funcionando igual dentro da tela cheia — nada de reimplementar. Some o
+     botão se o navegador não suportar (ex.: alguns webviews de app). */
+  var pedirTelaCheia = palco.requestFullscreen || palco.webkitRequestFullscreen;
+  var suportaTelaCheia = !!(pedirTelaCheia && (document.fullscreenEnabled || document.webkitFullscreenEnabled));
+  if (btnTelaCheia && suportaTelaCheia) {
+    btnTelaCheia.hidden = false;
+    var elementoTelaCheia = function () {
+      return document.fullscreenElement || document.webkitFullscreenElement;
+    };
+    // o ícone troca via CSS (aria-pressed), não o texto — o botão é o
+    // quadrado sobre a própria página, não teria onde mostrar rótulo.
+    var atualizarRotulo = function () {
+      var ativo = elementoTelaCheia() === palco;
+      btnTelaCheia.setAttribute("aria-pressed", ativo ? "true" : "false");
+      btnTelaCheia.setAttribute("aria-label", ativo ? "Sair da tela cheia" : "Tela cheia");
+    };
+    btnTelaCheia.addEventListener("click", function () {
+      if (elementoTelaCheia()) {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      } else {
+        (palco.requestFullscreen || palco.webkitRequestFullscreen).call(palco);
+      }
+    });
+    document.addEventListener("fullscreenchange", atualizarRotulo);
+    document.addEventListener("webkitfullscreenchange", atualizarRotulo);
+  }
 
   var larguraAtual = window.innerWidth, remedir;
   window.addEventListener("resize", function () {

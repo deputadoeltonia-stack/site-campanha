@@ -155,6 +155,44 @@ button { font: inherit; }
    lugar toda vez que o modo mudava entre 1 página (capa) e 2 (spread),
    já que cada um tem uma largura de conteúdo diferente. */
 .leitor-palco { position: relative; touch-action: pan-y; flex: 1 1 auto; min-height: 160px; }
+/* tela cheia: o navegador só garante que o elemento preenche a tela, não
+   centraliza o conteúdo dele — sem isto a página ficava colada no canto. */
+.leitor-palco:fullscreen,
+.leitor-palco:-webkit-full-screen {
+  width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--ink);
+}
+.leitor-palco:fullscreen .leitor-paginas,
+.leitor-palco:-webkit-full-screen .leitor-paginas { height: 92%; }
+.leitor-palco:fullscreen .pagina.ativa img,
+.leitor-palco:-webkit-full-screen .pagina.ativa img { max-height: 100%; max-width: 92vw; }
+/* as setas normalmente "furam" a borda da .leitor-palco de propósito (sobra
+   margem em volta dela na página) — em tela cheia não sobra margem nenhuma,
+   então essa mesma posição jogava as setas pra fora da viewport, invisíveis. */
+.leitor-palco:fullscreen .leitor-seta-prev,
+.leitor-palco:-webkit-full-screen .leitor-seta-prev { left: 1rem; }
+.leitor-palco:fullscreen .leitor-seta-next,
+.leitor-palco:-webkit-full-screen .leitor-seta-next { right: 1rem; }
+/* botão de tela cheia: quadrado (não redondo, pra não confundir com as
+   setas) e SOBRE a própria página — no topo, entre "Baixar PDF" e
+   "Compartilhar", ficava perdido e ninguém achava. Em tela cheia de
+   verdade ele continua filho do .leitor-palco, então mantém a posição no
+   canto — é ele mesmo que vira o "x" de sair. */
+.leitor-tela-cheia {
+  display: none;
+  position: absolute; top: .75rem; right: .75rem; z-index: 6;
+  width: 44px; height: 44px; border-radius: 10px; border: none;
+  background: rgba(23, 30, 49, .82); color: var(--surface);
+  cursor: pointer; align-items: center; justify-content: center;
+  transition: background .18s var(--ease);
+}
+.js .leitor-tela-cheia { display: flex; }
+.leitor-tela-cheia:hover { background: var(--ink); }
+.leitor-tela-cheia svg { width: 22px; height: 22px; }
+.leitor-tela-cheia .icone-fechar { display: none; }
+.leitor-tela-cheia[aria-pressed="true"] .icone-expandir { display: none; }
+.leitor-tela-cheia[aria-pressed="true"] .icone-fechar { display: block; }
 .leitor-seta {
   display: none;
   position: absolute; top: 50%; transform: translateY(-50%);

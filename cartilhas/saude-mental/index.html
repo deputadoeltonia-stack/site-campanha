@@ -3,25 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cartilha de Conscientização sobre o Suicídio — Em breve — Dr. Elton</title>
-  <meta name="description" content="Cartilha de conscientização sobre o suicídio. Em breve." />
-  <meta name="robots" content="noindex" />
+  <title>Cartilha de Conscientização sobre o Suicídio — Dr. Elton</title>
+  <meta name="description" content="Cartilha de conscientização sobre o suicídio: dados, sinais de alerta e como ajudar. Se precisar, ligue 188 (CVV). Leia online ou baixe o PDF." />
 
-  <meta property="og:title" content="Cartilha de Conscientização sobre o Suicídio — Em breve" />
-  <meta property="og:description" content="Em breve." />
-  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Cartilha de Conscientização sobre o Suicídio" />
+  <meta property="og:description" content="Dados, sinais de alerta e como ajudar quem está em sofrimento emocional. CVV: ligue 188." />
+  <meta property="og:type" content="article" />
   <meta property="og:locale" content="pt_BR" />
   <meta property="og:url" content="https://drelton4412.com.br/cartilhas/saude-mental/" />
-  <meta property="og:image" content="https://drelton4412.com.br/public/assets/og-image.png?v=2" />
+  <meta property="og:image" content="https://drelton4412.com.br/public/assets/cartilhas/saude-mental/og.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Capa da cartilha de Conscientização sobre o Suicídio" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="theme-color" content="#171E31" />
 
   <link rel="icon" href="/public/assets/favicon.svg" type="image/svg+xml" />
   <link rel="canonical" href="https://drelton4412.com.br/cartilhas/saude-mental/" />
 
-  <link rel="stylesheet" href="/cartilhas/style.css?v=7" />
+  <link rel="stylesheet" href="/cartilhas/style.css?v=10" />
+  <script>document.documentElement.classList.add('js');</script>
 </head>
 <body data-slug="saude-mental">
 
@@ -30,14 +31,52 @@
       <svg viewBox="0 0 10 16" aria-hidden="true"><path d="M8 1 L2 8 L8 15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Cartilhas
     </a>
+    <div class="leitor-topo-acoes">
+      <a class="btn btn-gold" id="btn-baixar" href="/public/cartilhas-pdf/saude-mental.pdf" download>Baixar PDF</a>
+      <button class="btn btn-ghost" id="btn-compartilhar" type="button" hidden>Compartilhar</button>
+    </div>
   </header>
 
-  <main class="indice">
-    <div class="indice-head">
-      <h1>Em breve</h1>
-      <p>Essa cartilha está sendo atualizada. Volte em breve.</p>
+  <main class="leitor" aria-label="Cartilha de Conscientização sobre o Suicídio">
+    <h1 class="leitor-titulo">Cartilha de Conscientização sobre o Suicídio</h1>
+
+    <div class="leitor-palco" id="palco">
+      <button class="leitor-tela-cheia" id="btn-tela-cheia" type="button" aria-label="Tela cheia" aria-pressed="false" hidden>
+        <svg class="icone-expandir" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg class="icone-fechar" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="leitor-seta leitor-seta-prev" id="btn-prev" type="button" aria-label="Página anterior" hidden>&lsaquo;</button>
+
+      <div class="leitor-paginas" id="paginas">
+        <figure class="pagina" data-n="1"><img src="/public/assets/cartilhas/saude-mental/pagina-01.webp" alt="Capa: cartilha de conscientização sobre o suicídio — ilustração de uma pessoa segurando um guarda-chuva protegendo uma criança da chuva, Dr. Elton, deputado federal 4412" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="2"><img src="/public/assets/cartilhas/saude-mental/pagina-02.webp" alt="Página 2: informação pode salvar vidas — por que falar sobre suicídio é importante e como a informação ajuda na prevenção" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="3"><img src="/public/assets/cartilhas/saude-mental/pagina-03.webp" alt="Página 3: dados sobre suicídio — segundo a OMS, cerca de 800 mil mortes por ano no mundo; no Brasil, 17.002 mortes em 2023, uma a cada 31 minutos; tabela com óbitos no Brasil, São Paulo e São José dos Campos" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="4"><img src="/public/assets/cartilhas/saude-mental/pagina-04.webp" alt="Página 4: alguns números — 8 dados estatísticos sobre suicídio no Brasil, faixa etária de maior risco e aumento das taxas entre jovens e mulheres" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="5"><img src="/public/assets/cartilhas/saude-mental/pagina-05.webp" alt="Página 5: saiba o que é mito e o que é verdade sobre suicídio — quadro comparativo, como avisos prévios e possibilidade de prevenção" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="6"><img src="/public/assets/cartilhas/saude-mental/pagina-06.webp" alt="Página 6: frases que são sinais da intenção de se matar — lista de frases de alerta como 'eu quero morrer' ou 'vou me matar'" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="7"><img src="/public/assets/cartilhas/saude-mental/pagina-07.webp" alt="Página 7: redes sociais podem dar dicas de quem precisa de ajuda — exemplos de mensagens de alerta e recomendação de acompanhar o uso de telas por crianças e jovens" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="8"><img src="/public/assets/cartilhas/saude-mental/pagina-08.webp" alt="Página 8: conheça os principais fatores de risco — histórico de tentativa anterior, transtorno mental associado, abuso de álcool e drogas, isolamento social" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="9"><img src="/public/assets/cartilhas/saude-mental/pagina-09.webp" alt="Página 9: Dr. Elton — 'Cuidar de pessoas não é apenas a minha profissão. É a missão que escolhi para a vida'; trajetória de médico há 25 anos a deputado federal 4412" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="10"><img src="/public/assets/cartilhas/saude-mental/pagina-10.webp" alt="Página 10: compromisso — combater as bets como defesa da saúde mental e do equilíbrio financeiro das famílias, bandeira do Dr. Elton, candidato a deputado federal" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="11"><img src="/public/assets/cartilhas/saude-mental/pagina-11.webp" alt="Página 11: veja outras propostas do Dr. Elton com São Paulo, 4412 — planos de saúde, medicamentos de alto custo, diabetes e prevenção a desastres naturais" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="12"><img src="/public/assets/cartilhas/saude-mental/pagina-12.webp" alt="Página 12: ações que salvam vidas — palestras de prevenção ao suicídio, projeto de lei de grades de proteção em passarelas e o livro A Divina Dopamina do Dr. Elton" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="13"><img src="/public/assets/cartilhas/saude-mental/pagina-13.webp" alt="Página 13: alguns eventos negativos podem ser fatores desencadeadores — problemas familiares, perdas, bullying, desemprego, entre outros" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="14"><img src="/public/assets/cartilhas/saude-mental/pagina-14.webp" alt="Página 14: fatores de proteção que variam de pessoa para pessoa — os 4 primeiros dos 10 principais, como rede de apoio emocional e acesso a tratamento" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="15"><img src="/public/assets/cartilhas/saude-mental/pagina-15.webp" alt="Página 15: mais fatores de proteção — do 5º ao 10º, estabilidade de vida, restrição de acesso a meios letais e ambiente familiar acolhedor" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="16"><img src="/public/assets/cartilhas/saude-mental/pagina-16.webp" alt="Página 16: transtornos mentais e suicídio — mais de 90% das pessoas que cometeram suicídio tinham diagnóstico psiquiátrico; tabela com os diagnósticos mais frequentes" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="17"><img src="/public/assets/cartilhas/saude-mental/pagina-17.webp" alt="Página 17: a depressão e o suicídio — risco ao longo da vida em pacientes deprimidos e os subgrupos de maior risco" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="18"><img src="/public/assets/cartilhas/saude-mental/pagina-18.webp" alt="Página 18: fique atento aos sinais — 8 sinais de alerta e o que não se deve dizer para quem está em sofrimento" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="19"><img src="/public/assets/cartilhas/saude-mental/pagina-19.webp" alt="Página 19: como eu posso ajudar — remova o acesso a meios de risco, mantenha a pessoa monitorada, ofereça apoio emocional; CVV, ligue 188, 24 horas" width="1100" height="1561" loading="lazy" /></figure>
+        <figure class="pagina" data-n="20"><img src="/public/assets/cartilhas/saude-mental/pagina-20.webp" alt="Contracapa: mais de 150 mil cartilhas distribuídas — como votar no Dr. Elton, deputado federal, número 4412" width="1100" height="1561" loading="lazy" /></figure>
+      </div>
+
+      <button class="leitor-seta leitor-seta-next" id="btn-next" type="button" aria-label="Próxima página" hidden>&rsaquo;</button>
     </div>
+
+    <p class="leitor-indicador" id="indicador">Página 1 de 20</p>
+    <p class="sr-only" id="status" aria-live="polite"></p>
   </main>
 
+  <script src="/cartilhas/reader.js?v=3" defer></script>
 </body>
 </html>

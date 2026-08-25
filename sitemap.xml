@@ -2,8 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://drelton4412.com.br/</loc><priority>1.0</priority></url>
   <url><loc>https://drelton4412.com.br/privacidade/</loc><priority>0.3</priority></url>
+  <url><loc>https://drelton4412.com.br/cartilhas/</loc><priority>0.5</priority></url>
+  <url><loc>https://drelton4412.com.br/cartilhas/saude-mental/</loc><priority>0.5</priority></url>
   <url><loc>https://drelton4412.com.br/emendas/</loc><priority>0.5</priority></url>
   <url><loc>https://drelton4412.com.br/emendas/vale/</loc><priority>0.5</priority></url>
   <url><loc>https://drelton4412.com.br/emendas/sp/</loc><priority>0.5</priority></url>
   <url><loc>https://drelton4412.com.br/emendas/sjc/</loc><priority>0.5</priority></url>
+  <url><loc>https://drelton4412.com.br/revista/</loc><priority>0.5</priority></url>
+  <url><loc>https://drelton4412.com.br/jornal/</loc><priority>0.5</priority></url>
+  <url><loc>https://drelton4412.com.br/propostas/</loc><priority>0.5</priority></url>
+  <url><loc>https://drelton4412.com.br/conquistas/</loc><priority>0.5</priority></url>
 </urlset>
